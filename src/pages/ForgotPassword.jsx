@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Send, ShieldCheck } from 'lucide-react';
-import { AuthLayout } from './layout/AuthLayout';
-import { AuthInput } from './ui/AuthInput';
-import { AuthButton } from './ui/AuthButton';
+import { AuthLayout } from '../components/layout/AuthLayout';
+import { AuthInput } from '../components/ui/AuthInput';
+import { AuthButton } from '../components/ui/AuthButton';
 
+//pagina para recuperar contraseña (enviar correo)
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
 
@@ -14,7 +15,8 @@ const ForgotPassword = () => {
   };
 
   return (
-    <AuthLayout 
+    //reutilizamos el layout con otras propiedades
+    <AuthLayout
       brandTitle="Recuperar Acceso"
       brandSubtitle="Sistema de diagnóstico ExperTrack"
       showDivider={false}
@@ -25,7 +27,7 @@ const ForgotPassword = () => {
       </div>
 
       <form onSubmit={handleResetPassword} className="login-form">
-        <AuthInput 
+        <AuthInput
           label="Correo electrónico"
           icon={Mail}
           type="email"

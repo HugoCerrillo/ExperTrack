@@ -6,22 +6,23 @@ import itlLogo from '../../assets/img/itl.png';
 export const InstitutionalHeader = () => {
   return (
     <header className="institutional-header">
-      {/* Contenedor de logos alineados a la izquierda */}
+      {/* Contenedor de logos alineados a la izquierda 
+      para el header de las paginas antes de iniciar sesión*/}
       <div className="header-logos-container">
-        <img 
-          src={sepLogo} 
-          alt="Secretaría de Educación Pública" 
-          className="header-logo sep-logo" 
+        <img
+          src={sepLogo}
+          alt="Secretaría de Educación Pública"
+          className="header-logo sep-logo"
         />
-        <img 
-          src={tecnmLogo} 
-          alt="Tecnológico Nacional de México" 
-          className="header-logo tecnm-logo" 
+        <img
+          src={tecnmLogo}
+          alt="Tecnológico Nacional de México"
+          className="header-logo tecnm-logo"
         />
-        <img 
-          src={itlLogo} 
-          alt="Instituto Tecnológico de La Laguna" 
-          className="header-logo itl-logo" 
+        <img
+          src={itlLogo}
+          alt="Instituto Tecnológico de La Laguna"
+          className="header-logo itl-logo"
         />
       </div>
     </header>

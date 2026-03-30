@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, Key, ShieldCheck } from 'lucide-react';
-import { AuthLayout } from './layout/AuthLayout';
-import { AuthInput } from './ui/AuthInput';
-import { AuthButton } from './ui/AuthButton';
+import { AuthLayout } from '../components/layout/AuthLayout';
+import { AuthInput } from '../components/ui/AuthInput';
+import { AuthButton } from '../components/ui/AuthButton';
 import '../assets/styles/reset-password.css'; // Estilos totalmente separados
 
+//pagina para restablecer la contraseña
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -16,7 +17,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <AuthLayout 
+    <AuthLayout
       brandTitle="Restablecer Contraseña"
       brandSubtitle="Sistema de diagnóstico ExperTrack"
       showDivider={false}
@@ -27,8 +28,8 @@ const ResetPassword = () => {
       </div>
 
       <form onSubmit={handleResetPassword} className="login-form reset-form-layout">
-        
-        <AuthInput 
+
+        <AuthInput
           label="Nueva Contraseña"
           icon={Lock}
           type="password"
@@ -37,7 +38,7 @@ const ResetPassword = () => {
           placeholder="********"
         />
 
-        <AuthInput 
+        <AuthInput
           label="Confirmar Contraseña"
           icon={Lock}
           type="password"

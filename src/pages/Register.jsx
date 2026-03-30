@@ -1,41 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { User, Phone, Mail, Lock, ArrowRight } from 'lucide-react';
-import { AuthLayout } from './layout/AuthLayout';
-import { AuthInput } from './ui/AuthInput';
-import { AuthButton } from './ui/AuthButton';
+import { AuthLayout } from '../components/layout/AuthLayout';
+import { AuthInput } from '../components/ui/AuthInput';
+import { AuthButton } from '../components/ui/AuthButton';
+import { useRegister } from '../hooks/back_register';
 
+//pagina para realizar el registro al sistema
 const Register = () => {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
-    telefono: '',
-    correo: '',
-    contrasena: ''
-  });
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleRegister = (e) => {
-    e.preventDefault();
-    console.log('Registro intent:', formData);
-  };
+  //recibimos los datos del hook correspondiente
+  const { formData, handleChange, handleRegister } = useRegister();
 
   return (
-    <AuthLayout 
+    <AuthLayout
       brandTitle="Crear Cuenta"
       brandSubtitle="Solicitud de acceso al sistema ExperTrack"
       showDivider={false}
     >
       <form onSubmit={handleRegister} className="login-form">
-        
-        <AuthInput 
+
+        <AuthInput
           label="Nombre"
           icon={User}
           type="text"
@@ -43,9 +27,10 @@ const Register = () => {
           value={formData.nombre}
           onChange={handleChange}
           placeholder="Ingresa tu nombre"
+          maxLength="50"
         />
 
-        <AuthInput 
+        <AuthInput
           label="Apellido Paterno"
           icon={User}
           type="text"
@@ -53,19 +38,22 @@ const Register = () => {
           value={formData.apellidoPaterno}
           onChange={handleChange}
           placeholder="Ingresa tu apellido"
+          maxLength="50"
         />
 
-        <AuthInput 
+        <AuthInput
           label="Apellido Materno"
           icon={User}
           type="text"
           name="apellidoMaterno"
           value={formData.apellidoMaterno}
           onChange={handleChange}
-          placeholder="Ingresa tu apellido"
+          placeholder="Ingresa tu apellido (Opcional)"
+          required={false}
+          maxLength="50"
         />
 
-        <AuthInput 
+        <AuthInput
           label="Teléfono"
           icon={Phone}
           type="tel"
@@ -73,9 +61,10 @@ const Register = () => {
           value={formData.telefono}
           onChange={handleChange}
           placeholder="10 dígitos"
+          maxLength="10"
         />
 
-        <AuthInput 
+        <AuthInput
           label="Correo electrónico"
           icon={Mail}
           type="email"
@@ -85,7 +74,7 @@ const Register = () => {
           placeholder="ejemplo@correo.com"
         />
 
-        <AuthInput 
+        <AuthInput
           label="Contraseña"
           icon={Lock}
           type="password"

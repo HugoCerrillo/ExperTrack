@@ -1,18 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { LogIn, Mail, Lock } from 'lucide-react';
-import { AuthLayout } from './layout/AuthLayout';
-import { AuthInput } from './ui/AuthInput';
-import { AuthButton } from './ui/AuthButton';
+import { AuthLayout } from '../components/layout/AuthLayout';
+import { AuthInput } from '../components/ui/AuthInput';
+import { AuthButton } from '../components/ui/AuthButton';
+import { useLogin } from '../hooks/back_login';
 
+//pagina para iniciar sesion
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Login intent:', { email, password });
-  };
+  //recibimos los datos del hook correspondiente 
+  const {
+    email,
+    setEmail,
+    password,
+    setPassword,
+    handleLogin
+  } = useLogin();
 
   return (
     <AuthLayout title="ACCESO AL SISTEMA">

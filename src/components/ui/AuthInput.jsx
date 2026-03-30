@@ -1,6 +1,8 @@
 import React from 'react';
 
-export const AuthInput = ({ label, icon: Icon, type = 'text', name, value, onChange, placeholder, required = true }) => {
+{/* Input que se reutiliza en las paginas
+      diferentes antes de iniciar sesión*/}
+export const AuthInput = ({ label, icon: Icon, type = 'text', name, value, onChange, placeholder, required = true, ...props }) => {
   return (
     <div className="input-group">
       <label>{label}</label>
@@ -13,6 +15,7 @@ export const AuthInput = ({ label, icon: Icon, type = 'text', name, value, onCha
           onChange={onChange}
           placeholder={placeholder}
           required={required}
+          {...props}
         />
       </div>
     </div>
