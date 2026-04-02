@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, Send, ShieldCheck } from 'lucide-react';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { AuthInput } from '../components/ui/AuthInput';
 import { AuthButton } from '../components/ui/AuthButton';
 
+import { useForgotPassword } from '../hooks/back_forgot_password';
+
 //pagina para recuperar contraseña (enviar correo)
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
-
-  const handleResetPassword = (e) => {
-    e.preventDefault();
-    console.log('Recuperar contraseña para:', email);
-  };
+  // Conectamos la interfaz visual con el "hook cerebro"
+  const { email, setEmail, handleResetPassword, isLoading } = useForgotPassword();
 
   return (
     //reutilizamos el layout con otras propiedades

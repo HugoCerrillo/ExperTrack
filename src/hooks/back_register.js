@@ -86,7 +86,7 @@ export function useRegister() {
             });
 
             //hacemos la peticion al backend con los datos del formulario
-            const response = await fetch('http://18.207.179.123:5000/register', {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

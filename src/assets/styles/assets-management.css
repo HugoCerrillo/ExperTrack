@@ -1,0 +1,129 @@
+/* src/assets/styles/assets-management.css */
+
+/* Hereda el 95% de su comportamiento del users.css para mantener constancia visual total */
+
+.section-divider {
+  margin: 2.5rem 0 1.5rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(80, 75, 56, 0.1);
+  color: var(--color-olive-dark);
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  grid-column: 1 / -1; /* Atraviesa toda la grid */
+}
+
+/* Tarjetas Sub-internas para Periféricos Embebidos */
+.peripheral-card {
+  background-color: #fafafa;
+  border: 1px solid rgba(80, 75, 56, 0.15);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  transition: box-shadow 0.2s;
+  grid-column: 1 / -1; /* Ocupa todo el modal de lado a lado */
+}
+
+.peripheral-card:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.peripheral-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  color: var(--color-olive-dark);
+  font-size: 1.05rem;
+}
+
+.btn-remove-peripheral {
+  background: rgba(248, 81, 73, 0.1);
+  color: #f85149;
+  border: none;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-remove-peripheral:hover {
+  background: #f85149;
+  color: #FFF;
+}
+
+.btn-add-peripheral {
+  background: none;
+  border: 2px dashed rgba(80, 75, 56, 0.3);
+  color: var(--color-olive-dark);
+  padding: 1.25rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  transition: all 0.2s;
+  margin-top: 0.5rem;
+  grid-column: 1 / -1;
+}
+
+.btn-add-peripheral:hover {
+  background: rgba(185, 178, 138, 0.15);
+  border-color: var(--color-khaki);
+  color: var(--color-khaki);
+}
+
+/* Badges específicos para el Tipo de Activo */
+.asset-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.asset-type-laptop {
+  background-color: #e0e7ff; 
+  color: #3730a3;
+}
+
+.asset-type-pc {
+  background-color: #fce7f3; 
+  color: #9d174d;
+}
+
+/* Celdas densas de la tabla de Activos */
+.specs-text {
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.2rem;
+}
+
+.asset-main-title {
+  font-weight: 700;
+  color: var(--color-olive-dark);
+  font-size: 1rem;
+}
+
+.asset-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-khaki);
+  font-weight: 600;
+}

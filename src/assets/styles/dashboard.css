@@ -1,0 +1,413 @@
+/* src/assets/styles/dashboard.css */
+
+/* Variables de la paleta institucional de ExperTrack */
+:root {
+  --color-cream-light: #F8F3D9;
+  --color-cream-mid: #EBE5C2;
+  --color-khaki: #B9B28A;
+  --color-olive-dark: #504B38;
+}
+
+/* Base reset to ensure no gray bars */
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--color-cream-mid); /* Fondo principal del dashboard */
+  overflow: hidden;
+}
+
+/* ----------------------------------
+   SIDEBAR LATERAL
+-----------------------------------*/
+.sidebar {
+  width: 270px;
+  background-color: var(--color-cream-light);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 40;
+  border-right: 1px solid rgba(80, 75, 56, 0.1); 
+}
+
+/* Modificador de escritorio: esconde la barra sin eliminarla del DOM */
+.sidebar.desktop-closed {
+  margin-left: -270px;
+}
+
+.sidebar-header {
+  padding: 1.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(80, 75, 56, 0.1);
+}
+
+.sidebar-logo-img {
+  height: 50px;
+  width: auto;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.sidebar-brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--color-olive-dark);
+}
+
+.sidebar-menu-title {
+  padding: 1.5rem 1.5rem 0.5rem;
+  font-size: 0.8rem;
+  color: #8c8567;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1.5rem;
+  color: var(--color-olive-dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: transparent;
+  transition: background-color 0.2s;
+}
+
+.sidebar-item:hover, .sidebar-item.active {
+  background-color: rgba(185, 178, 138, 0.15); /* Hover khaki sutil */
+}
+
+.sidebar-item:hover:before, .sidebar-item.active:before {
+  background-color: var(--color-olive-dark);
+}
+
+.sidebar-item .icon {
+  color: var(--color-khaki);
+  transition: color 0.2s;
+}
+
+.sidebar-item:hover .icon, .sidebar-item.active .icon {
+  color: var(--color-olive-dark);
+}
+
+.sidebar-bottom {
+  padding: 1rem 0;
+  border-top: 1px solid rgba(80, 75, 56, 0.1);
+}
+
+/* ----------------------------------
+   TOP HEADER (NAV SUPERIOR)
+-----------------------------------*/
+.dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-header {
+  height: 70px;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  z-index: 30;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.menu-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.menu-toggle-btn:hover {
+  background-color: rgba(80, 75, 56, 0.05);
+  color: var(--color-olive-dark);
+}
+
+.header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.header-role-title {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #9ca3af; /* Letra gris como en el mockup */
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon-btn, .avatar-btn {
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-olive-dark);
+  transition: background-color 0.2s;
+}
+
+.avatar-btn {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.icon-btn:hover, .avatar-btn:hover {
+  background-color: #e5e7eb;
+}
+
+/* ----------------------------------
+   CONTENEDOR DEL DASHBOARD PRINCIPAL
+-----------------------------------*/
+.dashboard-content {
+  flex: 1;
+  padding: 2.5rem;
+  overflow-y: auto;
+}
+
+/* ----------------------------------
+   NOTIFICACIONES Y DROPDOWNS
+-----------------------------------*/
+/* Notificaciones Badge */
+.icon-btn {
+  position: relative;
+}
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background-color: #f85149;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: bold;
+  height: 16px;
+  width: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+}
+
+/* Menú Desplegable Notificaciones */
+.notification-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 330px;
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  border: 1px solid rgba(80, 75, 56, 0.1);
+  overflow: hidden;
+  z-index: 50;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header {
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--color-olive-dark);
+  border-bottom: 1px solid rgba(80, 75, 56, 0.1);
+  background-color: #fafafa;
+}
+
+.dropdown-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(80, 75, 56, 0.05);
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background-color: rgba(185, 178, 138, 0.1); /* Efecto hover corporativo sutil */
+}
+
+.notif-text {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9rem;
+  color: var(--color-olive-dark);
+}
+
+.notif-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.dropdown-footer {
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-olive-dark);
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #fafafa;
+  transition: background-color 0.2s;
+}
+
+.dropdown-footer:hover {
+  background-color: #f3f4f6;
+}
+
+/* Dropdown del Menú de Usuario Avatar */
+.user-dropdown {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 220px;
+  background-color: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  border: 1px solid rgba(80, 75, 56, 0.1);
+  overflow: hidden;
+  z-index: 50;
+  animation: slideDown 0.2s ease-out;
+}
+
+.user-name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-olive-dark);
+  font-size: 0.95rem;
+}
+
+.user-role {
+  margin: 0;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--color-olive-dark);
+  font-weight: 500;
+}
+
+.logout-item {
+  color: #f85149;
+}
+
+.logout-item:hover {
+  background-color: rgba(248, 81, 73, 0.05); /* Rojo muy sutil al hacer hover en cerrar sesion */
+}
+
+.dropdown-divider {
+  height: 1px;
+  background-color: rgba(80, 75, 56, 0.1);
+  margin: 0;
+}
+
+/* ----------------------------------
+   COMPATIBILIDAD MOBILE
+-----------------------------------*/
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 35;
+  backdrop-filter: blur(2px);
+}
+
+@media (max-width: 1024px) {
+  .sidebar { /* Forzar cierre en mobiles ignorando margin desktop */
+    position: fixed;
+    height: 100vh;
+    transform: translateX(-100%);
+    margin-left: 0 !important; 
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.show {
+    display: block;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    padding: 0 1rem;
+  }
+  .header-role-title {
+    font-size: 1rem;
+  }
+  .dashboard-content {
+    padding: 1.5rem;
+  }
+  .notification-dropdown {
+    width: 280px;
+    right: -10px; /* Ajuste para que no se salga de la pantalla chica */
+  }
+  .user-dropdown {
+    width: 200px; /* Ligeramente mas delgado en celulares */
+    right: 0px; 
+  }
+}

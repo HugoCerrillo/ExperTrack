@@ -1,0 +1,455 @@
+/* src/assets/styles/users.css */
+
+.users-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Acciones Superiores */
+.users-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  background-color: #FFFFFF;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(80, 75, 56, 0.1);
+}
+
+.search-bar {
+  flex: 1;
+  max-width: 400px;
+}
+
+/* Fix para reutilizar AuthInput eliminando márgenes de formulario clásicos */
+.search-bar .input-group {
+  margin-bottom: 0;
+}
+
+.search-bar label {
+  display: none; /* No necesitamos etiqueta en la barra de búsqueda superior */
+}
+
+.btn-add-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--color-olive-dark);
+  color: #FFFFFF;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.btn-add-user:hover {
+  background-color: #3b3729; /* Olive oscuro */
+}
+
+/* Contenedor Div de Tabla */
+.table-wrapper {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(80, 75, 56, 0.1);
+  overflow-x: auto; /* Crea slider horizontal nativo */
+  -webkit-overflow-scrolling: touch; /* Suavidad en iPhone/iPad */
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  min-width: 800px; /* Al asegurar un ancho minimo, garantizamos que las celdas nunca colapsen asfixiadas en móbiles */
+}
+
+.users-table th, .users-table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(80, 75, 56, 0.1);
+  white-space: nowrap; /* Impide que el texto baje de línea, forza el scroll horizontal siempre */
+}
+
+.users-table th {
+  background-color: #fafafa;
+  color: var(--color-olive-dark);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.users-table tbody tr {
+  transition: background-color 0.2s;
+}
+
+.users-table tbody tr:hover {
+  background-color: rgba(185, 178, 138, 0.08); /* Fondo Light Khaki al pasar el mouse */
+}
+
+.users-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Tipografía en celdas individuales */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-cream-mid);
+  color: var(--color-olive-dark);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--color-cream-light);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-fullname {
+  font-weight: 600;
+  color: var(--color-olive-dark);
+}
+
+/* Info Contacto */
+.contact-cell {
+  display: flex;
+  flex-direction: column;
+  color: var(--color-olive-dark);
+  font-size: 0.95rem;
+}
+
+.contact-phone {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
+
+/* Capsulas / Badges Visuales */
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.role-administrador {
+  background-color: rgba(185, 178, 138, 0.2); /* Khaki transparente */
+  color: var(--color-olive-dark);
+}
+
+.role-técnico {
+  background-color: #e0f2fe;
+  color: #0369a1; /* Azul cielo */
+}
+
+.role-usuario {
+  background-color: #f3f4f6;
+  color: #4b5563; /* Gris */
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-active {
+  background-color: #dcfce7;
+  color: #15803d; /* Verde éxito genérico en la web (Accesibilidad) */
+}
+
+.status-inactive {
+  background-color: #fee2e2;
+  color: #b91c1c; /* Rojo error */
+}
+
+/* Botones de Editar y Basura */
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-edit {
+  color: var(--color-olive-dark);
+  background-color: rgba(80, 75, 56, 0.08); /* Fondo crema oscuro tenue */
+}
+
+.btn-edit:hover {
+  background-color: var(--color-olive-dark);
+  color: #FFF;
+}
+
+.btn-delete {
+  color: #f85149;
+  background-color: rgba(248, 81, 73, 0.1);
+}
+
+.btn-delete:hover {
+  background-color: #f85149;
+  color: #FFF;
+}
+
+/* =========================================
+   SISTEMA DE TABLAS RESPONSIVAS A "CARTAS" 
+========================================== */
+@media (max-width: 1024px) {
+  .users-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-bar {
+    max-width: 100%;
+  }
+}
+
+/* Eliminamos la Tabla tipo Tarjeta en móbiles:
+   Usar el slider nativo horizontal (creado por min-width arriba) 
+   es 100x más presentable para data pesada que quebrar filas. */
+
+/* =========================================
+   MODAL EMERGENTE DE EDICIÓN
+========================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal-content {
+  background-color: #FFFFFF;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh; /* Altura máxima estricta */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+  animation: modalPopIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden; /* Clave: Previene que el footer escape del borde perimetral */
+}
+
+/* Permitir que el form anidado herede el Flexbox para scrollear su contenido */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden; /* Cierra el tubo pasador */
+}
+
+@keyframes modalPopIn {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(80, 75, 56, 0.1);
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--color-olive-dark);
+  font-size: 1.4rem;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+  background-color: #f3f4f6;
+  color: #f85149;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto; /* Scroll dinámico si la pantalla es enana */
+  flex: 1; /* Esto hace que consuma el resto del espacio y active su barra de scroll interna */
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 1.5rem;
+  column-gap: 1.5rem;
+}
+
+/* Selectores visuales idénticos al AuthInput pero en Menu */
+.select-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--color-olive-dark);
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.auth-select {
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.8rem;
+  border: 1px solid rgba(80, 75, 56, 0.2);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background-color: #fafafa;
+  color: var(--color-olive-dark);
+  font-weight: 500;
+  appearance: none;
+  cursor: pointer;
+}
+
+.auth-select:focus {
+  outline: none;
+  border-color: var(--color-khaki);
+  box-shadow: 0 0 0 3px rgba(185, 178, 138, 0.1);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(80, 75, 56, 0.1);
+  background-color: #fafafa;
+  border-radius: 0 0 12px 12px;
+}
+
+.btn-cancel {
+  background: none;
+  border: 1px solid rgba(80, 75, 56, 0.2);
+  color: var(--color-olive-dark);
+  padding: 0.85rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: rgba(80, 75, 56, 0.05); /* fondo crema muy sutil */
+}
+
+/* Responsividad extra para Modal móvil */
+@media (max-width: 768px) {
+  .modal-grid {
+    grid-template-columns: 1fr;
+  }
+  .modal-footer {
+    flex-direction: column-reverse; /* El cancelar se va abajo en celulares por UX */
+  }
+  .modal-footer > div, .btn-cancel {
+    width: 100% !important;
+    text-align: center;
+  }
+}
+
+/* =========================================
+   SKELETON LOADER — Estado de carga
+========================================== */
+.skeleton-row td {
+  pointer-events: none;
+}
+
+.skeleton-cell {
+  height: 20px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  min-width: 80px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* =========================================
+   BOTÓN REFRESH
+========================================== */
+.btn-refresh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(80, 75, 56, 0.07);
+  color: var(--color-olive-dark);
+  border: 1px solid rgba(80, 75, 56, 0.15);
+  padding: 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-refresh:hover:not(:disabled) {
+  background-color: var(--color-olive-dark);
+  color: #fff;
+}
+
+.btn-refresh:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Animación de spin para el ícono de carga */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.spin-icon {
+  animation: spin 0.9s linear infinite;
+}

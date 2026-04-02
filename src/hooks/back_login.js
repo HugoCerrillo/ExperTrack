@@ -22,7 +22,7 @@ export function useLogin() {
 
         try {
             //Eviamos los datos del formulario al backend mediante la api
-            const response = await fetch('http://18.207.179.123:5000/login', {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
