@@ -198,7 +198,7 @@ const AssetManagement = () => {
                   {/* Celda Asignación */}
                   <td data-label="Asignación Responsable">
                     <div className="contact-cell">
-                      <span style={{ fontWeight: '700' }}><User size={14} style={{ display: 'none' }} /> {asset.dueño}</span>
+                      <span style={{ fontWeight: '700' }}><UserIcon size={14} style={{ display: 'none' }} /> {asset.dueño}</span>
                       <span className="contact-phone">{asset.area}</span>
                       <span className="specs-text">{asset.ubicacion}</span>
                     </div>
