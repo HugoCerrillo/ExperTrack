@@ -55,8 +55,8 @@ export function useLogin() {
                     localStorage.setItem('user', JSON.stringify(data.user));
                 }
 
-                //redirigimos al dashaboard
-                navigate('/dashboard');
+                //redirigimos al dashaboard reemplazando el historial para no poder dar "atrás"
+                navigate('/dashboard', { replace: true });
 
             } else {
                 //error en caso de que las credenciales sean invalidas

@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
 import UserManagement from './pages/UserManagement';
 import AssetManagement from './pages/AssetManagement';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -19,11 +20,11 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<Register />} />
           
-          {/* Rutas Privadas / Internas del Sistema */}
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/perfil" element={<UserProfile />} />
-          <Route path="/dashboard/usuarios" element={<UserManagement />} />
-          <Route path="/dashboard/activos" element={<AssetManagement />} />
+          {/* Rutas Privadas / Internas del Sistema (Protegidas) */}
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/dashboard/perfil" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+          <Route path="/dashboard/usuarios" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
+          <Route path="/dashboard/activos" element={<ProtectedRoute><AssetManagement /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>

@@ -1,9 +1,29 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, User, Users, MonitorSmartphone, Bell, FileText, LogOut } from 'lucide-react';
+import Swal from 'sweetalert2';
 import experTrackLogo from '../../assets/img/ExperTrack.png';
 
 export const Sidebar = ({ isOpen, closeSidebar }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: '¿Cerrar Sesión?',
+      text: "Tendrás que volver a ingresar tus credenciales.",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#504b38',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      localStorage.clear();
+      closeSidebar();
+      navigate('/', { replace: true });
+    }
+  };
   return (
     <>
       {/* Añadimos clase de desktop-closed para computadoras y mobile-open para móviles */}
@@ -52,10 +72,10 @@ export const Sidebar = ({ isOpen, closeSidebar }) => {
 
         {/* Cierre de sesión anclado abajo */}
         <div className="sidebar-bottom">
-          <NavLink to="/" onClick={closeSidebar} className="sidebar-item">
+          <button className="sidebar-item" onClick={handleLogout} style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}>
             <LogOut size={20} className="icon" />
             <span>Cerrar Sesión</span>
-          </NavLink>
+          </button>
         </div>
       </aside>
 

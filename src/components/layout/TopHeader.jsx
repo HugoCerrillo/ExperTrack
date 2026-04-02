@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Bell, User, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export const TopHeader = ({ toggleSidebar, title }) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -8,6 +10,26 @@ export const TopHeader = ({ toggleSidebar, title }) => {
   
   const dropdownRef = useRef(null);
   const userMenuRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const result = await Swal.fire({
+      title: '¿Cerrar Sesión?',
+      text: "Tendrás que volver a ingresar tus credenciales.",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#504b38',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, salir',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) {
+      localStorage.clear();
+      setShowUserMenu(false);
+      navigate('/', { replace: true });
+    }
+  };
 
   // Obtener datos del usuario logueado en tiempo real
   const [userData, setUserData] = useState({ 
@@ -125,10 +147,14 @@ export const TopHeader = ({ toggleSidebar, title }) => {
                 
                 <div className="dropdown-divider"></div>
                 
-                <Link to="/" className="dropdown-item user-item logout-item" onClick={() => setShowUserMenu(false)}>
+                <button 
+                  className="dropdown-item user-item logout-item" 
+                  onClick={handleLogout}
+                  style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
                   <LogOut size={16} />
                   <span>Cerrar Sesión</span>
-                </Link>
+                </button>
               </div>
             </div>
           )}

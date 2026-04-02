@@ -102,7 +102,12 @@ const AssetManagement = () => {
   // =========================================
   const addPeripheral = () => {
     const updatedAsset = { ...currentAsset };
-    updatedAsset.perifericos.push({ tipo: 'Monitor', marca: '', modelo: '', numero_serie: '', codigo_inventario: '' });
+    updatedAsset.perifericos.push({ 
+      tipo: 'Monitor', 
+      marca: '', 
+      numero_serie: '', 
+      id_inventario_interno: '' // Antes decía codigo_inventario, por eso no se guardaba
+    });
     setCurrentAsset(updatedAsset);
   };
 

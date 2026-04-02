@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Mail, Lock } from 'lucide-react';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { AuthInput } from '../components/ui/AuthInput';
@@ -8,6 +8,14 @@ import { useLogin } from '../hooks/back_login';
 
 //pagina para iniciar sesion
 const Login = () => {
+  const navigate = useNavigate();
+
+  // Si ya hay sesión iniciada, mandarlo directo al dashboard
+  React.useEffect(() => {
+    if (localStorage.getItem('user')) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate]);
 
   //recibimos los datos del hook correspondiente 
   const {
