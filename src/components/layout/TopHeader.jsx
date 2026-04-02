@@ -9,6 +9,32 @@ export const TopHeader = ({ toggleSidebar, title }) => {
   const dropdownRef = useRef(null);
   const userMenuRef = useRef(null);
 
+  // Obtener datos del usuario logueado en tiempo real
+  const [userData, setUserData] = useState({ 
+    initials: 'AD', 
+    fullName: 'Usuario', 
+    email: 'correo@expertrack.com' 
+  });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const user = JSON.parse(storedUser);
+        const n = (user.nombre || "").charAt(0).toUpperCase();
+        const ap = (user.apellido_paterno || user.apellidoPaterno || "").charAt(0).toUpperCase();
+        
+        setUserData({
+          initials: (n + ap) || 'U',
+          fullName: `${user.nombre} ${user.apellido_paterno || user.apellidoPaterno || ''}`,
+          email: user.correo || 'correo@expertrack.com'
+        });
+      } catch (e) {
+        console.error("Error al cargar datos del header", e);
+      }
+    }
+  }, []);
+
   // Datos Ficticios de Prueba para la UI
   const notifications = [
     { id: 1, text: 'Mantenimiento preventivo PC-Contabilidad completado', time: 'Hace 5 min' },
@@ -80,15 +106,15 @@ export const TopHeader = ({ toggleSidebar, title }) => {
             className="avatar-btn"
             onClick={() => setShowUserMenu(!showUserMenu)}
           >
-            AD
+            {userData.initials}
           </button>
 
           {/* Menú Desplegable de Usuario */}
           {showUserMenu && (
             <div className="user-dropdown">
               <div className="dropdown-header">
-                <p className="user-name">Administrador</p>
-                <p className="user-role">admin@expertrack.com</p>
+                <p className="user-name">{userData.fullName}</p>
+                <p className="user-role">{userData.email}</p>
               </div>
               
               <div className="dropdown-list">

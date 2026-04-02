@@ -1,20 +1,46 @@
-import React, { useState } from 'react';
-import { User, Phone, Mail, Lock, Save, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Phone, Mail, Lock, Save, Shield, Loader2 } from 'lucide-react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { AuthInput } from '../components/ui/AuthInput';
 import { AuthButton } from '../components/ui/AuthButton';
+import { useUserProfile } from '../hooks/back_user_profile';
+import Swal from 'sweetalert2';
 import '../assets/styles/profile.css'; 
 
 const UserProfile = () => {
-  // Estado local para los campos (Próximamente se precargarán desde AWS)
+  const { profile, loading, fetchProfile, updateProfile } = useUserProfile();
+
+  // Estado local para los campos del formulario
   const [formData, setFormData] = useState({
-    nombre: 'Administrador',
-    apellidoPaterno: 'Del',
-    apellidoMaterno: 'Sistema',
-    telefono: '8711002233',
-    correo: 'admin@expertrack.com',
-    contrasena: '' // Se deja vacío intencionalmente por seguridad
+    nombre: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
+    telefono: '',
+    correo: '',
+    contrasena: ''
   });
+
+  // Cargar perfil al entrar
+  useEffect(() => {
+    const load = async () => {
+      await fetchProfile();
+    };
+    load();
+  }, [fetchProfile]);
+
+  // Sincronizar formData cuando el perfil se cargue
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        nombre: profile.nombre || '',
+        apellidoPaterno: profile.apellido_paterno || profile.apellidoPaterno || '',
+        apellidoMaterno: profile.apellido_materno || profile.apellidoMaterno || '',
+        telefono: profile.telefono || '',
+        correo: profile.correo || '',
+        contrasena: ''
+      });
+    }
+  }, [profile]);
 
   const handleChange = (e) => {
     // Bloquear letras en caso del teléfono (igual que en registro)
@@ -27,11 +53,24 @@ const UserProfile = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    // Aquí conectaremos a la API de Flask posteriormente
-    console.log("Comenzando actualización de perfil:", formData);
+    const success = await updateProfile(formData);
+    if (success) {
+      setFormData(prev => ({ ...prev, contrasena: '' }));
+    }
   };
+
+  if (loading && !profile) {
+    return (
+      <DashboardLayout headerTitle="Mi Perfil">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+          <Loader2 size={48} className="spin-icon" style={{ color: '#504b38' }} />
+          <p style={{ marginLeft: '1rem', color: '#6b7280', fontSize: '1.2rem' }}>Cargando perfil desde AWS...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout headerTitle="Mi Perfil">
@@ -46,7 +85,7 @@ const UserProfile = () => {
             <h2 className="profile-name">{formData.nombre} {formData.apellidoPaterno}</h2>
             <p className="profile-role">
               <Shield size={14} style={{ display: 'inline', marginRight: '5px' }} />
-              Cuenta Administrador
+              Cuenta {profile?.rol || 'Usuario'}
             </p>
           </div>
         </div>
