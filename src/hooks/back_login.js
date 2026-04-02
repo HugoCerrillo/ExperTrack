@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 export function useLogin() {
     const [email, setEmail] = useState(''); // email del usuario
     const [password, setPassword] = useState(''); // contraseña del usuario
+    const navigate = useNavigate();
 
     //Gestiona todo el flujo asincrono para separar el Backend del Frontend
     const handleLogin = async (e) => {
@@ -49,11 +51,12 @@ export function useLogin() {
 
                 //como Flask ya inyecto las galletas JWT, usamos el almacenamiento local para 
                 // guardar datos públicos (ej. Nombre para la barra del menú)
-
-                // localStorage.setItem('user', JSON.stringify(data.user));
+                if (data.user) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                }
 
                 //redirigimos al dashaboard
-                // navigate('/dashboard');
+                navigate('/dashboard');
 
             } else {
                 //error en caso de que las credenciales sean invalidas
