@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
 import UserManagement from './pages/UserManagement';
 import AssetManagement from './pages/AssetManagement';
+import ExpertSystem from './pages/ExpertSystem';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/dashboard/perfil" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
           <Route path="/dashboard/usuarios" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />
           <Route path="/dashboard/activos" element={<ProtectedRoute><AssetManagement /></ProtectedRoute>} />
+          <Route path="/dashboard/sistema-experto" element={<ProtectedRoute><ExpertSystem /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>
