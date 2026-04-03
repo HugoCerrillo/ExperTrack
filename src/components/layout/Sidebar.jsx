@@ -1,12 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
-  Home, User, Users, MonitorSmartphone, Bell, FileText, 
-  LogOut, BrainCircuit, Activity, Database, Wrench, AlertTriangle 
+import {
+  Home, User, Users, MonitorSmartphone, Bell, FileText,
+  LogOut, BrainCircuit, Activity, Database, Wrench, AlertTriangle
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import experTrackLogo from '../../assets/img/ExperTrack.png';
 
-export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Administrador' }) => {
+export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
   const navigate = useNavigate();
 
   // Diccionario centralizado de los permisos de rutas por cada rol
@@ -64,7 +64,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Administrador' }) =>
     <>
       {/* Añadimos clase de desktop-closed para computadoras y mobile-open para móviles */}
       <aside className={`sidebar ${!isOpen ? 'desktop-closed' : ''} ${isOpen ? 'mobile-open' : ''}`}>
-        
+
         {/* Cabecera del Menu */}
         <div className="sidebar-header">
           <img src={experTrackLogo} alt="ExperTrack" className="sidebar-logo-img" />
@@ -72,18 +72,18 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Administrador' }) =>
         </div>
 
         <div className="sidebar-menu-title">Menu Principal</div>
-        
+
         {/* Enlaces de Navegación Interna construidos dinámicamente */}
         <nav className="sidebar-nav">
           {renderMenu.map((item, idx) => {
             const Icon = item.icon;
             return (
-              <NavLink 
-                key={idx} 
-                to={item.path} 
-                onClick={closeSidebar} 
-                end={item.exact} 
-                className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}
+              <NavLink
+                key={idx}
+                to={item.path}
+                onClick={closeSidebar}
+                end={item.exact}
+                className={({ isActive }) => `sidebar-item ${isActive ? 'active' : ''}`}
               >
                 <Icon size={20} className="icon" />
                 <span>{item.label}</span>
