@@ -74,8 +74,6 @@ export function useAssetManagement() {
                 didOpen: () => Swal.showLoading()
             });
 
-            console.log("Enviando JSON al servidor:", JSON.stringify(formData, null, 2));
-
             const response = await fetch(`${API_URL}/equipos`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -125,8 +123,6 @@ export function useAssetManagement() {
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
-
-            console.log("Enviando JSON de actualización al servidor:", JSON.stringify(formData, null, 2));
 
             const response = await fetch(`${API_URL}/equipos/${id}`, {
                 method: 'PUT',

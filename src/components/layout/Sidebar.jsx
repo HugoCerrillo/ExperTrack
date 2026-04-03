@@ -1,10 +1,46 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, User, Users, MonitorSmartphone, Bell, FileText, LogOut } from 'lucide-react';
+import { 
+  Home, User, Users, MonitorSmartphone, Bell, FileText, 
+  LogOut, BrainCircuit, Activity, Database, Wrench, AlertTriangle 
+} from 'lucide-react';
 import Swal from 'sweetalert2';
 import experTrackLogo from '../../assets/img/ExperTrack.png';
 
-export const Sidebar = ({ isOpen, closeSidebar }) => {
+export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Administrador' }) => {
   const navigate = useNavigate();
+
+  // Diccionario centralizado de los permisos de rutas por cada rol
+  const menuConfig = {
+    'Administrador': [
+      { path: '/dashboard', icon: Home, label: 'Inicio', exact: true },
+      { path: '/dashboard/perfil', icon: User, label: 'Mi Perfil' },
+      { path: '/dashboard/usuarios', icon: Users, label: 'Administrar Usuarios' },
+      { path: '/dashboard/activos', icon: MonitorSmartphone, label: 'Activos' },
+      { path: '/dashboard/alertas', icon: Bell, label: 'Gestión de Alertas' },
+      { path: '/dashboard/expediente', icon: FileText, label: 'Expediente Técnico' },
+    ],
+    'Técnico': [
+      { path: '/dashboard', icon: Home, label: 'Inicio', exact: true },
+      { path: '/dashboard/perfil', icon: User, label: 'Mi Perfil' },
+      { path: '/dashboard/activos', icon: MonitorSmartphone, label: 'Activos' },
+      { path: '/dashboard/sistema-experto', icon: BrainCircuit, label: 'Diagnostico con sistema experto' },
+      { path: '/dashboard/diagnosticos', icon: Activity, label: 'Diagnosticos' },
+      { path: '/dashboard/hechos', icon: Database, label: 'Gestión de Hechos (S.E)' },
+      { path: '/dashboard/alertas', icon: Bell, label: 'Gestión de Alertas' },
+      { path: '/dashboard/intervenciones', icon: Wrench, label: 'Gestión de Intervenciones Técnicas' },
+      { path: '/dashboard/expediente', icon: FileText, label: 'Expediente Técnico' },
+    ],
+    'Usuario Solicitante': [
+      { path: '/dashboard', icon: Home, label: 'Inicio', exact: true },
+      { path: '/dashboard/perfil', icon: User, label: 'Mi Perfil' },
+      { path: '/dashboard/activos', icon: MonitorSmartphone, label: 'Activos' },
+      { path: '/dashboard/reportar', icon: AlertTriangle, label: 'Reportar fallas' },
+      { path: '/dashboard/expediente', icon: FileText, label: 'Expediente Técnico' },
+    ]
+  };
+
+  // Seleccionamos la configuración de acuerdo al rol, si no llega uno válido mostramos nivel bajo (Usuario Solicitante)
+  const renderMenu = menuConfig[userRole] || menuConfig['Usuario Solicitante'];
 
   const handleLogout = async () => {
     const result = await Swal.fire({
@@ -37,37 +73,23 @@ export const Sidebar = ({ isOpen, closeSidebar }) => {
 
         <div className="sidebar-menu-title">Menu Principal</div>
         
-        {/* Enlaces de Navegación Interna */}
+        {/* Enlaces de Navegación Interna construidos dinámicamente */}
         <nav className="sidebar-nav">
-          <NavLink to="/dashboard" onClick={closeSidebar} end className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <Home size={20} className="icon" />
-            <span>Inicio</span>
-          </NavLink>
-          
-          <NavLink to="/dashboard/perfil" onClick={closeSidebar} className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <User size={20} className="icon" />
-            <span>Mi Perfil</span>
-          </NavLink>
-          
-          <NavLink to="/dashboard/usuarios" onClick={closeSidebar} className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <Users size={20} className="icon" />
-            <span>Administrar Usuarios</span>
-          </NavLink>
-          
-          <NavLink to="/dashboard/activos" onClick={closeSidebar} className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <MonitorSmartphone size={20} className="icon" />
-            <span>Activos</span>
-          </NavLink>
-          
-          <NavLink to="/dashboard/alertas" onClick={closeSidebar} className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <Bell size={20} className="icon" />
-            <span>Gestión de Alertas</span>
-          </NavLink>
-          
-          <NavLink to="/dashboard/expediente" onClick={closeSidebar} className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}>
-            <FileText size={20} className="icon" />
-            <span>Expediente Técnico</span>
-          </NavLink>
+          {renderMenu.map((item, idx) => {
+            const Icon = item.icon;
+            return (
+              <NavLink 
+                key={idx} 
+                to={item.path} 
+                onClick={closeSidebar} 
+                end={item.exact} 
+                className={({isActive}) => `sidebar-item ${isActive ? 'active' : ''}`}
+              >
+                <Icon size={20} className="icon" />
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
 
         {/* Cierre de sesión anclado abajo */}
