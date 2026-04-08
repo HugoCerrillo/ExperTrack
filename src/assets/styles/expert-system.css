@@ -157,6 +157,53 @@
   40% { transform: scale(1); margin-bottom: 8px; }
 }
 
+/* =========================================
+   Botones Desplegables de Chat (Quick Actions)
+========================================== */
+.chat-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-chat-action {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-khaki);
+  color: var(--color-olive-dark);
+  padding: 0.5rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.btn-chat-action:hover {
+  background-color: rgba(185, 178, 138, 0.15); /* Khaki sutil */
+}
+
+/* Variantes visuales para botones lógicos Prolog */
+.btn-chat-action.action-yes {
+  border-color: #15803d;
+  color: #15803d;
+}
+
+.btn-chat-action.action-yes:hover {
+  background-color: #dcfce7;
+}
+
+.btn-chat-action.action-no {
+  border-color: #b91c1c;
+  color: #b91c1c;
+}
+
+.btn-chat-action.action-no:hover {
+  background-color: #fee2e2;
+}
+
+
 /* Zona inferior de envío de texto */
 .chat-footer {
   padding: 1.25rem;

@@ -1,96 +1,202 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, BrainCircuit, User } from 'lucide-react';
+import { Send, BrainCircuit, User, RefreshCw } from 'lucide-react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import '../assets/styles/expert-system.css';
 
+const API_URL = 'http://18.207.179.123:5000/diagnosticar';
+
 const ExpertSystem = () => {
-  // Lista ficticia de mensajes de prueba para ilustrar el Flow de la conversación
+  // Definición del estado estricto de Peticiones según arquitectura
+  const [sessionData, setSessionData] = useState({
+    tipo: null,
+    sintoma: null,
+    historial: []
+  });
+
+  // Fases del Chat
+  const [chatState, setChatState] = useState('ASKING_TIPO'); // ASKING_TIPO | ASKING_SINTOMA | IN_PROGRESS | DONE
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentPrologQuestion, setCurrentPrologQuestion] = useState(null);
+
+  // Historial de la UI
   const [messages, setMessages] = useState([
     {
       id: 1,
       sender: 'bot',
-      text: '¡Hola, Técnico! Soy ExperBot, el sistema experto de ExperTrack. ¿En qué diagnóstico te puedo ayudar el día de hoy guiándote paso a paso?',
-      time: '08:00 AM'
-    },
-    {
-      id: 2,
-      sender: 'user',
-      text: 'Tengo una Laptop HP modelo LAT-500 en el escritorio 4 que prende pero arroja 3 pitidos largos y no manda imagen a la pantalla.',
-      time: '08:05 AM'
-    },
-    {
-      id: 3,
-      sender: 'bot',
-      text: 'De acuerdo. El patrón de 3 pitidos largos en los modelos HP suele estar estrictamente relacionado con fallos en la Memoria RAM. \n\nPor favor, retira los módulos de memoria y limpia los contactos con alcohol isopropílico. ¿El error persiste después de esto?',
-      time: '08:06 AM'
+      text: '¡Hola! Soy ExperBot. Para iniciar el proceso asitido del motor de inferencia, por favor selecciona el tipo de equipo a revisar:',
+      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      showOptions: 'TIPO' // Bandera especial para la UI
     }
   ]);
 
   const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Auto-smooth-scroll cada vez que entran mensajes nuevos
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
+  useEffect(() => scrollToBottom(), [messages, isTyping]);
 
-  // Manejador del Input (Acepta enviar en vez de dar salto de línea al pulsar ENTER)
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+  // ===================================
+  // CONECTOR A LA API (PROLOG VIA FLASK)
+  // ===================================
+  const fetchDiagnosisStep = async (currentPayload) => {
+    setIsTyping(true);
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(currentPayload)
+      });
+
+      const data = await response.json();
+      setIsTyping(false);
+
+      if (data.status === 'success') {
+        if (data.accion === 'pregunta') {
+          // Prolog pide confirmación Sí o No
+          setCurrentPrologQuestion(data.valor);
+          addBotMessage(data.valor, 'SI_NO');
+        } else if (data.accion === 'diagnostico') {
+          // Prolog encontró el final del árbol
+          setChatState('DONE');
+          addBotMessage(`⚠️ DIAGNÓSTICO ENCONTRADO:\n\n${data.valor}`);
+        } else if (data.accion === 'finalizado') {
+          // Prolog se quedó exhausto
+          setChatState('DONE');
+          addBotMessage(data.valor || "No se logró encontrar un diagnóstico certero en el sistema de hechos.");
+        }
+      } else {
+        addBotMessage("Hubo una interrupción con el motor de inferencia. Por favor intenta de nuevo.");
+      }
+
+    } catch (error) {
+      console.error(error);
+      setIsTyping(false);
+      addBotMessage("Aviso Técnico: El servidor Prolog parece estar fuera de línea temporalmente. Verifica conexión con Flask.");
     }
   };
 
-  // Simulación Visual de Envío
-  const sendMessage = () => {
-    if (!inputMessage.trim()) return;
+  // ===================================
+  // RESPONDEDORES DE ACCIONAMIENTO DE BOTONES
+  // ===================================
 
-    // 1. Añade mi mensaje al UI
-    const newUserMsg = {
-      id: messages.length + 1,
-      sender: 'user',
-      text: inputMessage,
-      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-    };
-    
-    setMessages((prev) => [...prev, newUserMsg]);
-    setInputMessage('');
-    
-    // 2. Simulamos el tiempo de espera (pensamiento del bot)
+  // Cuando el usuario elige Laptop o PC
+  const handleTypeSelect = (tipoSeleccionado) => {
+    addUserMessage(`Selección: ${tipoSeleccionado}`);
+
+    // Suprimimos los botones anteriores marcandolos como null
+    setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
+
+    setSessionData(prev => ({ ...prev, tipo: tipoSeleccionado }));
+    setChatState('ASKING_SINTOMA');
+
+    // Retardo natural simulado
     setIsTyping(true);
-    
-    // 3. Responde el bot a los (2.5 segundos) de forma automática con un texto mock
     setTimeout(() => {
       setIsTyping(false);
-      setMessages((prev) => [...prev, {
-        id: prev.length + 1,
-        sender: 'bot',
-        text: 'Interesante. Entendido el nuevo síntoma reportado. (MOCK EXPERCT SYSTEM: Esperando Endpoint de Flask conectable).',
-        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
-      }]);
-    }, 2500);
+      addBotMessage("Entendido. Ahora, ingresa exactamente la llave/palabra del síntoma principal, por ejemplo: 'no_enciende', 'sin_video', 'pitidos_3'.", null);
+    }, 600);
+  };
 
+  // Cuando Prolog te lanza pregunta y el Usuario pulsa Si o No
+  const handleLogicAnswer = (respuestaCorta) => {
+    addUserMessage(respuestaCorta === 'si' ? 'Sí' : 'No');
+
+    // Suprimimos los botones Si/No anteriores
+    setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
+
+    // Inyectamos el formato que Prolog Flask espera en la lista Historial
+    const stepInyectado = {
+      p: currentPrologQuestion,
+      r: respuestaCorta
+    };
+
+    const nuevoPayload = {
+      tipo: sessionData.tipo,
+      sintoma: sessionData.sintoma,
+      historial: [...sessionData.historial, stepInyectado]
+    };
+
+    setSessionData(nuevoPayload);
+
+    // Corremos ciclo otra vez
+    fetchDiagnosisStep(nuevoPayload);
+  };
+
+  // ===================================
+  // CONTROLADOR GENERAL DEL CHAT Y EL INPUT LIBRE
+  // ===================================
+  const addUserMessage = (text) => {
+    setMessages(prev => [...prev, {
+      id: prev.length + 1, sender: 'user', text,
+      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+    }]);
+  };
+
+  const addBotMessage = (text, specialOptionType = null) => {
+    setMessages(prev => [...prev, {
+      id: prev.length + 1, sender: 'bot', text,
+      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      showOptions: specialOptionType
+    }]);
+  };
+
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+    const msg = inputMessage.trim();
+    addUserMessage(msg);
+    setInputMessage('');
+
+    if (chatState === 'ASKING_SINTOMA') {
+      // El usuario envió el síntoma llave
+      setChatState('IN_PROGRESS');
+      const nuevoPayload = {
+        tipo: sessionData.tipo,
+        sintoma: msg,   // Inyecta el síntoma tecleado
+        historial: []   // Arranca desde 0 la memoria en Prolog
+      };
+      setSessionData(nuevoPayload);
+      fetchDiagnosisStep(nuevoPayload);
+    }
+    // Si se enviara texto random mientras el bot pregunta Sí/No, lo ignoramos a nivel motor pero se queda en UI
+  };
+
+  const resetDiagnosticSession = () => {
+    setSessionData({ tipo: null, sintoma: null, historial: [] });
+    setChatState('ASKING_TIPO');
+    setCurrentPrologQuestion(null);
+    setMessages([{
+      id: 1, sender: 'bot', text: '¡Sesión reiniciada! Selecciona el tipo de equipo a revisar:',
+      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      showOptions: 'TIPO'
+    }]);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   return (
-    <DashboardLayout headerTitle="Sistema Experto (Beta)">
+    <DashboardLayout headerTitle="Sistema Experto (Diagnósticos)">
       <div className="chat-container">
-        
+
         {/* Banner o Cabecera Fija */}
         <div className="chat-header">
           <div className="chat-header-icon">
-             <BrainCircuit size={24} />
+            <BrainCircuit size={24} />
           </div>
           <div className="chat-header-info">
-             <h3>ExperBot - Motor de Diagnóstico</h3>
-             <p>Asistente virtual de hardware alimentado por Inteligencia Artificial</p>
+            <h3>ExperBot - Inferencia en Tiempo Real</h3>
+            <p>Arquitectura Prolog</p>
           </div>
+          <button onClick={resetDiagnosticSession} className="btn-chat-action" style={{ marginLeft: 'auto' }} title="Limpiar y Reiniciar">
+            <RefreshCw size={16} /> Reiniciar
+          </button>
         </div>
 
         {/* Zona Scrollable de Conversación */}
@@ -100,11 +206,27 @@ const ExpertSystem = () => {
               <div className="message-avatar">
                 {msg.sender === 'bot' ? <BrainCircuit size={18} /> : <User size={18} />}
               </div>
-              
-              <div className="message-content">
+
+              <div className="message-content" style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className="message-bubble" style={{ whiteSpace: 'pre-wrap' }}>
                   {msg.text}
                 </div>
+
+                {/* INYECCIÓN DINÁMICA DE BOTONES PARA MÁQUINA DE ESTADOS */}
+                {msg.showOptions === 'TIPO' && (
+                  <div className="chat-action-buttons">
+                    <button className="btn-chat-action" onClick={() => handleTypeSelect('Laptop')}>💻 Laptop</button>
+                    <button className="btn-chat-action" onClick={() => handleTypeSelect('PC')}>🖥️ PC de Escritorio</button>
+                  </div>
+                )}
+
+                {msg.showOptions === 'SI_NO' && (
+                  <div className="chat-action-buttons">
+                    <button className="btn-chat-action action-yes" onClick={() => handleLogicAnswer('si')}>Sí, correcto</button>
+                    <button className="btn-chat-action action-no" onClick={() => handleLogicAnswer('no')}>No, no es así</button>
+                  </div>
+                )}
+
                 <span className="message-time">{msg.time}</span>
               </div>
             </div>
@@ -112,40 +234,45 @@ const ExpertSystem = () => {
 
           {/* Render Condicional de Carga (Tres Puntitos Bot) */}
           {isTyping && (
-             <div className="chat-message bot">
-               <div className="message-avatar">
-                 <BrainCircuit size={18} />
-               </div>
-               <div className="message-content">
-                 <div className="message-bubble typing-indicator">
-                   <div className="typing-dot"></div>
-                   <div className="typing-dot"></div>
-                   <div className="typing-dot"></div>
-                 </div>
-               </div>
-             </div>
+            <div className="chat-message bot">
+              <div className="message-avatar">
+                <BrainCircuit size={18} />
+              </div>
+              <div className="message-content">
+                <div className="message-bubble typing-indicator">
+                  <div className="typing-dot"></div>
+                  <div className="typing-dot"></div>
+                  <div className="typing-dot"></div>
+                </div>
+              </div>
+            </div>
           )}
-          
+
           <div ref={messagesEndRef} />
         </div>
 
         {/* Input Footer Bloqueado Abajo */}
         <div className="chat-footer">
           <div className="chat-input-wrapper">
-            <textarea 
+            <textarea
               className="chat-input"
-              placeholder="Explica detalladamente la falla o síntoma del equipo..."
+              placeholder={
+                chatState === 'ASKING_TIPO' ? '↑ Utiliza los botones superiores...' :
+                  chatState === 'DONE' ? 'Sesión terminada. Dale a reiniciar.' :
+                    "Escribe y pulsa Enter..."
+              }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
+              disabled={chatState === 'ASKING_TIPO' || chatState === 'DONE'}
             />
           </div>
-          <button 
-            className="btn-send-message" 
-            onClick={sendMessage}
-            disabled={!inputMessage.trim() || isTyping}
-            title="Enviar informe"
+          <button
+            className="btn-send-message"
+            onClick={handleSendMessage}
+            disabled={!inputMessage.trim() || isTyping || chatState === 'ASKING_TIPO' || chatState === 'DONE'}
+            title="Enviar mensaje"
           >
             <Send size={20} />
           </button>
