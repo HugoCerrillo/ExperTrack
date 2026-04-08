@@ -70,10 +70,12 @@ export const useExpertSystem = () => {
           // Prolog encontró el final del árbol
           setChatState('DONE');
           addBotMessage(`⚠️ DIAGNÓSTICO ENCONTRADO:\n\n${data.valor}`);
+          console.log("✅ [DEBUG] Historial Final Prolog (Éxito):", JSON.stringify(currentPayload, null, 2));
         } else if (data.accion === 'finalizado') {
           // Prolog se quedó exhausto
           setChatState('DONE');
           addBotMessage(data.valor || "No se logró encontrar un diagnóstico certero en el sistema de hechos.");
+          console.log("⚠️ [DEBUG] Historial Final Prolog (Agotado):", JSON.stringify(currentPayload, null, 2));
         }
       } else {
         addBotMessage("Hubo una interrupción con el motor de inferencia. Por favor intenta de nuevo.");
