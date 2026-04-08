@@ -6,13 +6,15 @@ import { useExpertSystem } from '../hooks/back_expert_system';
 
 const ExpertSystem = () => {
   const {
+    availableAssets,
+    loadingAssets,
     messages,
     inputMessage,
     setInputMessage,
     isTyping,
     chatState,
     messagesEndRef,
-    handleTypeSelect,
+    handleAssetSelect,
     handleLogicAnswer,
     handleSendMessage,
     resetDiagnosticSession
@@ -63,10 +65,37 @@ const ExpertSystem = () => {
                 </div>
 
                 {/* INYECCIÓN DINÁMICA DE BOTONES PARA MÁQUINA DE ESTADOS */}
-                {msg.showOptions === 'TIPO' && (
-                  <div className="chat-action-buttons">
-                    <button className="btn-chat-action" onClick={() => handleTypeSelect('Laptop')}>💻 Laptop</button>
-                    <button className="btn-chat-action" onClick={() => handleTypeSelect('PC')}>🖥️ PC de Escritorio</button>
+                {msg.showOptions === 'EQUIPO' && (
+                  <div className="chat-action-buttons" style={{ flexDirection: 'column', gap: '0.6rem' }}>
+                    <select 
+                      className="auth-select" 
+                      id="asset-dropdown"
+                      style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--color-khaki)', backgroundColor: '#fff', color: 'var(--color-olive-dark)' }}
+                      defaultValue=""
+                    >
+                      {loadingAssets ? (
+                        <option value="" disabled>Conectando con DB de Activos...</option>
+                      ) : (
+                        <>
+                          <option value="" disabled>-- Selecciona un Activo del Sistema --</option>
+                          {availableAssets.map(asset => (
+                            <option key={asset.id_equipo} value={asset.codigo_inventario}>
+                              {asset.codigo_inventario} - {asset.marca} {asset.modelo} ({asset.tipo_equipo})
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    <button 
+                      className="btn-chat-action action-yes" 
+                      style={{ alignSelf: 'flex-start' }}
+                      onClick={() => {
+                        const selector = document.getElementById('asset-dropdown');
+                        if (selector.value) handleAssetSelect(selector.value);
+                      }}
+                    >
+                      Confirmar Equipo
+                    </button>
                   </div>
                 )}
 

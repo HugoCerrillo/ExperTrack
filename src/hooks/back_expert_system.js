@@ -1,11 +1,16 @@
 import { useState, useRef } from 'react';
+import { useAssetManagement } from './back_asset_management';
 
 // Reescrito para usar el path /api y que Vercel se encargue del proxy a HTTP AWS RDS
 const API_URL = '/api/diagnosticar';
 
 export const useExpertSystem = () => {
+  // Obtenemos activos reales de la BD usando el hook existente
+  const { assets: availableAssets, loading: loadingAssets } = useAssetManagement();
+
   // Definición del estado estricto de Peticiones según arquitectura
   const [sessionData, setSessionData] = useState({
+    equipo_codigo: null,
     tipo: null,
     sintoma: null,
     historial: []
@@ -21,9 +26,9 @@ export const useExpertSystem = () => {
     {
       id: 1,
       sender: 'bot',
-      text: '¡Hola! Soy ExperBot. Para iniciar el proceso asistido del motor de inferencia, por favor selecciona el tipo de equipo a revisar:',
+      text: '¡Hola! Soy ExperBot. Para iniciar la bitácora de diagnóstico, por favor selecciona el equipo institucional que vas a revisar:',
       time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      showOptions: 'TIPO' // Bandera especial para dibujar botones iniciales
+      showOptions: 'EQUIPO' // Bandera para desplegar dropdown de activos
     }
   ]);
 
@@ -71,14 +76,22 @@ export const useExpertSystem = () => {
           setChatState('DONE');
           addBotMessage(`⚠️ DIAGNÓSTICO ENCONTRADO:\n\n${data.valor}`);
           
-          const payloadAuditoria = { ...currentPayload, diagnostico_final: data.valor };
+          const payloadAuditoria = { 
+            equipo_relacionado: currentPayload.equipo_codigo, 
+            ...currentPayload, 
+            diagnostico_final: data.valor 
+          };
           console.log("✅ [DEBUG] Historial Final Prolog (Éxito):", JSON.stringify(payloadAuditoria, null, 2));
         } else if (data.accion === 'finalizado') {
           // Prolog se quedó exhausto
           setChatState('DONE');
           addBotMessage(data.valor || "No se logró encontrar un diagnóstico certero en el sistema de hechos.");
           
-          const payloadAuditoria = { ...currentPayload, diagnostico_final: "SIN RESULTADO" };
+          const payloadAuditoria = { 
+            equipo_relacionado: currentPayload.equipo_codigo, 
+            ...currentPayload, 
+            diagnostico_final: "SIN RESULTADO" 
+          };
           console.log("⚠️ [DEBUG] Historial Final Prolog (Agotado):", JSON.stringify(payloadAuditoria, null, 2));
         }
       } else {
@@ -96,21 +109,28 @@ export const useExpertSystem = () => {
   // EXPORTABLES A LA VISTA
   // ===================================
 
-  // Cuando el usuario elige Laptop o PC
-  const handleTypeSelect = (tipoSeleccionado) => {
-    addUserMessage(`Selección: ${tipoSeleccionado}`);
+  // Cuando el usuario elige un activo del select
+  const handleAssetSelect = (codigoSeleccionado) => {
+    // Buscamos con las llaves que vienen de la Base de Datos
+    const asset = availableAssets.find(a => a.codigo_inventario === codigoSeleccionado);
+    if (!asset) return;
 
-    // Suprimimos los botones anteriores marcandolos como null
+    // Prolog usa estrictamente 'PC' o 'Laptop' en sus llaves
+    const tipoNormalizado = asset.tipo_equipo === 'PC de Escritorio' ? 'PC' : 'Laptop';
+
+    addUserMessage(`Asignado: ${asset.codigo_inventario} [${asset.marca} ${asset.modelo}]`);
+
+    // Suprimimos selector
     setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
 
-    setSessionData(prev => ({ ...prev, tipo: tipoSeleccionado }));
+    setSessionData(prev => ({ ...prev, equipo_codigo: asset.codigo_inventario, tipo: tipoNormalizado }));
     setChatState('ASKING_SINTOMA');
 
     // Retardo natural simulado
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
-      addBotMessage("Entendido. Ahora, ingresa exactamente la llave/palabra del síntoma principal de Prolog, por ejemplo: 'no_enciende', 'sin_video', 'pitidos_3'.", null);
+      addBotMessage("Activo enlazado correctamente. Para iniciar, ingresa la llave del síntoma general según Prolog (ej: 'no_enciende', 'sin_video').", null);
     }, 600);
   };
 
@@ -150,9 +170,10 @@ export const useExpertSystem = () => {
       // El usuario envió el síntoma llave
       setChatState('IN_PROGRESS');
       const nuevoPayload = {
-        tipo: sessionData.tipo,
-        sintoma: msg,   // Inyecta el síntoma tecleado
-        historial: []   // Arranca desde 0 la memoria en Prolog
+        equipo_codigo: sessionData.equipo_codigo, // Mantenemos el código para la auditoría, backend lo puede ignorar para prolog
+        tipo: sessionData.tipo,                   // Se usa en prolog
+        sintoma: msg,   
+        historial: []   
       };
       setSessionData(nuevoPayload);
       fetchDiagnosisStep(nuevoPayload);
@@ -161,24 +182,26 @@ export const useExpertSystem = () => {
 
   // Reset del ciclo
   const resetDiagnosticSession = () => {
-    setSessionData({ tipo: null, sintoma: null, historial: [] });
+    setSessionData({ equipo_codigo: null, tipo: null, sintoma: null, historial: [] });
     setChatState('ASKING_TIPO');
     setCurrentPrologQuestion(null);
     setMessages([{
-      id: 1, sender: 'bot', text: '¡Sesión reiniciada! Selecciona el tipo de equipo a revisar:',
+      id: 1, sender: 'bot', text: '¡Sesión Limpia! Selecciona el equipo institucional a diagnosticar:',
       time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      showOptions: 'TIPO'
+      showOptions: 'EQUIPO'
     }]);
   };
 
   return {
+    availableAssets, // Para enviarlo a la UI
+    loadingAssets,   // Para control visual
     messages,
     inputMessage,
     setInputMessage,
     isTyping,
     chatState,
     messagesEndRef,
-    handleTypeSelect,
+    handleAssetSelect,
     handleLogicAnswer,
     handleSendMessage,
     resetDiagnosticSession
