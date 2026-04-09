@@ -126,8 +126,8 @@ const AssetManagement = () => {
   // Lógica Visual Helper
   const getTypeIcon = (tipo) => {
     if (tipo === 'Laptop') return <Laptop size={14} />;
-    if (tipo === 'PC de Escritorio') return <Server size={14} />;
-    return <Tablet size={14} />;
+    if (tipo === 'PC' || tipo === 'PC de Escritorio') return <Server size={14} />;
+    return <Laptop size={14} />;
   };
 
   const filteredAssets = assets.filter(a =>
@@ -289,9 +289,7 @@ const AssetManagement = () => {
                         <Laptop className="input-icon" size={20} />
                         <select className="auth-select" value={currentAsset.tipo_equipo} onChange={(e) => setCurrentAsset({ ...currentAsset, tipo_equipo: e.target.value })}>
                           <option value="Laptop">Portátil (Laptop)</option>
-                          <option value="PC de Escritorio">PC de Escritorio</option>
-                          <option value="Servidor">Servidor Central</option>
-                          <option value="Tablet">Tablet / Dispositivo Móvil</option>
+                          <option value="PC">Computadora de Escritorio (PC)</option>
                         </select>
                       </div>
                     </div>

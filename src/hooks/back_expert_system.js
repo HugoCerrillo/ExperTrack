@@ -132,8 +132,8 @@ export const useExpertSystem = () => {
     const asset = availableAssets.find(a => a.codigo_inventario === codigoSeleccionado);
     if (!asset) return;
 
-    // Prolog usa estrictamente 'PC' o 'Laptop' en sus llaves
-    const tipoNormalizado = asset.tipo_equipo === 'PC de Escritorio' ? 'PC' : 'Laptop';
+    // Prolog usa estrictamente 'PC' o 'Laptop'
+    const tipoNormalizado = (asset.tipo_equipo === 'PC' || asset.tipo_equipo === 'PC de Escritorio') ? 'PC' : 'Laptop';
 
     addUserMessage(`Asignado: ${asset.codigo_inventario} [${asset.marca} ${asset.modelo}]`);
 
