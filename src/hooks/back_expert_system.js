@@ -38,21 +38,19 @@ export const useExpertSystem = () => {
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef(null);
 
-  // Obtener la biblioteca de Síntomas al arrancar
-  useEffect(() => {
-    const fetchSintomas = async () => {
-      try {
-        const response = await fetch('/api/sintomas');
-        const data = await response.json();
-        if (data.status === 'success') {
-          setSintomasValidos(data.sintomas || []);
-        }
-      } catch (error) {
-        console.error("Fallo obteniendo biblioteca de síntomas de hechos:", error);
+  // Obtener la biblioteca de Síntomas filtrada por el Backend
+  const fetchSintomas = async (tipoHardware) => {
+    try {
+      setSintomasValidos([]); // Reinicia para evitar traslapes
+      const response = await fetch(`/api/sintomas?tipo=${tipoHardware}`);
+      const data = await response.json();
+      if (data.status === 'success') {
+        setSintomasValidos(data.sintomas || []);
       }
-    };
-    fetchSintomas();
-  }, []);
+    } catch (error) {
+      console.error("Fallo obteniendo biblioteca de síntomas de hechos:", error);
+    }
+  };
 
   // Funciones Utilitarias Internas
   const addUserMessage = (text) => {
@@ -144,6 +142,9 @@ export const useExpertSystem = () => {
 
     setSessionData(prev => ({ ...prev, equipo_codigo: asset.codigo_inventario, tipo: tipoNormalizado }));
     setChatState('ASKING_SINTOMA');
+    
+    // Aquí disparamos la petición de síntomas filtrados por ese tipo en específico
+    fetchSintomas(tipoNormalizado);
 
     // Retardo natural simulado
     setIsTyping(true);
@@ -206,6 +207,7 @@ export const useExpertSystem = () => {
 
   // Reset del ciclo
   const resetDiagnosticSession = () => {
+    setSintomasValidos([]); // Limpiar la lista de opciones
     setSessionData({ equipo_codigo: null, tipo: null, sintoma: null, historial: [] });
     setChatState('ASKING_TIPO');
     setCurrentPrologQuestion(null);
