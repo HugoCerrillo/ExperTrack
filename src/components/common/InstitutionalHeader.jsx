@@ -21,7 +21,7 @@ export const InstitutionalHeader = () => {
         />
         <img
           src={itlLogo}
-          alt="Instituto Tecnológico de La Laguna"
+          alt="Instituto Tecnológico de León"
           className="header-logo itl-logo"
         />
       </div>
