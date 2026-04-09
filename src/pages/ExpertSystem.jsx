@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Send, BrainCircuit, User, RefreshCw } from 'lucide-react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import '../assets/styles/expert-system.css';
@@ -22,8 +22,16 @@ const ExpertSystem = () => {
     resetDiagnosticSession
   } = useExpertSystem();
 
+  const chatBodyRef = useRef(null);
+
+  // Manipulación aislada del contenedor para evitar el salto de ventana Chrome
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatBodyRef.current) {
+      chatBodyRef.current.scrollTo({
+        top: chatBodyRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   useEffect(() => scrollToBottom(), [messages, isTyping]);
@@ -54,7 +62,7 @@ const ExpertSystem = () => {
         </div>
 
         {/* Zona Scrollable de Conversación */}
-        <div className="chat-body">
+        <div className="chat-body" ref={chatBodyRef}>
           {messages.map((msg) => (
             <div key={msg.id} className={`chat-message ${msg.sender}`}>
               <div className="message-avatar">
@@ -158,8 +166,6 @@ const ExpertSystem = () => {
               </div>
             </div>
           )}
-
-          <div ref={messagesEndRef} />
         </div>
 
         {/* Input Footer Bloqueado Abajo */}
