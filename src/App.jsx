@@ -9,6 +9,34 @@ import UserManagement from './pages/UserManagement';
 import AssetManagement from './pages/AssetManagement';
 import ExpertSystem from './pages/ExpertSystem';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import Swal from 'sweetalert2';
+
+// ----------------------------------------------------------------------------
+// INTERCEPTOR GLOBAL DE PETICIONES HTTP
+// Vigila TODAS las llamadas fetch() que hace el sistema hacia el Backend. 
+// Si Flask responde 401 (Unauthorized/JWT Expirado), expulsa al usuario al Login.
+// ----------------------------------------------------------------------------
+const originalFetch = window.fetch;
+window.fetch = async function (...args) {
+  const response = await originalFetch.apply(this, args);
+  if (response.status === 401) {
+    if (!window.hasShown401Alert) {
+      window.hasShown401Alert = true;
+      localStorage.removeItem('user'); // Destrozar la identificación local
+      Swal.fire({
+        icon: 'warning',
+        title: 'Sesión de Seguridad Vencida',
+        text: 'Tu Token JWT ha caducado. Por motivos de seguridad de ExperTrack, debes volver a iniciar sesión.',
+        confirmButtonColor: '#504b38',
+        allowOutsideClick: false
+      }).then(() => {
+        window.location.href = '/';
+      });
+    }
+  }
+  return response;
+};
+// ----------------------------------------------------------------------------
 
 function App() {
   return (
