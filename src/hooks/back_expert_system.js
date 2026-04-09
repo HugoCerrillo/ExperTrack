@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAssetManagement } from './back_asset_management';
 
 // Reescrito para usar el path /api y que Vercel se encargue del proxy a HTTP AWS RDS
