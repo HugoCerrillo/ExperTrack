@@ -90,8 +90,8 @@ export const useExpertSystem = () => {
           addBotMessage(data.valor, 'SI_NO');
         } else if (data.accion === 'diagnostico') {
           // Prolog encontró el final del árbol
-          setChatState('DONE');
-          addBotMessage(`⚠️ DIAGNÓSTICO ENCONTRADO:\n\n${data.valor}`);
+          setChatState('ASKING_FINAL_DETAILS');
+          addBotMessage(`⚠️ DIAGNÓSTICO ENCONTRADO:\n\n${data.valor}\n\nPara nutrir la bitácora, por favor describe con tus propias palabras algún detalle adicional de la falla en la barra inferior (escríbelo abajo):`);
           
           const payloadAuditoria = { 
             equipo_relacionado: currentPayload.equipo_codigo, 
@@ -101,8 +101,8 @@ export const useExpertSystem = () => {
           console.log("✅ [DEBUG] Historial Final Prolog (Éxito):", JSON.stringify(payloadAuditoria, null, 2));
         } else if (data.accion === 'finalizado') {
           // Prolog se quedó exhausto
-          setChatState('DONE');
-          addBotMessage(data.valor || "No se logró encontrar un diagnóstico certero en el sistema de hechos.");
+          setChatState('ASKING_FINAL_DETAILS');
+          addBotMessage(`${data.valor || "No se logró encontrar un diagnóstico certero en el sistema de hechos."}\n\nPara escalar esto a un técnico, por favor describe a detalle lo que sucede con el equipo en la barra inferior (escríbelo abajo):`);
           
           const payloadAuditoria = { 
             equipo_relacionado: currentPayload.equipo_codigo, 
@@ -197,12 +197,26 @@ export const useExpertSystem = () => {
     fetchDiagnosisStep(nuevoPayload);
   };
 
-  // Cuando se envía texto libre (Fallback si lo habilitamos)
+  // Cuando se envía texto texto (Fase Detalle Final)
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
     const msg = inputMessage.trim();
     addUserMessage(msg);
     setInputMessage('');
+
+    if (chatState === 'ASKING_FINAL_DETAILS') {
+      const nuevoDetalle = msg;
+      // Lo guardamos en sessionData si deseamos, pero no se inyecta a historial prolog
+      setSessionData(prev => ({ ...prev, descripcion_usuario: nuevoDetalle }));
+      
+      setChatState('DONE');
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        addBotMessage("¡Gracias! Tu reporte detallado y el diagnóstico previo del sistema experto han sido documentados. El proceso asitido ha finalizado.");
+        console.log("📝 [DEBUG] Descripción en crudo del usuario (Aparte):", nuevoDetalle);
+      }, 700);
+    }
   };
 
   // Reset del ciclo

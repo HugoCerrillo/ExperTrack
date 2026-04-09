@@ -171,21 +171,22 @@ const ExpertSystem = () => {
                 chatState === 'ASKING_TIPO' ? '↑ Utiliza el selector de equipos arriba...' :
                 chatState === 'ASKING_SINTOMA' ? '↑ Selecciona una falla de la lista superior...' :
                 chatState === 'IN_PROGRESS' ? '↑ Responde utilizando los botones Sí / No...' :
-                chatState === 'DONE' ? 'Sesión terminada. Si fallaste, dale a reiniciar.' :
+                chatState === 'ASKING_FINAL_DETAILS' ? 'Escribe aquí los detalles adicionales de la falla...' :
+                chatState === 'DONE' ? 'Sesión terminada. Dale a Reiniciar para diagnosticar otro Activo.' :
                 "Escribe y pulsa Enter..."
               }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              disabled={true} 
+              disabled={chatState !== 'ASKING_FINAL_DETAILS'} 
             />
           </div>
           <button 
             className="btn-send-message"
             onClick={handleSendMessage}
-            disabled={true}
-            title="Envío manual bloqueado para prevenir fallos silogísticos."
+            disabled={chatState !== 'ASKING_FINAL_DETAILS' || !inputMessage.trim()}
+            title={chatState === 'ASKING_FINAL_DETAILS' ? 'Enviar Reporte al Técnico' : 'Bloqueado temporalmente'}
           >
             <Send size={20} />
           </button>
