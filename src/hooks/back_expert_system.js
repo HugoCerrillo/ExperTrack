@@ -8,6 +8,9 @@ export const useExpertSystem = () => {
   // Obtenemos activos reales de la BD usando el hook existente
   const { assets: availableAssets, loading: loadingAssets } = useAssetManagement();
 
+  // Síntomas Iniciales BD Hechos
+  const [sintomasValidos, setSintomasValidos] = useState([]);
+
   // Definición del estado estricto de Peticiones según arquitectura
   const [sessionData, setSessionData] = useState({
     equipo_codigo: null,
@@ -34,6 +37,22 @@ export const useExpertSystem = () => {
 
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef(null);
+
+  // Obtener la biblioteca de Síntomas al arrancar
+  useEffect(() => {
+    const fetchSintomas = async () => {
+      try {
+        const response = await fetch('/api/sintomas');
+        const data = await response.json();
+        if (data.status === 'success') {
+          setSintomasValidos(data.sintomas || []);
+        }
+      } catch (error) {
+        console.error("Fallo obteniendo biblioteca de síntomas de hechos:", error);
+      }
+    };
+    fetchSintomas();
+  }, []);
 
   // Funciones Utilitarias Internas
   const addUserMessage = (text) => {
@@ -130,8 +149,26 @@ export const useExpertSystem = () => {
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
-      addBotMessage("Activo enlazado correctamente. Para iniciar, ingresa la llave del síntoma general según Prolog (ej: 'no_enciende', 'sin_video').", null);
+      addBotMessage("Activo enlazado correctamente. Por favor, selecciona el síntoma principal que presenta este equipo:", 'SINTOMA');
     }, 600);
+  };
+
+  // Cuando selecciona el síntoma inicial del dropdown
+  const handleSymptomSelect = (claveSintoma) => {
+    const sintomaName = sintomasValidos.find(s => s.clave === claveSintoma)?.descripcion || claveSintoma;
+    addUserMessage(`Síntoma reportado: ${sintomaName}`);
+
+    setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
+    setChatState('IN_PROGRESS');
+
+    const nuevoPayload = {
+      equipo_codigo: sessionData.equipo_codigo,
+      tipo: sessionData.tipo,                   
+      sintoma: claveSintoma,   
+      historial: []   
+    };
+    setSessionData(nuevoPayload);
+    fetchDiagnosisStep(nuevoPayload);
   };
 
   // Cuando Prolog te lanza pregunta y el Usuario pulsa Si o No
@@ -159,25 +196,12 @@ export const useExpertSystem = () => {
     fetchDiagnosisStep(nuevoPayload);
   };
 
-  // Cuando se envía texto libre
+  // Cuando se envía texto libre (Fallback si lo habilitamos)
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
     const msg = inputMessage.trim();
     addUserMessage(msg);
     setInputMessage('');
-
-    if (chatState === 'ASKING_SINTOMA') {
-      // El usuario envió el síntoma llave
-      setChatState('IN_PROGRESS');
-      const nuevoPayload = {
-        equipo_codigo: sessionData.equipo_codigo, // Mantenemos el código para la auditoría, backend lo puede ignorar para prolog
-        tipo: sessionData.tipo,                   // Se usa en prolog
-        sintoma: msg,   
-        historial: []   
-      };
-      setSessionData(nuevoPayload);
-      fetchDiagnosisStep(nuevoPayload);
-    }
   };
 
   // Reset del ciclo
@@ -195,6 +219,7 @@ export const useExpertSystem = () => {
   return {
     availableAssets, // Para enviarlo a la UI
     loadingAssets,   // Para control visual
+    sintomasValidos, // Las opciones descriptivas
     messages,
     inputMessage,
     setInputMessage,
@@ -202,6 +227,7 @@ export const useExpertSystem = () => {
     chatState,
     messagesEndRef,
     handleAssetSelect,
+    handleSymptomSelect,
     handleLogicAnswer,
     handleSendMessage,
     resetDiagnosticSession

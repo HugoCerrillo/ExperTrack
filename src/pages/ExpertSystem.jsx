@@ -8,6 +8,7 @@ const ExpertSystem = () => {
   const {
     availableAssets,
     loadingAssets,
+    sintomasValidos,
     messages,
     inputMessage,
     setInputMessage,
@@ -15,6 +16,7 @@ const ExpertSystem = () => {
     chatState,
     messagesEndRef,
     handleAssetSelect,
+    handleSymptomSelect,
     handleLogicAnswer,
     handleSendMessage,
     resetDiagnosticSession
@@ -99,6 +101,36 @@ const ExpertSystem = () => {
                   </div>
                 )}
 
+                {/* SÍNTOMA SELECCIONABLE */}
+                {msg.showOptions === 'SINTOMA' && (
+                  <div className="chat-action-buttons" style={{ flexDirection: 'column', gap: '0.6rem' }}>
+                    <select 
+                      className="auth-select" 
+                      id="symptom-dropdown"
+                      style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--color-khaki)', backgroundColor: '#fff', color: 'var(--color-olive-dark)' }}
+                      defaultValue=""
+                    >
+                      <option value="" disabled>-- Selecciona un Patrón General --</option>
+                      {sintomasValidos.length === 0 && <option value="" disabled>Cargando síntomas...</option>}
+                      {sintomasValidos.map(sint => (
+                        <option key={sint.clave} value={sint.clave}>
+                          • {sint.descripcion}
+                        </option>
+                      ))}
+                    </select>
+                    <button 
+                      className="btn-chat-action action-yes" 
+                      style={{ alignSelf: 'flex-start' }}
+                      onClick={() => {
+                        const selector = document.getElementById('symptom-dropdown');
+                        if (selector.value) handleSymptomSelect(selector.value);
+                      }}
+                    >
+                      Reportar Problema
+                    </button>
+                  </div>
+                )}
+
                 {msg.showOptions === 'SI_NO' && (
                   <div className="chat-action-buttons">
                     <button className="btn-chat-action action-yes" onClick={() => handleLogicAnswer('si')}>Sí, correcto</button>
@@ -136,22 +168,24 @@ const ExpertSystem = () => {
             <textarea
               className="chat-input"
               placeholder={
-                chatState === 'ASKING_TIPO' ? '↑ Utiliza los botones superiores...' :
-                  chatState === 'DONE' ? 'Sesión terminada. Dale a reiniciar.' :
-                    "Escribe y pulsa Enter..."
+                chatState === 'ASKING_TIPO' ? '↑ Utiliza el selector de equipos arriba...' :
+                chatState === 'ASKING_SINTOMA' ? '↑ Selecciona una falla de la lista superior...' :
+                chatState === 'IN_PROGRESS' ? '↑ Responde utilizando los botones Sí / No...' :
+                chatState === 'DONE' ? 'Sesión terminada. Si fallaste, dale a reiniciar.' :
+                "Escribe y pulsa Enter..."
               }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              disabled={chatState === 'ASKING_TIPO' || chatState === 'DONE'}
+              disabled={true} 
             />
           </div>
-          <button
+          <button 
             className="btn-send-message"
             onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isTyping || chatState === 'ASKING_TIPO' || chatState === 'DONE'}
-            title="Enviar mensaje"
+            disabled={true}
+            title="Envío manual bloqueado para prevenir fallos silogísticos."
           >
             <Send size={20} />
           </button>
