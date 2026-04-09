@@ -269,10 +269,13 @@
 /* Compatibilidad extra móvil */
 @media (max-width: 600px) {
   .chat-container {
-    height: calc(100vh - 100px); 
+    height: calc(100vh - 110px); /* Ajuste estricto considerando header y padding del dashboard general */
     border-radius: 0;         /* Quitamos bordes gruesos laterales para aprovechar la reducida pantalla */
     border-left: none;
     border-right: none;
+    margin-left: -1.5rem;
+    margin-right: -1.5rem;
+    margin-bottom: -1.5rem; /* Cae hasta el fondo para máxima inmersión */
   }
   .chat-message {
     max-width: 95%; /* Las burbujas pueden ser mas elásticas en cel */
