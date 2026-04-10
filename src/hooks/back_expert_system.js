@@ -91,7 +91,15 @@ export const useExpertSystem = () => {
         } else if (data.accion === 'diagnostico') {
           // Prolog encontró el final del árbol
           setChatState('ASKING_FINAL_DETAILS');
-          addBotMessage(`⚠️ DIAGNÓSTICO ENCONTRADO:\n\n${data.valor}\n\nPara nutrir la bitácora, por favor describe con tus propias palabras algún detalle adicional de la falla en la barra inferior (escríbelo abajo):`);
+          
+          // Formateador dinámico para evitar texto amontonado
+          const textoLimpio = data.valor
+            .split('. ')
+            .filter(s => s.trim().length > 0)
+            .map(s => `🔹 ${s.trim()}${s.endsWith('.') ? '' : '.'}`)
+            .join('\n\n');
+
+          addBotMessage(`⚠️ DIAGNÓSTICO ENCONTRADO:\n\n${textoLimpio}\n\n─────────────────────\nPara nutrir la bitácora, por favor describe con tus propias palabras algún detalle extra de la falla en la barra inferior (caja de texto):`);
           
           const payloadAuditoria = { 
             equipo_relacionado: currentPayload.equipo_codigo, 
@@ -102,7 +110,12 @@ export const useExpertSystem = () => {
         } else if (data.accion === 'finalizado') {
           // Prolog se quedó exhausto
           setChatState('ASKING_FINAL_DETAILS');
-          addBotMessage(`${data.valor || "No se logró encontrar un diagnóstico certero en el sistema de hechos."}\n\nPara escalar esto a un técnico, por favor describe a detalle lo que sucede con el equipo en la barra inferior (escríbelo abajo):`);
+          
+          const exhausto = data.valor 
+            ? data.valor.split('. ').filter(s => s.trim().length > 0).map(s => `🔸 ${s.trim()}${s.endsWith('.') ? '' : '.'}`).join('\n\n') 
+            : "🔸 No se logró encontrar un diagnóstico certero en el árbol de hechos.";
+
+          addBotMessage(`❌ DIAGNÓSTICO INCONCLUSO:\n\n${exhausto}\n\n─────────────────────\nPara escalar tu caso a un técnico, por favor describe a detalle lo que sucede con el equipo en la barra inferior (caja de texto):`);
           
           const payloadAuditoria = { 
             equipo_relacionado: currentPayload.equipo_codigo, 
