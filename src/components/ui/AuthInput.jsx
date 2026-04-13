@@ -1,6 +1,6 @@
 import React from 'react';
 
-{/* Input que se reutiliza en las paginas
+{/*input que se reutiliza en las paginas
       diferentes antes de iniciar sesión*/}
 export const AuthInput = ({ label, icon: Icon, type = 'text', name, value, onChange, placeholder, required = true, ...props }) => {
   return (

@@ -25,7 +25,7 @@ const AssetManagement = () => {
 
   //estructura de datos para el modal que coincide con el backend
   const emptyAsset = {
-    id_usuario: '', // ID Real de la tabla Usuario
+    id_usuario: '', //ID Real de la tabla Usuario
     tipo_equipo: 'Laptop',
     marca: '',
     modelo: '',
@@ -85,7 +85,7 @@ const AssetManagement = () => {
     if (modalMode === 'ADD') {
       success = await crearEquipo(currentAsset);
     } else {
-      // Para editar, el backend en Flask usa PUT /equipos/<id>
+      //llmada a la funcion actualizarEquipo para editar el equipo en la base de datos
       success = await actualizarEquipo(currentAsset.id_equipo, currentAsset);
     }
 
@@ -97,39 +97,40 @@ const AssetManagement = () => {
     await eliminarEquipo(id);
   };
 
-  // =========================================
-  // Control Dinámico de Arreglo de Periféricos
-  // =========================================
+  //funcion para agregar un periferico
   const addPeripheral = () => {
     const updatedAsset = { ...currentAsset };
-    updatedAsset.perifericos.push({ 
-      tipo: 'Monitor', 
-      marca: '', 
-      numero_serie: '', 
-      id_inventario_interno: '' // Antes decía codigo_inventario, por eso no se guardaba
+    updatedAsset.perifericos.push({
+      tipo: 'Monitor',
+      marca: '',
+      numero_serie: '',
+      id_inventario_interno: ''
     });
     setCurrentAsset(updatedAsset);
   };
 
+  //funcion para eliminar un periferico
   const removePeripheral = (index) => {
     const updatedAsset = { ...currentAsset };
     updatedAsset.perifericos.splice(index, 1);
     setCurrentAsset(updatedAsset);
   };
 
+  //funcion para actualizar un periferico
   const updatePeripheral = (index, field, value) => {
     const updatedAsset = { ...currentAsset };
     updatedAsset.perifericos[index][field] = value;
     setCurrentAsset(updatedAsset);
   };
 
-  // Lógica Visual Helper
+  //funcion para obtener el icono del tipo de equipo (lucide-react)
   const getTypeIcon = (tipo) => {
     if (tipo === 'Laptop') return <Laptop size={14} />;
-    if (tipo === 'PC' || tipo === 'PC de Escritorio') return <Server size={14} />;
+    if (tipo === 'PC') return <Server size={14} />;
     return <Laptop size={14} />;
   };
 
+  //funcion para filtrar los activos
   const filteredAssets = assets.filter(a =>
     `${a.codigo_inventario} ${a.marca} ${a.modelo} ${a.dueño}`
       .toLowerCase()
@@ -141,7 +142,7 @@ const AssetManagement = () => {
     <DashboardLayout headerTitle="Gestión de Activos">
       <div className="users-container">
 
-        {/* Barra de Herramientas */}
+        {/*barra de herramientas*/}
         <div className="users-header-actions">
           <div className="search-bar">
             <AuthInput
@@ -155,7 +156,7 @@ const AssetManagement = () => {
           </button>
         </div>
 
-        {/* Tabla Robusta */}
+        {/*tablita de activos (equipos)*/}
         <div className="table-wrapper">
           <table className="users-table">
             <thead>
@@ -169,21 +170,21 @@ const AssetManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Pantalla de Carga */}
+              {/*pantalla de carga en caso de que este cargando los datos*/}
               {loadingAssets && (
                 <tr>
                   <td colSpan="6" style={{ textAlign: 'center', padding: '3rem' }}>
                     <Loader2 size={40} className="spin-icon" style={{ margin: '0 auto', color: '#504b38' }} />
-                    <p style={{ marginTop: '1rem', color: '#6b7280' }}>Consultando Inventario en AWS...</p>
+                    <p style={{ marginTop: '1rem', color: '#6b7280' }}>Consultando Inventario...</p>
                   </td>
                 </tr>
               )}
 
-              {/* Filas Reales */}
+              {/*filas de los activos registrados*/}
               {!loadingAssets && filteredAssets.map((asset) => (
                 <tr key={asset.id_equipo}>
 
-                  {/* Celda Identificadora */}
+                  {/*celda identificadora*/}
                   <td data-label="Equipo">
                     <div className="user-details" style={{ fontWeight: '500' }}>
                       <span className="asset-main-title">{asset.codigo_inventario}</span>
@@ -192,7 +193,7 @@ const AssetManagement = () => {
                     </div>
                   </td>
 
-                  {/* Celda Tipo */}
+                  {/*celda para el tipo de equipo*/}
                   <td data-label="Tipo de Equipo">
                     <span className={`asset-type-badge ${asset.tipo_equipo === 'Laptop' ? 'asset-type-laptop' : 'asset-type-pc'}`}>
                       {getTypeIcon(asset.tipo_equipo)}
@@ -200,7 +201,7 @@ const AssetManagement = () => {
                     </span>
                   </td>
 
-                  {/* Celda Asignación */}
+                  {/*celda para asignación y ubicación*/}
                   <td data-label="Asignación Responsable">
                     <div className="contact-cell">
                       <span style={{ fontWeight: '700' }}><UserIcon size={14} style={{ display: 'none' }} /> {asset.dueño}</span>
@@ -209,10 +210,8 @@ const AssetManagement = () => {
                     </div>
                   </td>
 
-                  {/* Celda Specs Rápidas */}
+                  {/*celda para especificaciones rapidas*/}
                   <td data-label="Hardware Clave">
-                    {/* Nota: El backend en el plural puede no traer las specs, 
-                        pero agregaremos un fallback o verteremos datos básicos */}
                     <div className="contact-cell">
                       <span className="asset-main-title">{asset.tipo_equipo}</span>
                       <span className="specs-text">ID Propietario: {asset.id_usuario}</span>
@@ -220,7 +219,7 @@ const AssetManagement = () => {
                     </div>
                   </td>
 
-                  {/* Celda Integridad Operativa */}
+                  {/*celda para el estado operativo*/}
                   <td data-label="Estado Operativo">
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
                       <div className={`status-badge ${asset.estado_operativo === 'Operativo' ? 'status-active' : 'status-inactive'}`}>
@@ -234,7 +233,7 @@ const AssetManagement = () => {
                     </div>
                   </td>
 
-                  {/* Celda Acciones */}
+                  {/*celda con los iconos de editar y eliminar*/}
                   <td data-label="Mantenimiento">
                     <div className="action-buttons">
                       <button className="btn-icon btn-edit" title="Ver / Editar Ficha" onClick={() => openModal('EDIT', asset)}>
@@ -260,9 +259,7 @@ const AssetManagement = () => {
           </table>
         </div>
 
-        {/* =========================================
-            SÚPER MODAL DRY: (ALTA Y EDICIÓN DE EQUIPO CON RELACIONES)
-        ========================================== */}
+        {/*modal para registrar o editar equipos*/}
         {modalMode && (
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -277,14 +274,14 @@ const AssetManagement = () => {
               <form onSubmit={handleSaveModal} className="modal-form">
                 <div className="modal-body">
 
-                  {/* SECCIÓN 1: IDENTIFICACIÓN GENERAL */}
-                  <h4 className="section-divider"><Barcode size={20} /> Identificación Institucional</h4>
+                  {/*seccion de identificacion general*/}
+                  <h4 className="section-divider"><Barcode size={20} /> Identificación Del Equipo</h4>
                   <div className="modal-grid">
                     <AuthInput label="Código de Inventario" icon={Barcode} value={currentAsset.codigo_inventario} onChange={(e) => setCurrentAsset({ ...currentAsset, codigo_inventario: e.target.value })} />
                     <AuthInput label="Número de Serie (S/N)" icon={Barcode} value={currentAsset.numero_serie} onChange={(e) => setCurrentAsset({ ...currentAsset, numero_serie: e.target.value })} />
 
                     <div className="input-group select-group">
-                      <label>Tipo de Autómata</label>
+                      <label>Tipo de Equipo</label>
                       <div className="input-wrapper">
                         <Laptop className="input-icon" size={20} />
                         <select className="auth-select" value={currentAsset.tipo_equipo} onChange={(e) => setCurrentAsset({ ...currentAsset, tipo_equipo: e.target.value })}>
@@ -299,16 +296,16 @@ const AssetManagement = () => {
                     <AuthInput label="Fecha de Adquisición" type="date" icon={Calendar} value={currentAsset.fecha_adquisicion} onChange={(e) => setCurrentAsset({ ...currentAsset, fecha_adquisicion: e.target.value })} />
                   </div>
 
-                  {/* SECCIÓN 2: LOCALIZACIÓN Y MANTENIMIENTO */}
+                  {/*seccion de localizacion fisica y asignaciones*/}
                   <h4 className="section-divider"><MapPin size={20} /> Localización Física y Asignaciones</h4>
                   <div className="modal-grid">
                     <div className="input-group select-group">
                       <label>Dueño / Usuario Asignado</label>
                       <div className="input-wrapper">
                         <UserIcon className="input-icon" size={20} />
-                        <select 
-                          className="auth-select" 
-                          value={currentAsset.id_usuario} 
+                        <select
+                          className="auth-select"
+                          value={currentAsset.id_usuario}
                           onChange={(e) => setCurrentAsset({ ...currentAsset, id_usuario: e.target.value })}
                           required
                         >
@@ -337,7 +334,7 @@ const AssetManagement = () => {
                     </div>
 
                     <div className="input-group select-group">
-                      <label>Cobertura de Garantía Legal</label>
+                      <label>Cobertura de Garantía de Fábrica</label>
                       <div className="input-wrapper">
                         <ShieldCheck className="input-icon" size={20} />
                         <select className="auth-select" value={currentAsset.en_garantia ? "true" : "false"} onChange={(e) => setCurrentAsset({ ...currentAsset, en_garantia: e.target.value === 'true' })}>
@@ -348,8 +345,8 @@ const AssetManagement = () => {
                     </div>
                   </div>
 
-                  {/* SECCIÓN 3: ESPECIFICACIONES TÉCNICAS */}
-                  <h4 className="section-divider"><Cpu size={20} /> Matriz de Especificaciones Internas (Vigentes)</h4>
+                  {/*seccion de especificaciones tecnicas*/}
+                  <h4 className="section-divider"><Cpu size={20} /> Matriz de Especificaciones (Vigentes)</h4>
                   <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>Al actualizar esto, el sistema versionará las specs antiguas de forma transparente por seguridad de auditoría.</p>
 
                   <div className="modal-grid">
@@ -387,7 +384,7 @@ const AssetManagement = () => {
                     <AuthInput label="Volumen del Disco Principal" type="text" icon={HardDrive} placeholder="Ej. 1TB o 512GB" value={currentAsset.especificaciones.almacenamiento} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, almacenamiento: e.target.value } })} />
                   </div>
 
-                  {/* SECCIÓN 4: ASIGNACIÓN DE PERIFÉRICOS (1 a N) */}
+                  {/*seccion de perifericos 0 a N*/}
                   <h4 className="section-divider"><ClipboardList size={20} /> Periféricos y Accesorios Anexos</h4>
                   <div className="peripherals-wrapper">
                     {currentAsset.perifericos.map((p, index) => (
@@ -396,13 +393,13 @@ const AssetManagement = () => {
                         <div className="peripheral-header">
                           <span>Accesorio #{index + 1}</span>
                           <button type="button" className="btn-remove-peripheral" onClick={() => removePeripheral(index)}>
-                            <Trash2 size={16} /> Quitar Liga
+                            <Trash2 size={16} /> Quitar Periférico
                           </button>
                         </div>
 
                         <div className="peripheral-grid modal-grid">
                           <div className="input-group select-group">
-                            <label>Clasificación del Modulo</label>
+                            <label>Clasificación del Periférico</label>
                             <div className="input-wrapper">
                               <Monitor className="input-icon" size={20} />
                               <select className="auth-select" value={p.tipo} onChange={(e) => updatePeripheral(index, 'tipo', e.target.value)}>
@@ -424,7 +421,7 @@ const AssetManagement = () => {
                     ))}
 
                     <button type="button" className="btn-add-peripheral" onClick={addPeripheral}>
-                      <Plus size={20} /> Acoplar Nuevo Periférico Físico
+                      <Plus size={20} /> Registrar Nuevo Periférico
                     </button>
                   </div>
 

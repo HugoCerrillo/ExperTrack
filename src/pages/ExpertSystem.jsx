@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Send, BrainCircuit, User, RefreshCw } from 'lucide-react';
+import { Send, BrainCircuit, User, RefreshCw } from 'lucide-react'; //iconos de lucide-react
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import '../assets/styles/expert-system.css';
 import { useExpertSystem } from '../hooks/back_expert_system';
@@ -24,7 +24,7 @@ const ExpertSystem = () => {
 
   const chatBodyRef = useRef(null);
 
-  // Manipulación aislada del contenedor para evitar el salto de ventana Chrome
+  //manipulacion para que el chat siempre se mantenga al final y no de un saltito raro
   const scrollToBottom = () => {
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTo({
@@ -44,17 +44,18 @@ const ExpertSystem = () => {
   };
 
   return (
+    //componente reutilizado de dashboard
     <DashboardLayout headerTitle="Sistema Experto (Diagnósticos)">
       <div className="chat-container">
 
-        {/* Banner o Cabecera Fija */}
+        {/*Cabecera del chat */}
         <div className="chat-header">
           <div className="chat-header-icon">
             <BrainCircuit size={24} />
           </div>
           <div className="chat-header-info">
-            <h3>ExperBot - Inferencia en Tiempo Real</h3>
-            <p>Arquitectura Prolog</p>
+            <h3>ExperBot - Asistente de Diagnóstico</h3>
+            <p>Diagnóstico inteligente de equipos</p>
           </div>
           <button onClick={resetDiagnosticSession} className="btn-chat-action" style={{ marginLeft: 'auto' }} title="Limpiar y Reiniciar">
             <RefreshCw size={16} /> Reiniciar
@@ -74,20 +75,20 @@ const ExpertSystem = () => {
                   {msg.text}
                 </div>
 
-                {/* INYECCIÓN DINÁMICA DE BOTONES PARA MÁQUINA DE ESTADOS */}
+                {/*insercion dinamica de botones*/}
                 {msg.showOptions === 'EQUIPO' && (
                   <div className="chat-action-buttons" style={{ flexDirection: 'column', gap: '0.6rem' }}>
-                    <select 
-                      className="auth-select" 
+                    <select
+                      className="auth-select"
                       id="asset-dropdown"
                       style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--color-khaki)', backgroundColor: '#fff', color: 'var(--color-olive-dark)' }}
                       defaultValue=""
                     >
                       {loadingAssets ? (
-                        <option value="" disabled>Conectando con DB de Activos...</option>
+                        <option value="" disabled>Conectando con Activos...</option>
                       ) : (
                         <>
-                          <option value="" disabled>-- Selecciona un Activo del Sistema --</option>
+                          <option value="" disabled>-- Selecciona un Activo disponible --</option>
                           {availableAssets.map(asset => (
                             <option key={asset.id_equipo} value={asset.codigo_inventario}>
                               {asset.codigo_inventario} - {asset.marca} {asset.modelo} ({asset.tipo_equipo})
@@ -96,8 +97,8 @@ const ExpertSystem = () => {
                         </>
                       )}
                     </select>
-                    <button 
-                      className="btn-chat-action action-yes" 
+                    <button
+                      className="btn-chat-action action-yes"
                       style={{ alignSelf: 'flex-start' }}
                       onClick={() => {
                         const selector = document.getElementById('asset-dropdown');
@@ -109,25 +110,25 @@ const ExpertSystem = () => {
                   </div>
                 )}
 
-                {/* SÍNTOMA SELECCIONABLE */}
+                {/*manifestacion de falla (sintoma) seleccionable*/}
                 {msg.showOptions === 'SINTOMA' && (
                   <div className="chat-action-buttons" style={{ flexDirection: 'column', gap: '0.6rem' }}>
-                    <select 
-                      className="auth-select" 
+                    <select
+                      className="auth-select"
                       id="symptom-dropdown"
                       style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--color-khaki)', backgroundColor: '#fff', color: 'var(--color-olive-dark)' }}
                       defaultValue=""
                     >
-                      <option value="" disabled>-- Selecciona un Patrón General --</option>
-                      {sintomasValidos.length === 0 && <option value="" disabled>Cargando síntomas...</option>}
+                      <option value="" disabled>-- Selecciona una manifestación de falla --</option>
+                      {sintomasValidos.length === 0 && <option value="" disabled>Cargando manifestación de falla...</option>}
                       {sintomasValidos.map(sint => (
                         <option key={sint.clave} value={sint.clave}>
                           • {sint.descripcion}
                         </option>
                       ))}
                     </select>
-                    <button 
-                      className="btn-chat-action action-yes" 
+                    <button
+                      className="btn-chat-action action-yes"
                       style={{ alignSelf: 'flex-start' }}
                       onClick={() => {
                         const selector = document.getElementById('symptom-dropdown');
@@ -151,7 +152,7 @@ const ExpertSystem = () => {
             </div>
           ))}
 
-          {/* Render Condicional de Carga (Tres Puntitos Bot) */}
+          {/*render para el punto de carga del bot*/}
           {isTyping && (
             <div className="chat-message bot">
               <div className="message-avatar">
@@ -168,27 +169,27 @@ const ExpertSystem = () => {
           )}
         </div>
 
-        {/* Input Footer Bloqueado Abajo */}
+        {/*input del usuario bloqueado en la parte inferior*/}
         <div className="chat-footer">
           <div className="chat-input-wrapper">
             <textarea
               className="chat-input"
               placeholder={
                 chatState === 'ASKING_TIPO' ? '↑ Utiliza el selector de equipos arriba...' :
-                chatState === 'ASKING_SINTOMA' ? '↑ Selecciona una falla de la lista superior...' :
-                chatState === 'IN_PROGRESS' ? '↑ Responde utilizando los botones Sí / No...' :
-                chatState === 'ASKING_FINAL_DETAILS' ? 'Escribe aquí los detalles adicionales de la falla...' :
-                chatState === 'DONE' ? 'Sesión terminada. Dale a Reiniciar para diagnosticar otro Activo.' :
-                "Escribe y pulsa Enter..."
+                  chatState === 'ASKING_SINTOMA' ? '↑ Selecciona una falla de la lista superior...' :
+                    chatState === 'IN_PROGRESS' ? '↑ Responde utilizando los botones Sí / No...' :
+                      chatState === 'ASKING_FINAL_DETAILS' ? 'Escribe aquí los detalles adicionales de la falla...' :
+                        chatState === 'DONE' ? 'Sesión terminada. Dale a Reiniciar para diagnosticar otro Activo.' :
+                          "Escribe y pulsa Enter..."
               }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              disabled={chatState !== 'ASKING_FINAL_DETAILS'} 
+              disabled={chatState !== 'ASKING_FINAL_DETAILS'}
             />
           </div>
-          <button 
+          <button
             className="btn-send-message"
             onClick={handleSendMessage}
             disabled={chatState !== 'ASKING_FINAL_DETAILS' || !inputMessage.trim()}

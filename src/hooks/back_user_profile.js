@@ -1,33 +1,30 @@
 import { useState, useCallback } from "react";
 import Swal from "sweetalert2";
 
-//----------------------------------------------------
-// URL base de la API (proxy Vercel)
+//url de la api pasando por vercel
 const API_URL = '/api';
-//----------------------------------------------------
 
+//funcion que maneja el perfil del usuario
 export function useUserProfile() {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Obtener ID del usuario desde localStorage
+    //obtener el id del usuario desde localStorage
     const getStoredUser = () => {
         const userStr = localStorage.getItem('user');
         if (userStr) {
             try {
                 return JSON.parse(userStr);
             } catch (e) {
-                console.error("Error al parsear usuario de localStorage", e);
+                console.error("Error al obtener usuario de localStorage", e);
                 return null;
             }
         }
         return null;
     };
 
-    //----------------------------------------------------
-    // GET /usuarios/<id> — Traer datos del perfil actual
-    //----------------------------------------------------
+    //solicitud get para traer los datos del usuario
     const fetchProfile = useCallback(async () => {
         const storedUser = getStoredUser();
         if (!storedUser || !storedUser.id_usuario) {
@@ -39,16 +36,19 @@ export function useUserProfile() {
         setLoading(true);
         setError(null);
         try {
+            //solicitud
             const response = await fetch(`${API_URL}/usuarios/${storedUser.id_usuario}`, {
                 method: 'GET',
                 credentials: 'include',
             });
 
+            //convertimos la respuesta a json
             const data = await response.json();
 
+            //analizamos la respuesta
             if (response.ok && data.status === 'success') {
                 setProfile(data.user);
-                // Actualizamos localStorage por si cambiaron datos en el servidor
+                //modificamos tambien en localStorage por si las dudas
                 localStorage.setItem('user', JSON.stringify(data.user));
             } else {
                 setError(data.message || 'Error al cargar el perfil.');
@@ -60,12 +60,10 @@ export function useUserProfile() {
         }
     }, []);
 
-    //----------------------------------------------------
-    // PUT /usuarios/<id> — Actualizar mis datos
-    //----------------------------------------------------
+    //solicitud put para actualizar el perfil del usuario
     const updateProfile = async (formData) => {
         const storedUser = getStoredUser();
-        if (!storedUser || !storedUser.id_usuario) return false;
+        if (!storedUser || !storedUser.id_usuario) return false; //si no hay usuario no se puede actualizar
 
         try {
             Swal.fire({
@@ -74,6 +72,7 @@ export function useUserProfile() {
                 didOpen: () => Swal.showLoading()
             });
 
+            //solicitud
             const response = await fetch(`${API_URL}/usuarios/${storedUser.id_usuario}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -84,20 +83,22 @@ export function useUserProfile() {
                     apellido_materno: formData.apellidoMaterno.trim(),
                     telefono: formData.telefono,
                     correo: formData.correo.trim(),
-                    // Solo enviamos contraseña si el usuario escribió algo
+                    //solo se envia la contraseña si el usuario la cambio
                     ...(formData.contrasena ? { contraseña: formData.contrasena } : {}),
-                    // Mantenemos el rol y estatus actuales (no se cambian desde el perfil)
+                    //se mantiene el rol y estatus actuales (no se cambian desde el perfil)
                     rol: storedUser.rol,
                     estatus: storedUser.estatus
                 })
             });
 
+            //convertimos la respuesta a json
             const data = await response.json();
 
+            //analizamos la respuesta
             if (response.ok && data.status === 'success') {
                 setProfile(data.user);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                
+
                 Swal.fire({
                     icon: 'success',
                     title: '¡Perfil Actualizado!',
@@ -125,6 +126,7 @@ export function useUserProfile() {
         }
     };
 
+    //retornamos al front
     return {
         profile,
         loading,

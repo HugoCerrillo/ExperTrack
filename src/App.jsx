@@ -11,22 +11,20 @@ import ExpertSystem from './pages/ExpertSystem';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Swal from 'sweetalert2';
 
-// ----------------------------------------------------------------------------
-// INTERCEPTOR GLOBAL DE PETICIONES HTTP
-// Vigila TODAS las llamadas fetch() que hace el sistema hacia el Backend. 
-// Si Flask responde 401 (Unauthorized/JWT Expirado), expulsa al usuario al Login.
-// ----------------------------------------------------------------------------
+//por seguridad y para que no se pueda acceder al sistema sin iniciar sesion
+//vigila todas las llamadas fetch() que hace el sistema hacia el Backend
+//si Flask responde 401 (Unauthorized/JWT Expirado), expulsa al usuario al Login.
 const originalFetch = window.fetch;
 window.fetch = async function (...args) {
   const response = await originalFetch.apply(this, args);
   if (response.status === 401) {
     if (!window.hasShown401Alert) {
       window.hasShown401Alert = true;
-      localStorage.removeItem('user'); // Destrozar la identificación local
+      localStorage.removeItem('user'); //removemos el usuario del localStorage
       Swal.fire({
         icon: 'warning',
-        title: 'Sesión de Seguridad Vencida',
-        text: 'Tu Token JWT ha caducado. Por motivos de seguridad de ExperTrack, debes volver a iniciar sesión.',
+        title: 'Sesión Caducada',
+        text: 'Tu sesión ha finalizado. Por motivos de seguridad de ExperTrack, debes volver a iniciar sesión.',
         confirmButtonColor: '#504b38',
         allowOutsideClick: false
       }).then(() => {
@@ -36,20 +34,20 @@ window.fetch = async function (...args) {
   }
   return response;
 };
-// ----------------------------------------------------------------------------
+
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
         <Routes>
-          {/* Se definen las rutas de navegación del sistema*/}
+          {/*definimos las rutas de navegacion del sistema*/}
           <Route path="/" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/register" element={<Register />} />
-          
-          {/* Rutas Privadas / Internas del Sistema (Protegidas) */}
+
+          {/*rutas privadas protegidas*/}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/dashboard/perfil" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
           <Route path="/dashboard/usuarios" element={<ProtectedRoute><UserManagement /></ProtectedRoute>} />

@@ -4,10 +4,11 @@ import { Menu, Bell, User, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
+//renderizado de header interactivo
 export const TopHeader = ({ toggleSidebar, title }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  
+
   const dropdownRef = useRef(null);
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
@@ -31,11 +32,11 @@ export const TopHeader = ({ toggleSidebar, title }) => {
     }
   };
 
-  // Obtener datos del usuario logueado en tiempo real
-  const [userData, setUserData] = useState({ 
-    initials: 'AD', 
-    fullName: 'Usuario', 
-    email: 'correo@expertrack.com' 
+  //obtener datos del usuario logueado en tiempo real
+  const [userData, setUserData] = useState({
+    initials: 'AD',
+    fullName: 'Usuario',
+    email: 'correo@expertrack.com'
   });
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export const TopHeader = ({ toggleSidebar, title }) => {
         const user = JSON.parse(storedUser);
         const n = (user.nombre || "").charAt(0).toUpperCase();
         const ap = (user.apellido_paterno || user.apellidoPaterno || "").charAt(0).toUpperCase();
-        
+
         setUserData({
           initials: (n + ap) || 'U',
           fullName: `${user.nombre} ${user.apellido_paterno || user.apellidoPaterno || ''}`,
@@ -64,14 +65,14 @@ export const TopHeader = ({ toggleSidebar, title }) => {
     { id: 3, text: 'Inventario actualizado: +5 Discos SSD 1TB ingresados', time: 'Ayer' },
   ];
 
-  // Cerrar paneles flotantes al hacer clic afuera
+  //cerrar paneles flotantes al hacer clic afuera
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Cerrar Notificaciones
+      //cerrar notificaciones
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
-      // Cerrar Menú de Usuario
+      //cerrar menu de usuario
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
@@ -82,31 +83,31 @@ export const TopHeader = ({ toggleSidebar, title }) => {
 
   return (
     <header className="dashboard-header">
-      {/* Botón Hamburguesa Interactivo */}
+      {/*boton hamburguesa interactivo*/}
       <div className="header-left">
         <button className="menu-toggle-btn" onClick={toggleSidebar}>
           <Menu size={32} strokeWidth={1.5} />
         </button>
       </div>
-      
-      {/* Título Central Dinámico */}
+
+      {/*titulo central dinamico*/}
       <div className="header-center">
         <h2 className="header-role-title">{title}</h2>
       </div>
 
-      {/* Botones de Acción Derecho con Dropdown */}
+      {/*botones de accion derecho con dropdown*/}
       <div className="header-right">
-        
+
         <div className="notification-wrapper" ref={dropdownRef} style={{ position: 'relative' }}>
-          <button 
-            className="icon-btn" 
+          <button
+            className="icon-btn"
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell size={20} />
             <span className="badge">3</span>
           </button>
 
-          {/* Menú Desplegable Renderizado Condicionalmente */}
+          {/*menu desplegable de notificaciones*/}
           {showNotifications && (
             <div className="notification-dropdown">
               <div className="dropdown-header">Notificaciones Recientes</div>
@@ -124,31 +125,31 @@ export const TopHeader = ({ toggleSidebar, title }) => {
         </div>
 
         <div className="user-menu-wrapper" ref={userMenuRef} style={{ position: 'relative' }}>
-          <button 
+          <button
             className="avatar-btn"
             onClick={() => setShowUserMenu(!showUserMenu)}
           >
             {userData.initials}
           </button>
 
-          {/* Menú Desplegable de Usuario */}
+          {/*menu desplegable de usuario*/}
           {showUserMenu && (
             <div className="user-dropdown">
               <div className="dropdown-header">
                 <p className="user-name">{userData.fullName}</p>
                 <p className="user-role">{userData.email}</p>
               </div>
-              
+
               <div className="dropdown-list">
                 <Link to="/dashboard/perfil" className="dropdown-item user-item" onClick={() => setShowUserMenu(false)}>
                   <User size={16} />
                   <span>Mi Perfil</span>
                 </Link>
-                
+
                 <div className="dropdown-divider"></div>
-                
-                <button 
-                  className="dropdown-item user-item logout-item" 
+
+                <button
+                  className="dropdown-item user-item logout-item"
                   onClick={handleLogout}
                   style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
                 >

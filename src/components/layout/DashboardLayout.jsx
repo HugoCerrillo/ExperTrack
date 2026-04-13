@@ -3,14 +3,12 @@ import { Sidebar } from './Sidebar';
 import { TopHeader } from './TopHeader';
 import '../../assets/styles/dashboard.css';
 
-/**
- * DashboardLayout envuelve cualquier pantalla (children) con la estructura maestra de trabajo.
- */
+//este dashboard se reutiliza en todas las pantallas del dashboard con children
 export const DashboardLayout = ({ children, headerTitle = "Administrador" }) => {
-  // Inicializamos el estado dependiendo del tamaño de la pantalla
+  //inicializamos el estado dependiendo del tamaño de la pantalla
   const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 1024);
 
-  // Escuchar redimensiones para acoplarse automáticamente al usuario
+  //escuchamos redimensiones para acoplarse automáticamente al usuario
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 1024) {
@@ -23,14 +21,14 @@ export const DashboardLayout = ({ children, headerTitle = "Administrador" }) => 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Funciones para despliegue de menú interactivo
+  //funciones para despliegue de menu interactivo 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
     <div className="dashboard-wrapper">
       <Sidebar isOpen={isSidebarOpen} closeSidebar={closeSidebar} />
-      
+
       <main className="dashboard-main">
         <TopHeader toggleSidebar={toggleSidebar} title={headerTitle} />
         <div className="dashboard-content">

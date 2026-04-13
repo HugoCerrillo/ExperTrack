@@ -5,11 +5,11 @@ import {
 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import experTrackLogo from '../../assets/img/ExperTrack.png';
-
+//renderizado de menu interactivo dependiendo del rol
 export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
   const navigate = useNavigate();
 
-  // Diccionario centralizado de los permisos de rutas por cada rol
+  //configuracion de rutas por cada rol
   const menuConfig = {
     'Administrador': [
       { path: '/dashboard', icon: Home, label: 'Inicio', exact: true },
@@ -62,10 +62,11 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
   };
   return (
     <>
-      {/* Añadimos clase de desktop-closed para computadoras y mobile-open para móviles */}
+      {/*clase desktop-closed para ocultar el menu en computadoras*/}
+      {/*clase mobile-open para mostrar el menu en móviles*/}
       <aside className={`sidebar ${!isOpen ? 'desktop-closed' : ''} ${isOpen ? 'mobile-open' : ''}`}>
 
-        {/* Cabecera del Menu */}
+        {/*cabecera del menu*/}
         <div className="sidebar-header">
           <img src={experTrackLogo} alt="ExperTrack" className="sidebar-logo-img" />
           <span className="sidebar-brand">ExperTrack</span>
@@ -73,7 +74,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
 
         <div className="sidebar-menu-title">Menu Principal</div>
 
-        {/* Enlaces de Navegación Interna construidos dinámicamente */}
+        {/*enlaces de navegacion interna construidos dinamicamente*/}
         <nav className="sidebar-nav">
           {renderMenu.map((item, idx) => {
             const Icon = item.icon;
@@ -92,7 +93,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
           })}
         </nav>
 
-        {/* Cierre de sesión anclado abajo */}
+        {/*cierre de sesion anclado abajo*/}
         <div className="sidebar-bottom">
           <button className="sidebar-item" onClick={handleLogout} style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}>
             <LogOut size={20} className="icon" />
@@ -101,7 +102,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
         </div>
       </aside>
 
-      {/* Capa negra transparente para cerrar menú en Celulares */}
+      {/*capa negra transparente para cerrar menu en celulares*/}
       <div className={`sidebar-overlay ${isOpen ? 'show' : ''}`} onClick={closeSidebar}></div>
     </>
   );

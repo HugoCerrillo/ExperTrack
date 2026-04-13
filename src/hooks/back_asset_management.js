@@ -1,19 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 
-//----------------------------------------------------
-// URL base de la API en AWS EC2
+//url base de la api pasando por vercel
 const API_URL = '/api';
-//----------------------------------------------------
 
 export function useAssetManagement() {
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    //----------------------------------------------------
-    // GET /equipos — Traer todos los equipos del servidor
-    //----------------------------------------------------
+    //solicitud get para traer todos los equipos registrados
     const fetchEquipos = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -37,14 +33,12 @@ export function useAssetManagement() {
         }
     }, []);
 
-    // Cargar al montar
+    //cargar al entrar al sistema
     useEffect(() => {
         fetchEquipos();
     }, [fetchEquipos]);
 
-    //----------------------------------------------------
-    // GET /equipos/<id> — Detalle completo incluyendo hijos
-    //----------------------------------------------------
+    //solicitud get para obtener el detalle completo de un equipo incluyendo los perifericos y especificaciones
     const fetchEquipoDetalle = async (id) => {
         try {
             const response = await fetch(`${API_URL}/equipos/${id}`, {
@@ -53,7 +47,7 @@ export function useAssetManagement() {
             });
             const data = await response.json();
             if (response.ok && data.status === 'success') {
-                return data; // Contiene data.equipo, data.perifericos, data.especificacion
+                return data; //contiene data.equipo, data.perifericos, data.especificacion
             }
             return null;
         } catch (err) {
@@ -62,9 +56,7 @@ export function useAssetManagement() {
         }
     };
 
-    //----------------------------------------------------
-    // POST /equipos — Registrar nuevo equipo
-    //----------------------------------------------------
+    //solicitud post para registrar un nuevo equipo
     const crearEquipo = async (formData) => {
         try {
             Swal.fire({
@@ -84,11 +76,11 @@ export function useAssetManagement() {
             const data = await response.json();
 
             if (response.ok && data.status === 'success') {
-                await fetchEquipos(); // Refrescar lista
+                await fetchEquipos();
                 Swal.fire({
                     icon: 'success',
                     title: '¡Equipo Registrado!',
-                    text: 'El activo se integró al inventario.',
+                    text: 'El equipo se integró al sistema.',
                     confirmButtonColor: '#504b38'
                 });
                 return true;
@@ -112,9 +104,7 @@ export function useAssetManagement() {
         }
     };
 
-    //----------------------------------------------------
-    // PUT /equipos/<id> — Actualizar equipo y specs
-    //----------------------------------------------------
+    //solicitud put para actualizar un equipo y sus especificaciones y perifericos
     const actualizarEquipo = async (id, formData) => {
         try {
             Swal.fire({
@@ -134,11 +124,11 @@ export function useAssetManagement() {
             const data = await response.json();
 
             if (response.ok && data.status === 'success') {
-                await fetchEquipos(); // Actualizar lista
+                await fetchEquipos(); //actualiza la lista de equipos
                 Swal.fire({
                     icon: 'success',
                     title: '¡Actualizado!',
-                    text: 'Auditoría técnica guardada exitosamente.',
+                    text: 'Cambios guardados exitosamente.',
                     confirmButtonColor: '#504b38'
                 });
                 return true;
@@ -162,18 +152,16 @@ export function useAssetManagement() {
         }
     };
 
-    //----------------------------------------------------
-    // DELETE /equipos/<id> — Baja de equipo
-    //----------------------------------------------------
+    //solicitud delete para eliminar un equipo
     const eliminarEquipo = async (id) => {
         const result = await Swal.fire({
-            title: '¿Confirmar retiro del equipo?',
+            title: '¿Confirmar eliminación del equipo?',
             text: "Esto dará de baja el equipo y todos sus periféricos permanentemente.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#f85149',
             cancelButtonColor: '#504b38',
-            confirmButtonText: 'Sí, retirar equipo',
+            confirmButtonText: 'Sí, eliminar equipo',
             cancelButtonText: 'Cancelar'
         });
 
@@ -181,7 +169,7 @@ export function useAssetManagement() {
 
         try {
             Swal.fire({
-                title: 'Retirando hardware...',
+                title: 'Eliminando equipo...',
                 allowEscapeKey: false,
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
@@ -198,8 +186,8 @@ export function useAssetManagement() {
                 setAssets(prev => prev.filter(a => a.id_equipo !== id));
                 Swal.fire({
                     icon: 'success',
-                    title: '¡Baja Exitosa!',
-                    text: 'El hardware ha sido retirado.',
+                    title: '¡Eliminación Exitosa!',
+                    text: 'El equipo ha sido eliminado.',
                     confirmButtonColor: '#504b38'
                 });
                 return true;
@@ -223,6 +211,7 @@ export function useAssetManagement() {
         }
     };
 
+    //retornar los valores
     return {
         assets,
         loading,

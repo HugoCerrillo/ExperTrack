@@ -1,6 +1,6 @@
 import React from 'react';
 
-{/* Boton que se reutiliza en las paginas
+{/*boton que se reutiliza en las paginas
       diferentes antes de iniciar sesión*/}
 export const AuthButton = ({ children, onClick, type = 'submit', icon: Icon }) => {
   return (

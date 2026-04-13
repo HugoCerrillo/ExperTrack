@@ -8,10 +8,6 @@ import { useUserManagement } from '../hooks/back_user_management';
 import '../assets/styles/users.css';
 
 const UserManagement = () => {
-
-  //----------------------------------------------------
-  // Hook principal: datos reales desde la API de Flask
-  //----------------------------------------------------
   const { users, loading, fetchUsuarios, crearUsuario, actualizarUsuario, eliminarUsuario } = useUserManagement();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,9 +26,7 @@ const UserManagement = () => {
     contrasena: ''
   });
 
-  //----------------------------------------------------
-  // Manejo del modal de agregar usuario
-  //----------------------------------------------------
+  //modal de agregar usuario
   const openAddModal = () => setIsAddModalOpen(true);
 
   const closeAddModal = () => {
@@ -52,11 +46,9 @@ const UserManagement = () => {
     if (ok) closeAddModal();
   };
 
-  //----------------------------------------------------
-  // Manejo del modal de edición
-  //----------------------------------------------------
+  //modal para editar usuario
   const handleEdit = (user) => {
-    // Cargamos en el estado de edición con contrasena vacía (seguridad)
+    //cargamos los datos del usuario a editar con contraseña vacia por seguridad
     setEditingUser({ ...user, contrasena: '' });
   };
 
@@ -67,45 +59,35 @@ const UserManagement = () => {
     if (!editingUser) return;
 
     setIsSaving(true);
-    // Llamamos a la API a través del hook
+    //llamamos a la funcion actualizarUsuario del hook
     const success = await actualizarUsuario(editingUser.id, editingUser);
     setIsSaving(false);
 
     if (success) {
       closeEditModal();
-      // Opcional: Podrías hacer un fetchUsuarios() aquí si quieres estar 100% seguro,
-      // pero el hook ya actualiza el estado local 'users' automáticamente.
     }
   };
 
-  //----------------------------------------------------
-  // Eliminación de usuario
-  //----------------------------------------------------
+  //eliminar usuario
   const handleDelete = async (id) => {
     await eliminarUsuario(id);
   };
 
-  //----------------------------------------------------
-  // Iconos por rol
-  //----------------------------------------------------
+  //iconos por rol
   const getRoleIcon = (rol) => {
     if (rol === 'Administrador') return <Shield size={14} />;
     if (rol === 'Técnico') return <Wrench size={14} />;
     return <Package size={14} />;
   };
 
-  //----------------------------------------------------
-  // Filtrado en tiempo real por barra de búsqueda
-  //----------------------------------------------------
+  //filtro de busqueda en tiempo real
   const filteredUsers = users.filter(u =>
     `${u.nombre} ${u.apellidoPaterno} ${u.correo} ${u.rol}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase())
   );
 
-  //----------------------------------------------------
-  // Skeleton loader mientras carga la tabla
-  //----------------------------------------------------
+  //mientras carga la tabla muestra skeleton
   const SkeletonRow = () => (
     <tr className="skeleton-row">
       {[...Array(5)].map((_, i) => (
@@ -118,7 +100,7 @@ const UserManagement = () => {
     <DashboardLayout headerTitle="Gestión de Usuarios">
       <div className="users-container">
 
-        {/* Cabecera Interactiva */}
+        {/*cabecera*/}
         <div className="users-header-actions">
           <div className="search-bar">
             <AuthInput
@@ -132,7 +114,7 @@ const UserManagement = () => {
             />
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
-            {/* Botón para recargar datos desde el servidor */}
+            {/*boton para recargar datos*/}
             <button
               className="btn-refresh"
               onClick={fetchUsuarios}
@@ -151,7 +133,7 @@ const UserManagement = () => {
           </div>
         </div>
 
-        {/* Tabla de Usuarios */}
+        {/*tabla de usuarios*/}
         <div className="table-wrapper">
           <table className="users-table">
             <thead>
@@ -164,14 +146,12 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {/* Skeleton mientras carga */}
+              {/*mientras carga, mostramos un skeleton*/}
               {loading && [...Array(4)].map((_, i) => <SkeletonRow key={i} />)}
 
-              {/* Filas reales */}
               {!loading && filteredUsers.map((user) => (
                 <tr key={user.id}>
-
-                  {/* Columna Usuario */}
+                  {/*columna usuario*/}
                   <td data-label="Usuario Completo">
                     <div className="user-cell">
                       <div className="user-avatar-small">
@@ -185,7 +165,7 @@ const UserManagement = () => {
                     </div>
                   </td>
 
-                  {/* Columna Rol */}
+                  {/*columna rol*/}
                   <td data-label="Rol del Sistema">
                     <span className={`role-badge role-${user.rol.split(' ')[0].toLowerCase()}`}>
                       {getRoleIcon(user.rol)}
@@ -193,7 +173,7 @@ const UserManagement = () => {
                     </span>
                   </td>
 
-                  {/* Columna Contacto */}
+                  {/*columna contacto*/}
                   <td data-label="Registro de Contacto">
                     <div className="contact-cell">
                       <span>{user.correo}</span>
@@ -201,7 +181,7 @@ const UserManagement = () => {
                     </div>
                   </td>
 
-                  {/* Columna Estatus */}
+                  {/*columna estatus*/}
                   <td data-label="Estado">
                     <div className={`status-badge ${user.estatus ? 'status-active' : 'status-inactive'}`}>
                       {user.estatus ? <UserCheck size={14} /> : <UserX size={14} />}
@@ -209,7 +189,7 @@ const UserManagement = () => {
                     </div>
                   </td>
 
-                  {/* Columna Acciones */}
+                  {/*columna acciones con botones de editar y eliminar*/}
                   <td data-label="Control de Acciones">
                     <div className="action-buttons">
                       <button className="btn-icon btn-edit" title="Editar cuenta" onClick={() => handleEdit(user)}>
@@ -224,7 +204,7 @@ const UserManagement = () => {
                 </tr>
               ))}
 
-              {/* Estado vacío cuando la búsqueda no da resultados */}
+              {/*estado vacio cuando la busqueda no da resultados*/}
               {!loading && filteredUsers.length === 0 && (
                 <tr>
                   <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
@@ -238,9 +218,7 @@ const UserManagement = () => {
           </table>
         </div>
 
-        {/*---------------------------------------------*/}
-        {/* MODAL: Editar usuario                        */}
-        {/*---------------------------------------------*/}
+        {/*modal para editar usuario*/}
         {editingUser && (
           <div className="modal-overlay" onClick={closeEditModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -277,9 +255,9 @@ const UserManagement = () => {
                         <Shield className="input-icon" size={20} />
                         <select className="auth-select" value={editingUser.rol}
                           onChange={(e) => setEditingUser({ ...editingUser, rol: e.target.value })}>
-                          <option value="Administrador">Administrador Supremo</option>
-                          <option value="Técnico">Cuerpo Técnico</option>
-                          <option value="Usuario Solicitante">Usuario Solicitante (Cliente)</option>
+                          <option value="Administrador">Administrador</option>
+                          <option value="Técnico">Técnico</option>
+                          <option value="Usuario Solicitante">Usuario Solicitante</option>
                         </select>
                       </div>
                     </div>
@@ -295,14 +273,14 @@ const UserManagement = () => {
                       value={editingUser.correo}
                       onChange={(e) => setEditingUser({ ...editingUser, correo: e.target.value })} />
 
-                    <AuthInput label="Contraseña (Oculta)" type="password" icon={Lock} name="contrasena"
+                    <AuthInput label="Contraseña" type="password" icon={Lock} name="contrasena"
                       value={editingUser.contrasena}
                       onChange={(e) => setEditingUser({ ...editingUser, contrasena: e.target.value })}
                       required={false}
                       placeholder="Déjala en blanco para NO cambiarla" />
 
                     <div className="input-group select-group">
-                      <label>Estatus Biométrico / Acceso</label>
+                      <label>Estatus</label>
                       <div className="input-wrapper">
                         <UserCheck className="input-icon" size={20} />
                         <select className="auth-select"
@@ -333,9 +311,7 @@ const UserManagement = () => {
           </div>
         )}
 
-        {/*---------------------------------------------*/}
-        {/* MODAL: Agregar nuevo usuario                 */}
-        {/*---------------------------------------------*/}
+        {/*modal para agregar nuevo usuario*/}
         {isAddModalOpen && (
           <div className="modal-overlay" onClick={closeAddModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -371,9 +347,9 @@ const UserManagement = () => {
                         <Shield className="input-icon" size={20} />
                         <select className="auth-select" value={newUser.rol}
                           onChange={(e) => setNewUser({ ...newUser, rol: e.target.value })}>
-                          <option value="Usuario Solicitante">Usuario Solicitante (Cliente)</option>
-                          <option value="Técnico">Cuerpo Técnico</option>
-                          <option value="Administrador">Administrador Supremo</option>
+                          <option value="Usuario Solicitante">Usuario Solicitante</option>
+                          <option value="Técnico">Técnico</option>
+                          <option value="Administrador">Administrador</option>
                         </select>
                       </div>
                     </div>
@@ -395,7 +371,7 @@ const UserManagement = () => {
                       placeholder="Asigna una contraseña inicial..." />
 
                     <div className="input-group select-group">
-                      <label>Estatus Biométrico / Acceso</label>
+                      <label>Estatus</label>
                       <div className="input-wrapper">
                         <UserCheck className="input-icon" size={20} />
                         <select className="auth-select"

@@ -16,7 +16,7 @@ export const AuthLayout = ({
       <InstitutionalHeader />
       <div className="login-container">
 
-        {/* Panel izquierdo que se reutiliza en todas
+        {/*panel izquierdo que se reutiliza en todas
       las pantallas antes de iniciar sesión*/}
         <div className="panel left-panel">
 
@@ -64,7 +64,7 @@ export const AuthLayout = ({
           </div>
         </div>
 
-        {/* Panel derecho donde iran los formularios
+        {/*panel derecho donde iran los formularios
         necesarios para login, register, recovery password
         y reset password */}
         <div className="panel right-panel">
@@ -87,7 +87,7 @@ export const AuthLayout = ({
               </div>
             )}
 
-            {/* aqui se inyecta el formulario (login, register, recovery password, reset password) */}
+            {/*aqui se inyecta el formulario (login, register, recovery password, reset password) */}
             {children}
 
           </div>

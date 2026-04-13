@@ -5,12 +5,12 @@ import { AuthInput } from '../components/ui/AuthInput';
 import { AuthButton } from '../components/ui/AuthButton';
 import { useUserProfile } from '../hooks/back_user_profile';
 import Swal from 'sweetalert2';
-import '../assets/styles/profile.css'; 
+import '../assets/styles/profile.css';
 
 const UserProfile = () => {
   const { profile, loading, fetchProfile, updateProfile } = useUserProfile();
 
-  // Estado local para los campos del formulario
+  //estado local para los campos del formulario
   const [formData, setFormData] = useState({
     nombre: '',
     apellidoPaterno: '',
@@ -20,7 +20,7 @@ const UserProfile = () => {
     contrasena: ''
   });
 
-  // Cargar perfil al entrar
+  //cargamos el perfil al entrar
   useEffect(() => {
     const load = async () => {
       await fetchProfile();
@@ -28,7 +28,7 @@ const UserProfile = () => {
     load();
   }, [fetchProfile]);
 
-  // Sincronizar formData cuando el perfil se cargue
+  //sincronizamos el formulario cuando el perfil se cargue
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -43,12 +43,12 @@ const UserProfile = () => {
   }, [profile]);
 
   const handleChange = (e) => {
-    // Bloquear letras en caso del teléfono (igual que en registro)
+    //bloqueamos letras en caso del teléfono
     if (e.target.name === 'telefono') {
-        const rawValue = e.target.value.replace(/[^0-9]/g, '');
-        if (rawValue.length > 10) return;
-        setFormData({ ...formData, telefono: rawValue });
-        return;
+      const rawValue = e.target.value.replace(/[^0-9]/g, '');
+      if (rawValue.length > 10) return;
+      setFormData({ ...formData, telefono: rawValue });
+      return;
     }
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -75,11 +75,11 @@ const UserProfile = () => {
   return (
     <DashboardLayout headerTitle="Mi Perfil">
       <div className="profile-container">
-        
-        {/* Cabecera Ilustrativa */}
+
+        {/*cabecera*/}
         <div className="profile-header-card">
           <div className="profile-avatar-large">
-             <User size={48} color="#FFFFFF" strokeWidth={1.5} />
+            <User size={48} color="#FFFFFF" strokeWidth={1.5} />
           </div>
           <div className="profile-info-text">
             <h2 className="profile-name">{formData.nombre} {formData.apellidoPaterno}</h2>
@@ -97,7 +97,7 @@ const UserProfile = () => {
 
           <form onSubmit={handleUpdate} className="profile-form">
             <div className="form-grid">
-              
+
               <AuthInput
                 label="Nombre(s)"
                 icon={User}
@@ -107,7 +107,7 @@ const UserProfile = () => {
                 placeholder="Ingresa tu nombre"
                 maxLength="50"
               />
-              
+
               <AuthInput
                 label="Apellido Paterno"
                 icon={User}
@@ -117,7 +117,7 @@ const UserProfile = () => {
                 placeholder="Primer apellido"
                 maxLength="50"
               />
-              
+
               <AuthInput
                 label="Apellido Materno"
                 icon={User}
@@ -128,7 +128,7 @@ const UserProfile = () => {
                 required={false}
                 maxLength="50"
               />
-              
+
               <AuthInput
                 label="Teléfono Móvil"
                 icon={Phone}
@@ -166,7 +166,7 @@ const UserProfile = () => {
 
             </div>
 
-            {/* Guardar Cambios acomodado a la derecha */}
+            {/*guardar*/}
             <div className="profile-form-footer">
               <div style={{ width: '250px' }}>
                 <AuthButton icon={Save}>

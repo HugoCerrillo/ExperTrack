@@ -6,7 +6,7 @@ import itlLogo from '../../assets/img/itl.png';
 export const InstitutionalHeader = () => {
   return (
     <header className="institutional-header">
-      {/* Contenedor de logos alineados a la izquierda 
+      {/*contenedor de logos alineados a la izquierda 
       para el header de las paginas antes de iniciar sesión*/}
       <div className="header-logos-container">
         <img

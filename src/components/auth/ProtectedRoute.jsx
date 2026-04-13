@@ -1,19 +1,17 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 
-/**
- * Componente de Orden Superior (HOC) para proteger rutas privadas.
- * Si no existe un usuario en localStorage, redirige al Login.
- */
+//este componente sirve para proteger rutas privadas (cuando inicies sesion no podras entrar a rutas privadas)
+//de lo contrario si no tienes sesion, te redirige al login
 const ProtectedRoute = ({ children }) => {
   const user = localStorage.getItem('user');
 
   if (!user) {
-    // Si no hay sesión, mandamos al login
+    //si no hay sesion, te redirige al login
     return <Navigate to="/" replace />;
   }
 
-  // Si hay sesión, renderizamos el contenido de la ruta
+  //si hay sesion, renderiza el contenido de la ruta
   return children;
 };
 

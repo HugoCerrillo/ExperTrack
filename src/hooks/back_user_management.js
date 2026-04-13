@@ -1,43 +1,37 @@
 import { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 
-//----------------------------------------------------
-// URL base de la API en AWS EC2
+//url base de la api en aws ec2 pasando por vercel 
 const API_URL = '/api';
-//----------------------------------------------------
 
-//----------------------------------------------------
-// Mapea los campos del backend a camelCase del frontend
+//mapeamos los campos del backend a camelCase del frontend
+//camelCase es para que el frontend pueda entender los campos
 const mapUsuario = (u) => ({
-    // Buscamos id_usuario o id (para ser compatibles con cualquier version del to_dict)
-    id: u.id_usuario || u.id, 
+    id: u.id_usuario || u.id,
     nombre: u.nombre || '',
     apellidoPaterno: u.apellido_paterno || u.apellidoPaterno || '',
     apellidoMaterno: u.apellido_materno || u.apellidoMaterno || '',
     rol: u.rol || 'Usuario Solicitante',
     telefono: u.telefono || '',
     correo: u.correo || '',
-    // Convertimos estatus a booleano real por si llega como 1/0 o "true"/"false"
     estatus: u.estatus === true || u.estatus === 1 || u.estatus === "true",
     fechaRegistro: u.fecha_registro || null
 });
-//----------------------------------------------------
 
+//funcion que maneja los usuarios
 export function useUserManagement() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    //----------------------------------------------------
-    // GET /usuarios — Traer todos los usuarios del servidor
-    //----------------------------------------------------
+    //solicutd get para traer todos los usuarios de la bd
     const fetchUsuarios = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
             const response = await fetch(`${API_URL}/usuarios`, {
                 method: 'GET',
-                credentials: 'include', // envía la cookie JWT automáticamente
+                credentials: 'include', //importante mandar el jwt 
             });
 
             const data = await response.json();
@@ -67,15 +61,12 @@ export function useUserManagement() {
         }
     }, []);
 
-    // Cargar usuarios al montar el componente
+    //al cargar el componente se ejecuta fetchUsuarios
     useEffect(() => {
         fetchUsuarios();
     }, [fetchUsuarios]);
 
-    //----------------------------------------------------
-    // POST /usuarios — Crear un nuevo usuario (admin)
-    // Recibe objeto con campos en camelCase del formulario
-    //----------------------------------------------------
+    //solicitud post para crear un usuario
     const crearUsuario = async (formData) => {
         try {
             Swal.fire({
@@ -101,10 +92,12 @@ export function useUserManagement() {
                 })
             });
 
+            //convertimos la respuesta a json
             const data = await response.json();
 
+            //analizamos la respuesta 
             if (response.ok && data.status === 'success') {
-                // Refrescamos la lista desde el servidor para coherencia
+                //traemos nuevamente los usuarios actualizados para reflejar el cambio en la tabla
                 await fetchUsuarios();
                 Swal.fire({
                     icon: 'success',
@@ -112,7 +105,7 @@ export function useUserManagement() {
                     text: 'La cuenta ha sido dada de alta exitosamente en ExperTrack.',
                     confirmButtonColor: '#504b38'
                 });
-                return true; // indica éxito al componente
+                return true;
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -133,9 +126,7 @@ export function useUserManagement() {
         }
     };
 
-    //----------------------------------------------------
-    // PUT /usuarios/<id> — Actualizar datos de un usuario
-    //----------------------------------------------------
+    //solicitus put para actualizar un usuario
     const actualizarUsuario = async (id, formData) => {
         try {
             Swal.fire({
@@ -145,7 +136,7 @@ export function useUserManagement() {
                 didOpen: () => Swal.showLoading()
             });
 
-            // Construimos el payload, la contraseña solo se envía si fue tocada
+            //construimos el nuestro json con los datos del usuario, la contraseña solo se envía si el usuario la cambió
             const payload = {
                 nombre: formData.nombre.trim(),
                 apellido_paterno: formData.apellidoPaterno.trim(),
@@ -156,11 +147,12 @@ export function useUserManagement() {
                 estatus: formData.estatus
             };
 
-            // Solo enviamos contraseña si el admin la llenó
+            //solo enviamos la contraseña si el usuario la cambió
             if (formData.contrasena && formData.contrasena.trim() !== '') {
                 payload.contraseña = formData.contrasena;
             }
 
+            //se hace la solicitud put para actualizar el usuario
             const response = await fetch(`${API_URL}/usuarios/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
@@ -168,11 +160,14 @@ export function useUserManagement() {
                 body: JSON.stringify(payload)
             });
 
+            //convertimos la respuesta a json
             const data = await response.json();
 
+            //analizamos la respuesta 
             if (response.ok && data.status === 'success') {
-                // Actualizamos localmente sin hacer otro fetch para mayor velocidad
+                //actualizamos localmente por ahora para mas veelocidad
                 setUsers(prev =>
+                    //usamos el .map para recorrer el array de usuarios y actualizar el que coincida con el id
                     prev.map(u => u.id === id ? mapUsuario({ ...data.user, id_usuario: data.user.id_usuario || id }) : u)
                 );
                 Swal.fire({
@@ -202,9 +197,7 @@ export function useUserManagement() {
         }
     };
 
-    //----------------------------------------------------
-    // DELETE /usuarios/<id> — Eliminar usuario del sistema
-    //----------------------------------------------------
+    //solicitud delete para eliminar un usuario
     const eliminarUsuario = async (id) => {
         const result = await Swal.fire({
             title: '¿Confirmar eliminación?',
@@ -217,6 +210,7 @@ export function useUserManagement() {
             cancelButtonText: 'Cancelar'
         });
 
+        //si el usuario no confirma la eliminación, se retorna false
         if (!result.isConfirmed) return false;
 
         try {
@@ -227,15 +221,18 @@ export function useUserManagement() {
                 didOpen: () => Swal.showLoading()
             });
 
+            //se hace la solicitud delete para eliminar el usuario
             const response = await fetch(`${API_URL}/usuarios/${id}`, {
                 method: 'DELETE',
                 credentials: 'include',
             });
 
+            //convertimos la respuesta a json
             const data = await response.json();
 
+            //analizamos la respuesta
             if (response.ok && data.status === 'success') {
-                // Quitamos el usuario de la lista local
+                //quitamos el usuario de la lista local
                 setUsers(prev => prev.filter(u => u.id !== id));
                 Swal.fire({
                     title: '¡Eliminado!',
@@ -264,9 +261,7 @@ export function useUserManagement() {
         }
     };
 
-    //----------------------------------------------------
-    // Retornamos todo lo que necesita el componente
-    //----------------------------------------------------
+    //retornamos para el componente
     return {
         users,
         loading,
