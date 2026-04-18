@@ -66,7 +66,7 @@ const UserProfile = () => {
       <DashboardLayout headerTitle="Mi Perfil">
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
           <Loader2 size={48} className="spin-icon" style={{ color: '#504b38' }} />
-          <p style={{ marginLeft: '1rem', color: '#6b7280', fontSize: '1.2rem' }}>Cargando perfil desde AWS...</p>
+          <p style={{ marginLeft: '1rem', color: '#6b7280', fontSize: '1.2rem' }}>Cargando perfil...</p>
         </div>
       </DashboardLayout>
     );
