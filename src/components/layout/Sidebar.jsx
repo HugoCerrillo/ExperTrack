@@ -40,7 +40,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
   };
 
   // Seleccionamos la configuración de acuerdo al rol, si no llega uno válido mostramos nivel bajo (Usuario Solicitante)
-  const renderMenu = menuConfig[userRole] || menuConfig['Usuario Solicitante'];
+  const renderMenu = menuConfig[userRole] || menuConfig['Administrador'];
 
   const handleLogout = async () => {
     const result = await Swal.fire({
