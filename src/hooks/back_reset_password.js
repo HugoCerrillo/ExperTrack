@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
+//hook para restablecer la contraseña
 export function useResetPassword() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     const handleResetPassword = async (token, newPassword) => {
-        if (!token) {
+        if (!token) { //si no hay token, redirige al login
             Swal.fire({
                 icon: 'warning',
                 title: 'Enlace inválido',
@@ -19,6 +20,7 @@ export function useResetPassword() {
             return false;
         }
 
+        //validar que la contraseña tenga al menos 8 caracteres
         if (!newPassword || newPassword.length < 8) {
             Swal.fire({
                 icon: 'warning',
@@ -32,6 +34,7 @@ export function useResetPassword() {
         setLoading(true);
 
         try {
+            //peticion al backend para restablecer la contraseña
             const response = await fetch('/api/restablecer-password', {
                 method: 'POST',
                 headers: {
@@ -43,9 +46,9 @@ export function useResetPassword() {
                 })
             });
 
-            const data = await response.json();
+            const data = await response.json(); //respuesta del backend
 
-            if (response.ok && data.status === "success") {
+            if (response.ok && data.status === "success") { //si la respuesta es ok y el status es success
                 Swal.fire({
                     icon: 'success',
                     title: '¡Contraseña Actualizada!',
@@ -57,7 +60,7 @@ export function useResetPassword() {
                 return true;
 
             } else {
-                // Si el token es invalido o expiró, el servidor retorna 401
+                //si el token es invalido o expiro, el servidor retorna 401
                 if (response.status === 401) {
                     Swal.fire({
                         icon: 'error',

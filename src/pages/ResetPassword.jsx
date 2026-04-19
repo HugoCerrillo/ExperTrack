@@ -6,20 +6,20 @@ import { AuthInput } from '../components/ui/AuthInput';
 import { AuthButton } from '../components/ui/AuthButton';
 import { useResetPassword } from '../hooks/back_reset_password';
 import Swal from 'sweetalert2';
-import '../assets/styles/reset-password.css'; // Estilos totalmente separados
+import '../assets/styles/reset-password.css';
 
 //pagina para restablecer la contraseña
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token');
-  
+
   const { handleResetPassword, loading } = useResetPassword();
 
-  // Redirigir inmediatamente si alguien entra a /reset-password sin url que contenga token
+  //redirigir inmediatamente si alguien entra a /reset-password sin url que contenga token
   useEffect(() => {
     if (!token) {
       Swal.fire({
@@ -44,11 +44,11 @@ const ResetPassword = () => {
       });
       return;
     }
-    
+
     await handleResetPassword(token, password);
   };
 
-  // Evitar render formulario vacio si no hay token (esta redireccionando)
+  //evitar render formulario vacio si no hay token (esta redireccionando)
   if (!token) return null;
 
   return (
