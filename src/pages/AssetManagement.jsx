@@ -174,17 +174,22 @@ const AssetManagement = () => {
             
             {/* Filtro para ver únicamente mis equipos */}
             {!isSolicitante && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '1.5rem', paddingRight: '1rem' }}>
+              <div 
+                style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginLeft: '1.5rem', paddingRight: '1rem', backgroundColor: '#fff', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                title="Activa esta casilla para ocultar el inventario general y mostrar exclusivamente los equipos en los que tú eres el responsable asignado."
+              >
                 <input 
                   type="checkbox" 
-                  id="filterMineCheckbox" 
                   checked={showOnlyMine} 
                   onChange={(e) => setShowOnlyMine(e.target.checked)} 
                   style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#504b38' }}
                 />
-                <label htmlFor="filterMineCheckbox" style={{ cursor: 'pointer', fontWeight: 600, color: '#504b38', whiteSpace: 'nowrap' }}>
-                  Ver solo mis activos
-                </label>
+                <span 
+                  onClick={() => setShowOnlyMine(!showOnlyMine)} 
+                  style={{ cursor: 'pointer', fontWeight: 600, color: '#504b38', whiteSpace: 'nowrap', fontSize: '0.95rem' }}
+                >
+                  Ver solo mis equipos
+                </span>
               </div>
             )}
           </div>
