@@ -126,6 +126,7 @@ const ExpertSystem = () => {
                           • {sint.descripcion}
                         </option>
                       ))}
+                      <option value="NO_FALLA">• No veo la falla de mi equipo en esta lista</option>
                     </select>
                     <button
                       className="btn-chat-action action-yes"

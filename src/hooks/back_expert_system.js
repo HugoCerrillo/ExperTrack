@@ -6,7 +6,20 @@ const API_URL = '/api/diagnosticar';
 
 export const useExpertSystem = () => {
   //equipos disponibles
-  const { assets: availableAssets, loading: loadingAssets } = useAssetManagement();
+  const { assets, loading: loadingAssets } = useAssetManagement();
+
+  const loggedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = loggedUser.id_usuario || loggedUser.id;
+  const isSolicitante = loggedUser.rol === 'Usuario Solicitante';
+
+  // Solo operativos. Solicitantes solo ven los suyos. Técnicos ven todos los operativos.
+  const availableAssets = assets.filter(a => {
+    if (a.estado_operativo !== 'Operativo') return false; 
+    if (isSolicitante) {
+      return Number(a.id_usuario) === Number(userId);
+    }
+    return true; 
+  });
 
   //manifestaciones de falla iniciales
   const [sintomasValidos, setSintomasValidos] = useState([]);
@@ -162,20 +175,49 @@ export const useExpertSystem = () => {
 
   //cuando selecciona la manifestacion de falla principal
   const handleSymptomSelect = (claveSintoma) => {
-    const sintomaName = sintomasValidos.find(s => s.clave === claveSintoma)?.descripcion || claveSintoma;
+    const isNoFalla = claveSintoma === 'NO_FALLA';
+    const sintomaName = isNoFalla 
+      ? 'No veo la falla de mi equipo' 
+      : (sintomasValidos.find(s => s.clave === claveSintoma)?.descripcion || claveSintoma);
+
     addUserMessage(`Manifestación de falla: ${sintomaName}`);
 
     setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
-    setChatState('IN_PROGRESS');
 
-    const nuevoPayload = {
-      equipo_codigo: sessionData.equipo_codigo,
-      tipo: sessionData.tipo,
-      sintoma: claveSintoma,
-      historial: []
-    };
-    setSessionData(nuevoPayload);
-    fetchDiagnosisStep(nuevoPayload);
+    // Si es Usuario Solicitante O seleccionó "No veo la falla", omitimos Prolog
+    if (isSolicitante || isNoFalla) {
+      setChatState('ASKING_FINAL_DETAILS');
+      
+      const nuevoPayload = {
+        equipo_codigo: sessionData.equipo_codigo,
+        tipo: sessionData.tipo,
+        sintoma: claveSintoma,
+        historial: []
+      };
+      setSessionData(nuevoPayload);
+
+      setIsTyping(true);
+      setTimeout(() => {
+        setIsTyping(false);
+        const autoMsg = isSolicitante 
+          ? "Hemos registrado tu solicitud de diagnóstico. Para finalizar y notificar a los técnicos, por favor describe con tus propias palabras qué le falla a tu equipo en la barra inferior (caja de texto):"
+          : "Entendido. Como la falla no parece estar en la biblioteca estándar, por favor describe detalladamente qué le sucede al equipo en la barra inferior (caja de texto):";
+        addBotMessage(autoMsg);
+      }, 700);
+
+    } else {
+      // Es Técnico/Admin y SÍ es un síntoma del catálogo: consultamos a Prolog.
+      setChatState('IN_PROGRESS');
+
+      const nuevoPayload = {
+        equipo_codigo: sessionData.equipo_codigo,
+        tipo: sessionData.tipo,
+        sintoma: claveSintoma,
+        historial: []
+      };
+      setSessionData(nuevoPayload);
+      fetchDiagnosisStep(nuevoPayload);
+    }
   };
 
   //cuando el usuario responde si o no a la pregunta de prolog
@@ -219,7 +261,10 @@ export const useExpertSystem = () => {
       setIsTyping(true);
       setTimeout(() => {
         setIsTyping(false);
-        addBotMessage("¡Gracias! Tu reporte detallado y el diagnóstico previo del sistema experto han sido registrados. El proceso asistido ha finalizado.");
+        const doneMsg = isSolicitante 
+          ? "¡Gracias! Tu descripción detallada ha sido registrada con éxito. Un técnico revisará tu caso en breve. El proceso ha finalizado."
+          : "¡Gracias! Tu reporte detallado y el diagnóstico previo del sistema experto han sido registrados. El proceso asistido ha finalizado.";
+        addBotMessage(doneMsg);
         console.log("[DEBUG] Descripción del usuario:", nuevoDetalle);
       }, 700);
     }
