@@ -83,17 +83,23 @@ const AssetManagement = () => {
     setCurrentAsset(emptyAsset);
   };
 
-  //aqui abrimos el modal de agregar mediante la variable modalMode
+  //aqui abrimos el modal de agregar o editar
   const handleSaveModal = async (e) => {
     e.preventDefault();
     setIsSaving(true);
+    
+    // Forzamos el casteo de id_usuario a entero, ya que el select nativo lo convierte a string
+    // y Python/Flask a veces bloquea o ignora las actualizaciones de IDs si viajan como string.
+    const assetToSave = {
+      ...currentAsset,
+      id_usuario: currentAsset.id_usuario ? Number(currentAsset.id_usuario) : null
+    };
 
     let success = false;
     if (modalMode === 'ADD') {
-      success = await crearEquipo(currentAsset);
+      success = await crearEquipo(assetToSave);
     } else {
-      //llmada a la funcion actualizarEquipo para editar el equipo en la base de datos
-      success = await actualizarEquipo(currentAsset.id_equipo, currentAsset);
+      success = await actualizarEquipo(currentAsset.id_equipo, assetToSave);
     }
 
     setIsSaving(false);
