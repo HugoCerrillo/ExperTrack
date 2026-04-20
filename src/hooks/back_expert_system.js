@@ -108,7 +108,11 @@ export const useExpertSystem = () => {
             .map(s => `🔹 ${s.trim()}${s.endsWith('.') ? '' : '.'}`)
             .join('\n\n');
 
-          addBotMessage(`DIAGNÓSTICO ENCONTRADO:\n\n${textoLimpio}\n\n─────────────────────\nPara nutrir la bitácora, por favor describe con tus propias palabras algún detalle extra de la falla en la barra inferior (caja de texto):`);
+          const finalMsg = isSolicitante 
+            ? `Tu diagnóstico se ha realizado exitosamente.\n\n─────────────────────\nPara nutrir la bitácora y notificar a soporte, por favor describe con tus propias palabras qué le notas al equipo en la barra inferior (caja de texto):`
+            : `DIAGNÓSTICO ENCONTRADO:\n\n${textoLimpio}\n\n─────────────────────\nPara nutrir la bitácora, por favor describe con tus propias palabras algún detalle extra de la falla en la barra inferior (caja de texto):`;
+
+          addBotMessage(finalMsg);
 
           const payloadAuditoria = {
             equipo_relacionado: currentPayload.equipo_codigo,
@@ -124,7 +128,11 @@ export const useExpertSystem = () => {
             ? data.valor.split('. ').filter(s => s.trim().length > 0).map(s => `🔸 ${s.trim()}${s.endsWith('.') ? '' : '.'}`).join('\n\n')
             : "🔸 No se logró encontrar un diagnóstico certero en el árbol de hechos.";
 
-          addBotMessage(`DIAGNÓSTICO INCONCLUSO:\n\n${exhausto}\n\n─────────────────────\nPara escalar tu caso a un técnico, por favor describe a detalle lo que sucede con el equipo en la barra inferior (caja de texto):`);
+          const finalMsgInconcluso = isSolicitante
+            ? `Hemos concluido con la revisión preliminar.\n\n─────────────────────\nPara escalar tu caso a un técnico, por favor describe a detalle lo que sucede con el equipo en la barra inferior (caja de texto):`
+            : `DIAGNÓSTICO INCONCLUSO:\n\n${exhausto}\n\n─────────────────────\nPara escalar tu caso a un técnico, por favor describe a detalle lo que sucede con el equipo en la barra inferior (caja de texto):`;
+
+          addBotMessage(finalMsgInconcluso);
 
           const payloadAuditoria = {
             equipo_relacionado: currentPayload.equipo_codigo,
@@ -184,8 +192,8 @@ export const useExpertSystem = () => {
 
     setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
 
-    // Si es Usuario Solicitante O seleccionó "No veo la falla", omitimos Prolog
-    if (isSolicitante || isNoFalla) {
+    // Si solucionó "No veo la falla", omitimos Prolog
+    if (isNoFalla) {
       setChatState('ASKING_FINAL_DETAILS');
       
       const nuevoPayload = {
@@ -206,7 +214,7 @@ export const useExpertSystem = () => {
       }, 700);
 
     } else {
-      // Es Técnico/Admin y SÍ es un síntoma del catálogo: consultamos a Prolog.
+      // Sí es un síntoma del catálogo: consultamos a Prolog (sea solicitante o tecnico)
       setChatState('IN_PROGRESS');
 
       const nuevoPayload = {
