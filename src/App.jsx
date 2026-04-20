@@ -18,7 +18,12 @@ import Swal from 'sweetalert2';
 const originalFetch = window.fetch;
 window.fetch = async function (...args) {
   const response = await originalFetch.apply(this, args);
-  if (response.status === 401) {
+  
+  // Extraemos la URL para no interceptar errores 401 en flujos que no requieren sesion activa
+  const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+  const isAuthEndpoint = url.includes('/login') || url.includes('/restablecer-password');
+
+  if (response.status === 401 && !isAuthEndpoint) {
     if (!window.hasShown401Alert) {
       window.hasShown401Alert = true;
       localStorage.removeItem('user'); //removemos el usuario del localStorage

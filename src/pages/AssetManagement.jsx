@@ -17,15 +17,22 @@ import '../assets/styles/assets-management.css';
 const AssetManagement = () => {
 
   const { assets, loading: loadingAssets, fetchEquipos, fetchEquipoDetalle, crearEquipo, actualizarEquipo, eliminarEquipo } = useAssetManagement();
-  const { users } = useUserManagement(); // Para el dropdown de dueños
+  
+  const loggedUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = loggedUser.id_usuario || loggedUser.id;
+  const userRole = loggedUser.rol || 'Usuario Solicitante';
+  const isSolicitante = userRole === 'Usuario Solicitante';
+
+  const { users } = useUserManagement(); // Para el dropdown de dueños (Administradores y Técnicos)
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [showOnlyMine, setShowOnlyMine] = useState(isSolicitante); // Filtro activo por defecto para solicitantes
   const [modalMode, setModalMode] = useState(null); // 'ADD', 'EDIT', o null
   const [isSaving, setIsSaving] = useState(false);
 
   //estructura de datos para el modal que coincide con el backend
   const emptyAsset = {
-    id_usuario: '', //ID Real de la tabla Usuario
+    id_usuario: isSolicitante ? userId : '', //ID Real de la tabla Usuario
     tipo_equipo: 'Laptop',
     marca: '',
     modelo: '',
@@ -131,11 +138,18 @@ const AssetManagement = () => {
   };
 
   //funcion para filtrar los activos
-  const filteredAssets = assets.filter(a =>
-    `${a.codigo_inventario} ${a.marca} ${a.modelo} ${a.dueño}`
+  const filteredAssets = assets.filter(a => {
+    const matchesSearch = `${a.codigo_inventario} ${a.marca} ${a.modelo} ${a.dueño}`
       .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+      .includes(searchTerm.toLowerCase());
+      
+    // Si showOnlyMine está activado, comprobamos que el id del activo sea igual al id logueado
+    // Nota: backend debe enviar a.id_usuario para validar esto de forma segura.
+    // Usamos doble validación por si el backend mandara IDs como int o string
+    const matchesOwner = showOnlyMine ? (Number(a.id_usuario) === Number(userId)) : true;
+
+    return matchesSearch && matchesOwner;
+  });
 
   //aqui se renderiza la pagina de activos reutilizando componentes 
   return (
@@ -144,11 +158,29 @@ const AssetManagement = () => {
 
         {/*barra de herramientas*/}
         <div className="users-header-actions">
-          <div className="search-bar">
-            <AuthInput
-              icon={Search} type="text" placeholder="Buscar por código, marca, modelo o dueño..."
-              value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} required={false} label={false}
-            />
+          <div className="search-bar" style={{ display: 'flex', alignItems: 'center' }}>
+            <div style={{ flex: 1 }}>
+              <AuthInput
+                icon={Search} type="text" placeholder="Buscar activo..."
+                value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} required={false} label={false}
+              />
+            </div>
+            
+            {/* Filtro para ver únicamente mis equipos */}
+            {!isSolicitante && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '1.5rem', paddingRight: '1rem' }}>
+                <input 
+                  type="checkbox" 
+                  id="filterMineCheckbox" 
+                  checked={showOnlyMine} 
+                  onChange={(e) => setShowOnlyMine(e.target.checked)} 
+                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#504b38' }}
+                />
+                <label htmlFor="filterMineCheckbox" style={{ cursor: 'pointer', fontWeight: 600, color: '#504b38', whiteSpace: 'nowrap' }}>
+                  Ver solo mis activos
+                </label>
+              </div>
+            )}
           </div>
           <button className="btn-add-user" onClick={() => openModal('ADD')}>
             <Plus size={18} />
@@ -299,25 +331,27 @@ const AssetManagement = () => {
                   {/*seccion de localizacion fisica y asignaciones*/}
                   <h4 className="section-divider"><MapPin size={20} /> Localización Física y Asignaciones</h4>
                   <div className="modal-grid">
-                    <div className="input-group select-group">
-                      <label>Dueño / Usuario Asignado</label>
-                      <div className="input-wrapper">
-                        <UserIcon className="input-icon" size={20} />
-                        <select
-                          className="auth-select"
-                          value={currentAsset.id_usuario}
-                          onChange={(e) => setCurrentAsset({ ...currentAsset, id_usuario: e.target.value })}
-                          required
-                        >
-                          <option value="">Selecciona un responsable...</option>
-                          {users.map(u => (
-                            <option key={u.id} value={u.id}>
-                              {u.nombre} {u.apellidoPaterno} ({u.rol})
-                            </option>
-                          ))}
-                        </select>
+                    {!isSolicitante && (
+                      <div className="input-group select-group">
+                        <label>Dueño / Usuario Asignado</label>
+                        <div className="input-wrapper">
+                          <UserIcon className="input-icon" size={20} />
+                          <select
+                            className="auth-select"
+                            value={currentAsset.id_usuario}
+                            onChange={(e) => setCurrentAsset({ ...currentAsset, id_usuario: e.target.value })}
+                            required
+                          >
+                            <option value="">Selecciona un responsable...</option>
+                            {users.map(u => (
+                              <option key={u.id} value={u.id}>
+                                {u.nombre} {u.apellidoPaterno} ({u.rol})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                    </div>
+                    )}
                     <AuthInput label="Departamento / Área" icon={MapPin} value={currentAsset.area} onChange={(e) => setCurrentAsset({ ...currentAsset, area: e.target.value })} />
                     <AuthInput label="Ubicación Física Exacta" icon={MapPin} value={currentAsset.ubicacion} onChange={(e) => setCurrentAsset({ ...currentAsset, ubicacion: e.target.value })} placeholder="Piso 2, Cubículo 4" />
 
@@ -345,85 +379,89 @@ const AssetManagement = () => {
                     </div>
                   </div>
 
-                  {/*seccion de especificaciones tecnicas*/}
-                  <h4 className="section-divider"><Cpu size={20} /> Matriz de Especificaciones (Vigentes)</h4>
-                  <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>Al actualizar esto, el sistema versionará las specs antiguas de forma transparente por seguridad de auditoría.</p>
+                  {/*seccion de especificaciones tecnicas (Oculto para Solicitantes) */}
+                  {!isSolicitante && (
+                    <>
+                      <h4 className="section-divider"><Cpu size={20} /> Matriz de Especificaciones (Vigentes)</h4>
+                      <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>Al actualizar esto, el sistema versionará las specs antiguas de forma transparente por seguridad de auditoría.</p>
 
-                  <div className="modal-grid">
-                    <AuthInput label="Sistema Operativo Instalado" icon={Monitor} value={currentAsset.especificaciones.sistema_operativo} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, sistema_operativo: e.target.value } })} />
-                    <AuthInput label="Procesador (CPU Gen)" icon={Cpu} value={currentAsset.especificaciones.procesador} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, procesador: e.target.value } })} />
+                      <div className="modal-grid">
+                        <AuthInput label="Sistema Operativo Instalado" icon={Monitor} value={currentAsset.especificaciones.sistema_operativo} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, sistema_operativo: e.target.value } })} />
+                        <AuthInput label="Procesador (CPU Gen)" icon={Cpu} value={currentAsset.especificaciones.procesador} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, procesador: e.target.value } })} />
 
-                    <div className="input-group select-group">
-                      <label>Generación Memoria RAM</label>
-                      <div className="input-wrapper">
-                        <HardDrive className="input-icon" size={20} />
-                        <select className="auth-select" value={currentAsset.especificaciones.ram_tipo} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, ram_tipo: e.target.value } })}>
-                          <option value="DDR3">Arquitectura DDR3</option>
-                          <option value="DDR4">Arquitectura DDR4</option>
-                          <option value="DDR5">Arquitectura DDR5</option>
-                          <option value="LPDDR">LPDDR (Soldada)</option>
-                          <option value="Apple Silicon">Memoria Unificada</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <AuthInput label="Volumen de RAM Instalada" type="text" icon={HardDrive} value={currentAsset.especificaciones.ram} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, ram: e.target.value } })} />
-
-                    <div className="input-group select-group">
-                      <label>Tecnología de Disco Principal</label>
-                      <div className="input-wrapper">
-                        <HardDrive className="input-icon" size={20} />
-                        <select className="auth-select" value={currentAsset.especificaciones.almacenamiento_tipo} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, almacenamiento_tipo: e.target.value } })}>
-                          <option value="SSD">Estado Sólido (SSD SATA)</option>
-                          <option value="SSD NVMe">SSD M.2 (NVMe Express)</option>
-                          <option value="HDD">Disco Mecánico (HDD)</option>
-                        </select>
-                      </div>
-                    </div>
-
-                    <AuthInput label="Volumen del Disco Principal" type="text" icon={HardDrive} placeholder="Ej. 1TB o 512GB" value={currentAsset.especificaciones.almacenamiento} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, almacenamiento: e.target.value } })} />
-                  </div>
-
-                  {/*seccion de perifericos 0 a N*/}
-                  <h4 className="section-divider"><ClipboardList size={20} /> Periféricos y Accesorios Anexos</h4>
-                  <div className="peripherals-wrapper">
-                    {currentAsset.perifericos.map((p, index) => (
-                      <div className="peripheral-card" key={index}>
-
-                        <div className="peripheral-header">
-                          <span>Accesorio #{index + 1}</span>
-                          <button type="button" className="btn-remove-peripheral" onClick={() => removePeripheral(index)}>
-                            <Trash2 size={16} /> Quitar Periférico
-                          </button>
-                        </div>
-
-                        <div className="peripheral-grid modal-grid">
-                          <div className="input-group select-group">
-                            <label>Clasificación del Periférico</label>
-                            <div className="input-wrapper">
-                              <Monitor className="input-icon" size={20} />
-                              <select className="auth-select" value={p.tipo} onChange={(e) => updatePeripheral(index, 'tipo', e.target.value)}>
-                                <option value="Monitor">Monitor Secundario</option>
-                                <option value="Teclado">Teclado Alfanumérico</option>
-                                <option value="Mouse">Ratón Óptico/Inalámbrico</option>
-                                <option value="Dock Station">Docking Station / Hub</option>
-                                <option value="Regulador">Regulador Eléctrico (UPS)</option>
-                              </select>
-                            </div>
+                        <div className="input-group select-group">
+                          <label>Generación Memoria RAM</label>
+                          <div className="input-wrapper">
+                            <HardDrive className="input-icon" size={20} />
+                            <select className="auth-select" value={currentAsset.especificaciones.ram_tipo} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, ram_tipo: e.target.value } })}>
+                              <option value="DDR3">Arquitectura DDR3</option>
+                              <option value="DDR4">Arquitectura DDR4</option>
+                              <option value="DDR5">Arquitectura DDR5</option>
+                              <option value="LPDDR">LPDDR (Soldada)</option>
+                              <option value="Apple Silicon">Memoria Unificada</option>
+                            </select>
                           </div>
-
-                          <AuthInput label="Marca" icon={Tag} value={p.marca} onChange={(e) => updatePeripheral(index, 'marca', e.target.value)} />
-                          <AuthInput label="Número de Serie Físico" icon={Barcode} value={p.numero_serie} onChange={(e) => updatePeripheral(index, 'numero_serie', e.target.value)} />
-                          <AuthInput label="Placa de Inventario Interno" icon={Barcode} value={p.id_inventario_interno} onChange={(e) => updatePeripheral(index, 'id_inventario_interno', e.target.value)} required={false} />
                         </div>
 
-                      </div>
-                    ))}
+                        <AuthInput label="Volumen de RAM Instalada" type="text" icon={HardDrive} value={currentAsset.especificaciones.ram} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, ram: e.target.value } })} />
 
-                    <button type="button" className="btn-add-peripheral" onClick={addPeripheral}>
-                      <Plus size={20} /> Registrar Nuevo Periférico
-                    </button>
-                  </div>
+                        <div className="input-group select-group">
+                          <label>Tecnología de Disco Principal</label>
+                          <div className="input-wrapper">
+                            <HardDrive className="input-icon" size={20} />
+                            <select className="auth-select" value={currentAsset.especificaciones.almacenamiento_tipo} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, almacenamiento_tipo: e.target.value } })}>
+                              <option value="SSD">Estado Sólido (SSD SATA)</option>
+                              <option value="SSD NVMe">SSD M.2 (NVMe Express)</option>
+                              <option value="HDD">Disco Mecánico (HDD)</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <AuthInput label="Volumen del Disco Principal" type="text" icon={HardDrive} placeholder="Ej. 1TB o 512GB" value={currentAsset.especificaciones.almacenamiento} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, almacenamiento: e.target.value } })} />
+                      </div>
+
+                      {/*seccion de perifericos 0 a N*/}
+                      <h4 className="section-divider"><ClipboardList size={20} /> Periféricos y Accesorios Anexos</h4>
+                      <div className="peripherals-wrapper">
+                        {currentAsset.perifericos.map((p, index) => (
+                          <div className="peripheral-card" key={index}>
+
+                            <div className="peripheral-header">
+                              <span>Accesorio #{index + 1}</span>
+                              <button type="button" className="btn-remove-peripheral" onClick={() => removePeripheral(index)}>
+                                <Trash2 size={16} /> Quitar Periférico
+                              </button>
+                            </div>
+
+                            <div className="peripheral-grid modal-grid">
+                              <div className="input-group select-group">
+                                <label>Clasificación del Periférico</label>
+                                <div className="input-wrapper">
+                                  <Monitor className="input-icon" size={20} />
+                                  <select className="auth-select" value={p.tipo} onChange={(e) => updatePeripheral(index, 'tipo', e.target.value)}>
+                                    <option value="Monitor">Monitor Secundario</option>
+                                    <option value="Teclado">Teclado Alfanumérico</option>
+                                    <option value="Mouse">Ratón Óptico/Inalámbrico</option>
+                                    <option value="Dock Station">Docking Station / Hub</option>
+                                    <option value="Regulador">Regulador Eléctrico (UPS)</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <AuthInput label="Marca" icon={Tag} value={p.marca} onChange={(e) => updatePeripheral(index, 'marca', e.target.value)} />
+                              <AuthInput label="Número de Serie Físico" icon={Barcode} value={p.numero_serie} onChange={(e) => updatePeripheral(index, 'numero_serie', e.target.value)} />
+                              <AuthInput label="Placa de Inventario Interno" icon={Barcode} value={p.id_inventario_interno} onChange={(e) => updatePeripheral(index, 'id_inventario_interno', e.target.value)} required={false} />
+                            </div>
+
+                          </div>
+                        ))}
+
+                        <button type="button" className="btn-add-peripheral" onClick={addPeripheral}>
+                          <Plus size={20} /> Registrar Nuevo Periférico
+                        </button>
+                      </div>
+                    </>
+                  )}
 
                 </div>
 

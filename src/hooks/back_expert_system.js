@@ -239,9 +239,9 @@ export const useExpertSystem = () => {
   };
 
   return {
-    availableAssets, //enviamos a la ui
-    loadingAssets,   //control visual
-    sintomasValidos, //opciones descriptivas
+    availableAssets,
+    loadingAssets,
+    sintomasValidos,
     messages,
     inputMessage,
     setInputMessage,
