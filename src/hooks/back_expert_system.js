@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAssetManagement } from './back_asset_management';
+import Swal from 'sweetalert2';
 
 //url de la api pasando por vercels
 const API_URL = '/api/diagnosticar';
@@ -25,10 +26,14 @@ export const useExpertSystem = () => {
   const [sintomasValidos, setSintomasValidos] = useState([]);
 
   const [sessionData, setSessionData] = useState({
+    id_equipo: null,
     equipo_codigo: null,
     tipo: null,
     sintoma: null,
-    historial: []
+    sintoma_nombre: null,
+    historial: [],
+    resultado_prolog: "",
+    descripcion_usuario: ""
   });
 
   //fases del diagnostico
@@ -100,6 +105,7 @@ export const useExpertSystem = () => {
         } else if (data.accion === 'diagnostico') {
           //prolog encontró el final del árbol
           setChatState('ASKING_FINAL_DETAILS');
+          setSessionData(prev => ({ ...prev, resultado_prolog: data.valor }));
 
           //formateador de texto
           const textoLimpio = data.valor
@@ -123,6 +129,7 @@ export const useExpertSystem = () => {
         } else if (data.accion === 'finalizado') {
           //prolog no encontró el final del árbol
           setChatState('ASKING_FINAL_DETAILS');
+          setSessionData(prev => ({ ...prev, resultado_prolog: data.valor || "No se logró encontrar un diagnóstico certero." }));
 
           const exhausto = data.valor
             ? data.valor.split('. ').filter(s => s.trim().length > 0).map(s => `🔸 ${s.trim()}${s.endsWith('.') ? '' : '.'}`).join('\n\n')
@@ -167,7 +174,12 @@ export const useExpertSystem = () => {
     //suprimimos el selector
     setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
 
-    setSessionData(prev => ({ ...prev, equipo_codigo: asset.codigo_inventario, tipo: tipoNormalizado }));
+    setSessionData(prev => ({ 
+      ...prev, 
+      id_equipo: asset.id_equipo,
+      equipo_codigo: asset.codigo_inventario, 
+      tipo: tipoNormalizado 
+    }));
     setChatState('ASKING_SINTOMA');
 
     //aqui hacemos la peticion de sintomas filtrados por tipo de equipo
@@ -197,10 +209,13 @@ export const useExpertSystem = () => {
       setChatState('ASKING_FINAL_DETAILS');
       
       const nuevoPayload = {
+        id_equipo: sessionData.id_equipo,
         equipo_codigo: sessionData.equipo_codigo,
         tipo: sessionData.tipo,
         sintoma: claveSintoma,
-        historial: []
+        sintoma_nombre: sintomaName,
+        historial: [],
+        resultado_prolog: isNoFalla ? "Manifestación fuera del árbol de conocimiento." : "Derivación Preliminar (Solicitante)"
       };
       setSessionData(nuevoPayload);
 
@@ -218,10 +233,13 @@ export const useExpertSystem = () => {
       setChatState('IN_PROGRESS');
 
       const nuevoPayload = {
+        id_equipo: sessionData.id_equipo,
         equipo_codigo: sessionData.equipo_codigo,
         tipo: sessionData.tipo,
         sintoma: claveSintoma,
-        historial: []
+        sintoma_nombre: sintomaName,
+        historial: [],
+        resultado_prolog: ""
       };
       setSessionData(nuevoPayload);
       fetchDiagnosisStep(nuevoPayload);
@@ -242,8 +260,7 @@ export const useExpertSystem = () => {
     };
 
     const nuevoPayload = {
-      tipo: sessionData.tipo,
-      sintoma: sessionData.sintoma,
+      ...sessionData,
       historial: [...sessionData.historial, stepInyectado]
     };
 
@@ -253,7 +270,93 @@ export const useExpertSystem = () => {
     fetchDiagnosisStep(nuevoPayload);
   };
 
-  //cuando se envia texto texto (Fase Detalle Final)
+  const enviarReporte = async (estadoFisico, descripcionFinal) => {
+    setChatState('DONE');
+    setIsTyping(true);
+    
+    try {
+      Swal.fire({
+        title: 'Generando Reporte...',
+        text: 'Aperturando evento y asignando técnico...',
+        allowEscapeKey: false,
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      // 1. Crear Evento
+      const manifestacion = sessionData.sintoma_nombre || sessionData.sintoma;
+      const fallaCompleta = `Manifestación: ${manifestacion}.\nDetalles del usuario: ${descripcionFinal}`;
+
+      const resEvento = await fetch('/api/eventos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          id_equipo: sessionData.id_equipo,
+          falla_reportada: fallaCompleta,
+          estado_fisico: estadoFisico
+        })
+      });
+
+      const dataEvento = await resEvento.json();
+
+      if (!resEvento.ok || dataEvento.status !== 'success') {
+        throw new Error(dataEvento.message || 'Error al generar el Evento');
+      }
+
+      const idEventoGenerado = dataEvento.evento.id_evento;
+
+      // 2. Crear Diagnostico
+      const chatLogLimpio = messages.map(m => ({ sender: m.sender, text: m.text, time: m.time }));
+      // Incluimos lo ultimo que dijo el usuario
+      chatLogLimpio.push({ 
+        sender: 'user', 
+        text: estadoFisico ? estadoFisico : descripcionFinal, 
+        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+      });
+
+      const resDiag = await fetch('/api/diagnosticos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          id_evento: idEventoGenerado,
+          log_chatbot: chatLogLimpio,
+          resultado_preeliminar: sessionData.resultado_prolog,
+          validacion_tecnico: ""
+        })
+      });
+
+      const dataDiag = await resDiag.json();
+
+      if (!resDiag.ok || dataDiag.status !== 'success') {
+        throw new Error(dataDiag.message || 'Error al guardar log de diagnóstico');
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: '¡Reporte Protegido!',
+        html: `Recepción correcta. Mantenimiento Folio <b>#${idEventoGenerado}</b> generado.<br>El equipo se ha inhabilitado.`,
+        confirmButtonColor: '#504b38'
+      });
+
+      addBotMessage(`¡Todo listo! Tu reporte de diagnóstico ha finalizado y el equipo pasó a Mantenimiento bajo el Evento de Seguimiento #${idEventoGenerado}.`);
+
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error de Sincronización',
+        text: error.message || 'No se pudo comunicar con el servidor.',
+        confirmButtonColor: '#f85149'
+      });
+      addBotMessage(`Hubo un error de conexión al salvar el reporte en AWS: ${error.message}`);
+    } finally {
+      setIsTyping(false);
+    }
+  };
+
+  //cuando se envia texto texto (Fase Detalle Final o Estado Fisico)
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
     const msg = inputMessage.trim();
@@ -265,23 +368,31 @@ export const useExpertSystem = () => {
       //guardamos el detalle en sessionData
       setSessionData(prev => ({ ...prev, descripcion_usuario: nuevoDetalle }));
 
-      setChatState('DONE');
-      setIsTyping(true);
-      setTimeout(() => {
-        setIsTyping(false);
-        const doneMsg = isSolicitante 
-          ? "¡Gracias! Tu descripción detallada ha sido registrada con éxito. Un técnico revisará tu caso en breve. El proceso ha finalizado."
-          : "¡Gracias! Tu reporte detallado y el diagnóstico previo del sistema experto han sido registrados. El proceso asistido ha finalizado.";
-        addBotMessage(doneMsg);
-        console.log("[DEBUG] Descripción del usuario:", nuevoDetalle);
-      }, 700);
+      if (isSolicitante) {
+        //solicitante no captura estado físico, manda string vacío.
+        enviarReporte("", nuevoDetalle);
+      } else {
+        //técnico sÍ, lo mandamos a un paso intermedio
+        setChatState('ASKING_ESTADO_FISICO');
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          addBotMessage(`Perfecto. Como último paso técnico para abrir el Evento, descríbeme el Estado Físico de revisión del equipo (ej. Abolladuras, rayones, impecable):`);
+        }, 700);
+      }
+    } else if (chatState === 'ASKING_ESTADO_FISICO') {
+      const estadoFisico = msg;
+      enviarReporte(estadoFisico, sessionData.descripcion_usuario);
     }
   };
 
   //reset del ciclo
   const resetDiagnosticSession = () => {
     setSintomasValidos([]); //limpiamos la lista de opciones
-    setSessionData({ equipo_codigo: null, tipo: null, sintoma: null, historial: [] });
+    setSessionData({ 
+      id_equipo: null, equipo_codigo: null, tipo: null, sintoma: null, 
+      sintoma_nombre: null, historial: [], resultado_prolog: "", descripcion_usuario: "" 
+    });
     setChatState('ASKING_TIPO');
     setCurrentPrologQuestion(null);
     setMessages([{

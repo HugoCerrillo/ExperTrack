@@ -179,22 +179,23 @@ const ExpertSystem = () => {
                 chatState === 'ASKING_TIPO' ? '↑ Utiliza el selector de equipos arriba...' :
                   chatState === 'ASKING_SINTOMA' ? '↑ Selecciona una falla de la lista superior...' :
                     chatState === 'IN_PROGRESS' ? '↑ Responde utilizando los botones Sí / No...' :
-                      chatState === 'ASKING_FINAL_DETAILS' ? 'Escribe aquí los detalles adicionales de la falla...' :
-                        chatState === 'DONE' ? 'Sesión terminada. Dale a Reiniciar para diagnosticar otro Activo.' :
-                          "Escribe y pulsa Enter..."
+                      chatState === 'ASKING_FINAL_DETAILS' ? 'Escribe aquí los detalles de la falla...' :
+                        chatState === 'ASKING_ESTADO_FISICO' ? 'Describe el estado físico del equipo (ej. Golpes, rayones...)' :
+                          chatState === 'DONE' ? 'Sesión terminada. Dale a Reiniciar para diagnosticar otro Activo.' :
+                            "Escribe y pulsa Enter..."
               }
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={handleKeyDown}
               rows={1}
-              disabled={chatState !== 'ASKING_FINAL_DETAILS'}
+              disabled={chatState !== 'ASKING_FINAL_DETAILS' && chatState !== 'ASKING_ESTADO_FISICO'}
             />
           </div>
           <button
             className="btn-send-message"
             onClick={handleSendMessage}
-            disabled={chatState !== 'ASKING_FINAL_DETAILS' || !inputMessage.trim()}
-            title={chatState === 'ASKING_FINAL_DETAILS' ? 'Enviar Reporte al Técnico' : 'Bloqueado temporalmente'}
+            disabled={(chatState !== 'ASKING_FINAL_DETAILS' && chatState !== 'ASKING_ESTADO_FISICO') || !inputMessage.trim()}
+            title={(chatState === 'ASKING_FINAL_DETAILS' || chatState === 'ASKING_ESTADO_FISICO') ? 'Enviar Reporte' : 'Bloqueado temporalmente'}
           >
             <Send size={20} />
           </button>
