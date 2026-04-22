@@ -35,7 +35,6 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
       { path: '/dashboard/perfil', icon: User, label: 'Mi Perfil' },
       { path: '/dashboard/activos', icon: MonitorSmartphone, label: 'Activos' },
       { path: '/dashboard/sistema-experto', icon: AlertTriangle, label: 'Reportar fallas' },
-      { path: '/dashboard/expediente', icon: FileText, label: 'Expediente Técnico' },
     ]
   };
 

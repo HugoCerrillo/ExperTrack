@@ -9,6 +9,7 @@ import UserManagement from './pages/UserManagement';
 import AssetManagement from './pages/AssetManagement';
 import ExpertSystem from './pages/ExpertSystem';
 import FactManagement from './pages/FactManagement';
+import TechnicalRecord from './pages/TechnicalRecord';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Swal from 'sweetalert2';
 
@@ -60,6 +61,7 @@ function App() {
           <Route path="/dashboard/activos" element={<ProtectedRoute><AssetManagement /></ProtectedRoute>} />
           <Route path="/dashboard/sistema-experto" element={<ProtectedRoute><ExpertSystem /></ProtectedRoute>} />
           <Route path="/dashboard/hechos" element={<ProtectedRoute><FactManagement /></ProtectedRoute>} />
+          <Route path="/dashboard/expediente" element={<ProtectedRoute><TechnicalRecord /></ProtectedRoute>} />
         </Routes>
       </div>
     </Router>
