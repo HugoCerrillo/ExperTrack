@@ -105,6 +105,29 @@
   padding-top: 1.5rem;
 }
 
+/* Estados de Carga */
+.profile-loading-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60vh;
+}
+
+.profile-loading-text {
+  margin-left: 1rem;
+  color: #6b7280;
+  font-size: 1.2rem;
+}
+
+.profile-role-icon {
+  display: inline;
+  margin-right: 5px;
+}
+
+.profile-action-btn-wrapper {
+  width: 250px;
+}
+
 /* Apilamiento perfecto en celulares */
 @media (max-width: 768px) {
   .form-grid {

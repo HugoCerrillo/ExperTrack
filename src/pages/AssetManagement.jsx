@@ -163,9 +163,9 @@ const AssetManagement = () => {
       <div className="users-container">
 
         {/*barra de herramientas*/}
-        <div className="users-header-actions">
-          <div className="search-bar" style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ flex: 1 }}>
+        <div className="users-header-actions" style={{ flexDirection: 'column', gap: '1rem' }}>
+          <div className="am-search-wrapper">
+            <div className="am-search-input-box">
               <AuthInput
                 icon={Search} type="text" placeholder="Buscar activo..."
                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} required={false} label={false}
@@ -174,20 +174,13 @@ const AssetManagement = () => {
             
             {/* Filtro para ver únicamente mis equipos */}
             {!isSolicitante && (
-              <div 
-                style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginLeft: '1.5rem', paddingRight: '1rem', backgroundColor: '#fff', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                title="Activa esta casilla para ocultar el inventario general y mostrar exclusivamente los equipos en los que tú eres el responsable asignado."
-              >
+              <div className="am-filter-pill" title="Activa esta casilla para ocultar el inventario general y mostrar exclusivamente los equipos en los que tú eres el responsable asignado.">
                 <input 
                   type="checkbox" 
                   checked={showOnlyMine} 
                   onChange={(e) => setShowOnlyMine(e.target.checked)} 
-                  style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#504b38' }}
                 />
-                <span 
-                  onClick={() => setShowOnlyMine(!showOnlyMine)} 
-                  style={{ cursor: 'pointer', fontWeight: 600, color: '#504b38', whiteSpace: 'nowrap', fontSize: '0.95rem' }}
-                >
+                <span onClick={() => setShowOnlyMine(!showOnlyMine)}>
                   Ver solo mis equipos
                 </span>
               </div>
@@ -216,9 +209,9 @@ const AssetManagement = () => {
               {/*pantalla de carga en caso de que este cargando los datos*/}
               {loadingAssets && (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '3rem' }}>
+                  <td colSpan="6" className="am-empty-row">
                     <Loader2 size={40} className="spin-icon" style={{ margin: '0 auto', color: '#504b38' }} />
-                    <p style={{ marginTop: '1rem', color: '#6b7280' }}>Consultando Inventario...</p>
+                    <p style={{ marginTop: '1rem' }}>Consultando Inventario...</p>
                   </td>
                 </tr>
               )}
@@ -232,7 +225,7 @@ const AssetManagement = () => {
                     <div className="user-details" style={{ fontWeight: '500' }}>
                       <span className="asset-main-title">{asset.codigo_inventario}</span>
                       <span className="asset-subtitle">{asset.marca} {asset.modelo}</span>
-                      <span className="specs-text" style={{ fontSize: '0.75rem' }}>S/N: {asset.numero_serie}</span>
+                      <span className="specs-text am-sn-text">S/N: {asset.numero_serie}</span>
                     </div>
                   </td>
 
@@ -247,7 +240,7 @@ const AssetManagement = () => {
                   {/*celda para asignación y ubicación*/}
                   <td data-label="Asignación Responsable">
                     <div className="contact-cell">
-                      <span style={{ fontWeight: '700' }}><UserIcon size={14} style={{ display: 'none' }} /> {asset.dueño}</span>
+                      <span className="am-owner-text"><UserIcon size={14} style={{ display: 'none' }} /> {asset.dueño}</span>
                       <span className="contact-phone">{asset.area}</span>
                       <span className="specs-text">{asset.ubicacion}</span>
                     </div>
@@ -264,7 +257,7 @@ const AssetManagement = () => {
 
                   {/*celda para el estado operativo*/}
                   <td data-label="Estado Operativo">
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
+                    <div className="am-table-badges-col">
                       <div className={`status-badge ${asset.estado_operativo === 'Operativo' ? 'status-active' : 'status-inactive'}`}>
                         {asset.estado_operativo === 'Operativo' ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
                         {asset.estado_operativo}
@@ -293,7 +286,7 @@ const AssetManagement = () => {
 
               {filteredAssets.length === 0 && (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
+                  <td colSpan="6" className="am-empty-row">
                     Sin resultados.
                   </td>
                 </tr>
@@ -394,7 +387,7 @@ const AssetManagement = () => {
                   {!isSolicitante && (
                     <>
                       <h4 className="section-divider"><Cpu size={20} /> Matriz de Especificaciones (Vigentes)</h4>
-                      <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '1.5rem', marginTop: '-0.5rem' }}>Al actualizar esto, el sistema versionará las specs antiguas de forma transparente por seguridad de auditoría.</p>
+                      <p className="am-info-desc">Al actualizar esto, el sistema versionará las specs antiguas de forma transparente por seguridad de auditoría.</p>
 
                       <div className="modal-grid">
                         <AuthInput label="Sistema Operativo Instalado" icon={Monitor} value={currentAsset.especificaciones.sistema_operativo} onChange={(e) => setCurrentAsset({ ...currentAsset, especificaciones: { ...currentAsset.especificaciones, sistema_operativo: e.target.value } })} />
@@ -480,7 +473,7 @@ const AssetManagement = () => {
                   <button type="button" className="btn-cancel" onClick={closeModal}>
                     Cancelar y Descartar Cambios
                   </button>
-                  <div style={{ width: '250px' }}>
+                  <div className="am-btn-wrapper">
                     <AuthButton type="submit" icon={isSaving ? Loader2 : Save} disabled={isSaving}>
                       {isSaving ? 'Procesando...' : (modalMode === 'ADD' ? 'Registrar en Inventario' : 'Guardar Ficha Técnica')}
                     </AuthButton>

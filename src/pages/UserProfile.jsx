@@ -64,9 +64,9 @@ const UserProfile = () => {
   if (loading && !profile) {
     return (
       <DashboardLayout headerTitle="Mi Perfil">
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-          <Loader2 size={48} className="spin-icon" style={{ color: '#504b38' }} />
-          <p style={{ marginLeft: '1rem', color: '#6b7280', fontSize: '1.2rem' }}>Cargando perfil...</p>
+        <div className="profile-loading-box">
+          <Loader2 size={48} className="spin-icon" color="#504b38" />
+          <p className="profile-loading-text">Cargando perfil...</p>
         </div>
       </DashboardLayout>
     );
@@ -84,7 +84,7 @@ const UserProfile = () => {
           <div className="profile-info-text">
             <h2 className="profile-name">{formData.nombre} {formData.apellidoPaterno}</h2>
             <p className="profile-role">
-              <Shield size={14} style={{ display: 'inline', marginRight: '5px' }} />
+              <Shield size={14} className="profile-role-icon" />
               Cuenta {profile?.rol || 'Usuario'}
             </p>
           </div>
@@ -168,7 +168,7 @@ const UserProfile = () => {
 
             {/*guardar*/}
             <div className="profile-form-footer">
-              <div style={{ width: '250px' }}>
+              <div className="profile-action-btn-wrapper">
                 <AuthButton icon={Save}>
                   Guardar Cambios
                 </AuthButton>

@@ -9,6 +9,7 @@ import { AuthButton } from '../components/ui/AuthButton';
 import { useEventsManagement } from '../hooks/back_events_management';
 import '../assets/styles/users.css';
 import '../assets/styles/assets-management.css';
+import '../assets/styles/technical-record.css';
 
 const TechnicalRecord = () => {
   const { records, loading, fetchExpediente, updateEvento, updateDiagnostico, createDiagnostico, createMantenimiento, updateMantenimiento } = useEventsManagement();
@@ -150,31 +151,18 @@ const TechnicalRecord = () => {
       <div className="users-container">
         
         {/* Barra de herramientas superior */}
-        <div className="users-header-actions">
-          <div className="search-bar" style={{ display: 'flex', alignItems: 'center' }}>
-            <div style={{ flex: 1 }}>
+        <div className="users-header-actions" style={{ flexDirection: 'column', gap: '1rem' }}>
+          <div className="tr-search-container">
+            <div className="tr-search-input-wrapper">
               <AuthInput
                 icon={Search} type="text" placeholder="Buscar ticket o equipo..."
                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} required={false} label={false}
               />
             </div>
             
-            <div 
-              style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginLeft: '1.5rem', paddingRight: '1rem', backgroundColor: '#fff', padding: '0.5rem 1rem', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-              title="Oculta los eventos que ya fueron validados y completados."
-            >
-              <input 
-                type="checkbox" 
-                checked={hideValidated} 
-                onChange={(e) => setHideValidated(e.target.checked)} 
-                style={{ width: '18px', height: '18px', cursor: 'pointer', accentColor: '#504b38' }}
-              />
-              <span 
-                onClick={() => setHideValidated(!hideValidated)} 
-                style={{ cursor: 'pointer', fontWeight: 600, color: '#504b38', whiteSpace: 'nowrap', fontSize: '0.95rem' }}
-              >
-                Ocultar Validados
-              </span>
+            <div className="tr-filter-pill" title="Oculta los eventos que ya fueron validados y completados.">
+              <input type="checkbox" checked={hideValidated} onChange={(e) => setHideValidated(e.target.checked)} />
+              <span onClick={() => setHideValidated(!hideValidated)}>Ocultar Validados</span>
             </div>
           </div>
         </div>
@@ -194,16 +182,16 @@ const TechnicalRecord = () => {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '3rem' }}>
+                  <td colSpan="5" className="tr-empty-state">
                     <Loader2 size={40} className="spin-icon" style={{ margin: '0 auto', color: '#504b38' }} />
-                    <p style={{ marginTop: '1rem', color: '#6b7280' }}>Sincronizando Expedientes...</p>
+                    <p style={{ marginTop: '1rem' }}>Sincronizando Expedientes...</p>
                   </td>
                 </tr>
               )}
 
               {!loading && filteredRecords.length === 0 && (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
+                  <td colSpan="5" className="tr-empty-state">
                     No hay eventos que mostrar en la bandeja.
                   </td>
                 </tr>
@@ -264,36 +252,33 @@ const TechnicalRecord = () => {
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '750px' }}>
               
-              <div className="modal-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <h3 style={{ marginBottom: '0.2rem' }}>Expediente Folio #{currentEvent.id_evento}</h3>
-                  {isReadOnly && <span className="status-badge" style={{ backgroundColor: '#bbf7d0', color: '#166534' }}><ShieldCheck size={12} /> Documento Sellado (Solo Lectura)</span>}
+              <div className="tr-modal-header">
+                <div className="tr-modal-title-wrapper">
+                  <h3 className="tr-modal-title">Expediente Folio #{currentEvent.id_evento}</h3>
+                  {isReadOnly && <span className="status-badge tr-seal-badge"><ShieldCheck size={12} /> Documento Sellado (Solo Lectura)</span>}
                 </div>
-                <button type="button" className="btn-close-modal" onClick={closeModal}><X size={24} /></button>
+                <button type="button" className="btn-close-modal" onClick={closeModal} style={{ flexShrink: 0, marginTop: '-0.3rem' }}><X size={24} /></button>
               </div>
 
               {/* TABS SUPERIORES */}
-              <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: '1rem', marginTop: '1rem' }}>
+              <div className="tr-tabs-container">
                 <button 
-                  type="button" 
-                  onClick={() => setActiveTab('EVENTO')} 
-                  style={{ flex: 1, padding: '1rem', background: 'none', border: 'none', borderBottom: activeTab==='EVENTO' ? '3px solid #504b38' : '3px solid transparent', fontWeight: activeTab==='EVENTO' ? 700 : 500, color: activeTab==='EVENTO' ? '#504b38' : '#6b7280', cursor: 'pointer' }}
+                  type="button" onClick={() => setActiveTab('EVENTO')} 
+                  className={`tr-tab-btn ${activeTab === 'EVENTO' ? 'active' : ''}`}
                 >
-                  <AlertCircle size={16} style={{ display: 'inline', marginBottom: '-3px', marginRight: '6px' }} /> 1. Falla / Evento
+                  <AlertCircle size={16} /> Falla
                 </button>
                 <button 
-                  type="button" 
-                  onClick={() => setActiveTab('DIAGNOSTICO')} 
-                  style={{ flex: 1, padding: '1rem', background: 'none', border: 'none', borderBottom: activeTab==='DIAGNOSTICO' ? '3px solid #504b38' : '3px solid transparent', fontWeight: activeTab==='DIAGNOSTICO' ? 700 : 500, color: activeTab==='DIAGNOSTICO' ? '#504b38' : '#6b7280', cursor: 'pointer' }}
+                  type="button" onClick={() => setActiveTab('DIAGNOSTICO')} 
+                  className={`tr-tab-btn ${activeTab === 'DIAGNOSTICO' ? 'active' : ''}`}
                 >
-                  <Activity size={16} style={{ display: 'inline', marginBottom: '-3px', marginRight: '6px' }} /> 2. Diagnóstico Técnico
+                  <Activity size={16} /> Diagnóstico
                 </button>
                 <button 
-                  type="button" 
-                  onClick={() => setActiveTab('MANTENIMIENTO')} 
-                  style={{ flex: 1, padding: '1rem', background: 'none', border: 'none', borderBottom: activeTab==='MANTENIMIENTO' ? '3px solid #504b38' : '3px solid transparent', fontWeight: activeTab==='MANTENIMIENTO' ? 700 : 500, color: activeTab==='MANTENIMIENTO' ? '#504b38' : '#6b7280', cursor: 'pointer' }}
+                  type="button" onClick={() => setActiveTab('MANTENIMIENTO')} 
+                  className={`tr-tab-btn ${activeTab === 'MANTENIMIENTO' ? 'active' : ''}`}
                 >
-                  <Wrench size={16} style={{ display: 'inline', marginBottom: '-3px', marginRight: '6px' }} /> 3. Mantenimiento Final
+                  <Wrench size={16} /> Mantenimiento
                 </button>
               </div>
 
@@ -303,7 +288,7 @@ const TechnicalRecord = () => {
                   {/* VISTA 1: EVENTO / FALLA INICIAL */}
                   {activeTab === 'EVENTO' && (
                     <div className="fade-in-tab">
-                      <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Reporte general del incidente y estado en el que se entregó el hardware al departamento de sistemas.</p>
+                      <p className="tr-tab-desc">Reporte general del incidente y estado en el que se entregó el hardware al departamento de sistemas.</p>
                       <div className="modal-grid" style={{ gridTemplateColumns: '1fr' }}>
                         <div className="input-group">
                           <label>Falla Reportada por el Usuario</label>
@@ -327,8 +312,8 @@ const TechnicalRecord = () => {
                           />
                         </div>
                         {!isAdmin && !isReadOnly && (
-                          <div style={{ padding: '1rem', backgroundColor: '#fef2f2', borderRadius: '8px', border: '1px solid #fecaca', display: 'flex', gap: '0.8rem', color: '#b91c1c', fontSize: '0.85rem' }}>
-                            <ShieldAlert size={18} style={{ flexShrink: 0 }} /> Por seguridad, como Técnico no puedes manipular las evidencias narrativas iniciales de la falla que ya registró este Evento. Ve a las pestañas de resolución.
+                          <div className="tr-alert-box">
+                            <ShieldAlert size={18} /> Por seguridad, como Técnico no puedes manipular las evidencias narrativas iniciales de la falla que ya registró este Evento. Ve a las pestañas de resolución.
                           </div>
                         )}
                       </div>
@@ -365,10 +350,10 @@ const TechnicalRecord = () => {
                           </div>
                         </>
                       ) : (
-                        <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-                          <Activity size={40} style={{ margin: '0 auto', color: '#d1d5db', marginBottom: '1rem' }} />
-                          <h4 style={{ color: '#4b5563' }}>Sin Diagnóstico Registrado</h4>
-                          <p style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '1.5rem' }}>Este evento se originó sin la asistencia del Sistema Experto.</p>
+                        <div className="tr-no-data-box">
+                          <Activity size={40} className="tr-no-data-icon" />
+                          <h4 className="tr-no-data-title">Sin Diagnóstico Registrado</h4>
+                          <p className="tr-tab-desc">Este evento se originó sin la asistencia del Sistema Experto.</p>
                           {isTecnico && !isReadOnly && (
                             <button type="button" className="btn-chat-action action-yes" onClick={() => setCurrentEvent({...currentEvent, diagnostico: { es_nuevo: true, resultado_preeliminar: 'Creado manual', validacion_tecnico: '', log_chatbot: null }})}>
                               + Aperturar Diagnóstico Manualmente
@@ -441,10 +426,10 @@ const TechnicalRecord = () => {
                           </div>
                         </>
                       ) : (
-                        <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-                          <Wrench size={40} style={{ margin: '0 auto', color: '#d1d5db', marginBottom: '1rem' }} />
-                          <h4 style={{ color: '#4b5563' }}>Sin Actividades de Mantenimiento</h4>
-                          <p style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '1.5rem' }}>No se han documentado intervenciones definitivas para este Evento aún.</p>
+                        <div className="tr-no-data-box">
+                          <Wrench size={40} className="tr-no-data-icon" />
+                          <h4 className="tr-no-data-title">Sin Actividades de Mantenimiento</h4>
+                          <p className="tr-tab-desc">No se han documentado intervenciones definitivas para este Evento aún.</p>
                           {isTecnico && !isReadOnly && (
                             <button type="button" className="btn-chat-action action-yes" onClick={() => setCurrentEvent({...currentEvent, mantenimiento: { es_nuevo: true, tipo: 'Correctivo', descripcion_trabajo: '', piezas_reemplazadas: '', fecha_entrega: '' }})}>
                               + Asentar Nuevo Mantenimiento
@@ -458,26 +443,26 @@ const TechnicalRecord = () => {
                 </div>
 
                 {/* BOTONERA INFERIOR UNIFIED */}
-                <div className="modal-footer" style={{ borderTop: '1px solid #e5e7eb', padding: '1rem', display: 'flex', justifyContent: 'space-between' }}>
+                <div className="tr-modal-footer">
                   
                   {/* Boton especial de validacion para Tecnicos */}
-                  <div>
+                  <div className="tr-footer-left">
                     {isTecnico && !isReadOnly && (
-                      <button type="button" className="btn-chat-action action-no" style={{ backgroundColor: '#22c55e', color: 'white', borderColor: '#16a34a', display: 'flex', alignItems: 'center', gap: '0.5rem' }} onClick={handleValidarEvento}>
+                      <button type="button" className="btn-chat-action tr-btn-validate" onClick={handleValidarEvento}>
                         <CheckCircle2 size={18} /> Aprobar y Validar Todo
                       </button>
                     )}
                   </div>
 
-                  <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button type="button" className="btn-cancel" onClick={closeModal}>
+                  <div className="tr-footer-right">
+                    <button type="button" className="btn-cancel tr-cancel-btn" onClick={closeModal}>
                       Cancelar
                     </button>
                     
                     {!isReadOnly && (
-                      <div style={{ width: '200px' }}>
+                      <div className="tr-save-btn-wrapper">
                         <AuthButton type="submit" icon={isSaving ? Loader2 : Save} disabled={isSaving}>
-                          {isSaving ? 'Aplicando...' : 'Guardar Cambios'}
+                          {isSaving ? 'Guardando...' : 'Guardar Cambios'}
                         </AuthButton>
                       </div>
                     )}

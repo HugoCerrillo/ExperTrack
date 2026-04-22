@@ -113,7 +113,7 @@ const UserManagement = () => {
               label={false}
             />
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
+          <div className="users-actions-group">
             {/*boton para recargar datos*/}
             <button
               className="btn-refresh"
@@ -207,7 +207,7 @@ const UserManagement = () => {
               {/*estado vacio cuando la busqueda no da resultados*/}
               {!loading && filteredUsers.length === 0 && (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
+                  <td colSpan="5" className="users-empty-row">
                     {users.length === 0
                       ? 'No hay usuarios registrados en el sistema.'
                       : 'No se encontraron registros que coincidan con la búsqueda.'}
@@ -299,7 +299,7 @@ const UserManagement = () => {
                   <button type="button" className="btn-cancel" onClick={closeEditModal}>
                     Cancelar y Descartar Cambios
                   </button>
-                  <div style={{ width: '220px' }}>
+                  <div className="modal-save-wrapper">
                     <AuthButton type="submit" icon={isSaving ? Loader2 : Save} disabled={isSaving}>
                       {isSaving ? 'Guardando...' : 'Actualizar Servidor'}
                     </AuthButton>
@@ -390,7 +390,7 @@ const UserManagement = () => {
                   <button type="button" className="btn-cancel" onClick={closeAddModal}>
                     Cancelar Registro
                   </button>
-                  <div style={{ width: '220px' }}>
+                  <div className="modal-save-wrapper">
                     <AuthButton type="submit" icon={isSaving ? Loader2 : Plus} disabled={isSaving}>
                       {isSaving ? 'Creando...' : 'Crear Cuenta'}
                     </AuthButton>
