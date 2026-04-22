@@ -163,7 +163,7 @@ const AssetManagement = () => {
       <div className="users-container">
 
         {/*barra de herramientas*/}
-        <div className="users-header-actions" style={{ flexDirection: 'column', gap: '1rem' }}>
+        <div className="users-header-actions">
           <div className="am-search-wrapper">
             <div className="am-search-input-box">
               <AuthInput

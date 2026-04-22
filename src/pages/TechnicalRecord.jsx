@@ -151,7 +151,7 @@ const TechnicalRecord = () => {
       <div className="users-container">
         
         {/* Barra de herramientas superior */}
-        <div className="users-header-actions" style={{ flexDirection: 'column', gap: '1rem' }}>
+        <div className="users-header-actions">
           <div className="tr-search-container">
             <div className="tr-search-input-wrapper">
               <AuthInput

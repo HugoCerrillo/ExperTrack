@@ -127,3 +127,85 @@
   color: var(--color-khaki);
   font-weight: 600;
 }
+
+/* Utils Responsivos para el Header de Activos */
+.am-search-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.am-search-input-box {
+  flex: 1;
+  max-width: 500px;
+}
+
+.am-filter-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid rgba(80, 75, 56, 0.2);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.am-filter-pill:hover {
+  border-color: var(--color-khaki);
+  background-color: #fcfbf8;
+}
+
+.am-filter-pill input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #504b38;
+}
+
+.am-filter-pill span {
+  font-weight: 600;
+  color: #504b38;
+  font-size: 0.95rem;
+  user-select: none;
+}
+
+/* Ajustes de Responsividad para la cabecera - Forzamos persistencia horizontal */
+@media (min-width: 769px) {
+  .users-header-actions {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .users-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.25rem;
+  }
+  
+  .am-search-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .am-search-input-box {
+    max-width: 100%;
+  }
+
+  .am-filter-pill {
+    justify-content: center;
+  }
+  
+  .btn-add-user {
+    width: 100%;
+    justify-content: center;
+  }
+}
