@@ -283,7 +283,7 @@ const TechnicalRecord = () => {
               </div>
 
               <form onSubmit={handleSaveModal} className="modal-form">
-                <div className="modal-body" style={{ minHeight: '320px' }}>
+                <div className="modal-body">
 
                   {/* VISTA 1: EVENTO / FALLA INICIAL */}
                   {activeTab === 'EVENTO' && (
