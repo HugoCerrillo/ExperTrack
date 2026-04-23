@@ -11,43 +11,44 @@ import '../assets/styles/users.css';
 import '../assets/styles/assets-management.css';
 import '../assets/styles/technical-record.css';
 
+//vista para mostrar el expediente tecnico
 const TechnicalRecord = () => {
   const { records, loading, fetchExpediente, updateEvento, updateDiagnostico, createDiagnostico, createMantenimiento, updateMantenimiento } = useEventsManagement();
-  
-  const loggedUser = JSON.parse(localStorage.getItem('user') || '{}');
-  const userId = loggedUser.id_usuario || loggedUser.id;
-  const userRole = loggedUser.rol || 'Usuario Solicitante';
-  const isAdmin = userRole === 'Administrador';
-  const isTecnico = userRole === 'Técnico';
+
+  const loggedUser = JSON.parse(localStorage.getItem('user') || '{}'); //obtenemos el usuario logueado
+  const userId = loggedUser.id_usuario || loggedUser.id; //obtenemos el id del usuario logueado
+  const userRole = loggedUser.rol || 'Usuario Solicitante'; //obtenemos el rol del usuario logueado
+  const isAdmin = userRole === 'Administrador'; //adyuara a saber si el usuario es administrador
+  const isTecnico = userRole === 'Técnico'; //ayudara a saber si el usuario es técnico
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [hideValidated, setHideValidated] = useState(isTecnico); // Por defecto el tecnico oculta los validados
-  const [currentEvent, setCurrentEvent] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('EVENTO'); // EVENTO | DIAGNOSTICO | MANTENIMIENTO
+  const [hideValidated, setHideValidated] = useState(isTecnico); //por defecto el tecnico oculta los validados
+  const [currentEvent, setCurrentEvent] = useState(null); //estado para guardar el evento actual
+  const [isModalOpen, setIsModalOpen] = useState(false); //estado para controlar la visibilidad del modal
+  const [isSaving, setIsSaving] = useState(false); //estado para controlar el guardado
+  const [activeTab, setActiveTab] = useState('EVENTO'); //estado para controlar la pestaña activa
 
   useEffect(() => {
     fetchExpediente();
   }, [fetchExpediente]);
 
-  // Filtrado reactivo en pantalla
+  //filtrado de los expedientes
   const filteredRecords = records.filter(r => {
-    // 1. Filtro estricto por Rol
+    //Filtro estricto por Rol
     if (isTecnico && Number(r.id_usuario) !== Number(userId)) return false;
-    
-    // 2. Filtro de Búsqueda
+
+    //Filtro de Búsqueda
     const searchString = `${r.id_evento} ${r.falla_reportada} ${r.equipo_detalle?.codigo_inventario} ${r.equipo_detalle?.marca}`.toLowerCase();
     if (!searchString.includes(searchTerm.toLowerCase())) return false;
 
-    // 3. Filtro de Validación
+    //Filtro de Validación
     if (hideValidated && r.validado) return false;
 
     return true;
   });
 
+  //abrimos el modal
   const openModal = (record) => {
-    // Clonamos profundamente para no mutar el estado principal accidentalmente
     setCurrentEvent({
       ...record,
       diagnostico: record.diagnostico ? { ...record.diagnostico } : null,
@@ -57,13 +58,14 @@ const TechnicalRecord = () => {
     setIsModalOpen(true);
   };
 
+  //cerramos el modal
   const closeModal = () => {
     setCurrentEvent(null);
     setIsModalOpen(false);
   };
 
+  //validamos el evento
   const handleValidarEvento = async () => {
-    // Pregunta agresiva de seguridad
     const confirm = await Swal.fire({
       title: '¿Validar y Cerrar Evento?',
       text: "Al validar, el Equipo será declarado como 'Operativo' y este folio se bloqueará en modo Sólo-Lectura permanentemente.",
@@ -78,9 +80,9 @@ const TechnicalRecord = () => {
     if (!confirm.isConfirmed) return;
 
     setIsSaving(true);
-    // Cambiamos a True
+    //cambiamos el estado del evento a validado=true
     const success = await updateEvento(currentEvent.id_evento, { validado: true });
-    
+
     if (success) {
       Swal.fire({ icon: 'success', title: 'Evento Cerrado', text: 'El equipo ha recuperado su estatus Operativo.' });
       closeModal();
@@ -89,14 +91,15 @@ const TechnicalRecord = () => {
     setIsSaving(false);
   };
 
+  //guardamos los cambios del modal
   const handleSaveModal = async (e) => {
     e.preventDefault();
     setIsSaving(true);
 
     try {
-      // 1. Guardar cambios del EVENTO en si (solo estado_fisico, falla_reportada, etc)
-      // Ni admin ni tecnico deberian andar cambiando el equipo ni creador desde aqui por seguridad estructural.
-      // Tecnico solo puede validar, Admin puede editar texto. El backend rechaza si Tecnico intenta mandar textos al Evento.
+      //fuardamos los cambios del evento en si (solo estado_fisico, falla_reportada, etc)
+      //si es admin puede editar el evento
+      //si es tecnico solo puede validar
       if (isAdmin) {
         await updateEvento(currentEvent.id_evento, {
           falla_reportada: currentEvent.falla_reportada,
@@ -104,10 +107,10 @@ const TechnicalRecord = () => {
         });
       }
 
-      // 2. Guardar DIAGNOSTICO
+      //guardamos el diagnostico
       if (currentEvent.diagnostico) {
-        // En teoria la DB lo crea, pero si lo vamos a mutar:
-        if (currentEvent.diagnostico.es_nuevo) { // bandera custom 
+        //si es nuevo se crea, si no se actualiza
+        if (currentEvent.diagnostico.es_nuevo) {
           await createDiagnostico({ ...currentEvent.diagnostico, id_evento: currentEvent.id_evento });
         } else {
           await updateDiagnostico(currentEvent.id_evento, {
@@ -117,7 +120,7 @@ const TechnicalRecord = () => {
         }
       }
 
-      // 3. Guardar MANTENIMIENTO
+      //guardamos el mantenimiento
       if (currentEvent.mantenimiento) {
         if (currentEvent.mantenimiento.es_nuevo) {
           await createMantenimiento({ ...currentEvent.mantenimiento, id_evento: currentEvent.id_evento });
@@ -143,13 +146,13 @@ const TechnicalRecord = () => {
     }
   };
 
-  // Switch de Lectura global
+  //si el evento esta validado, es solo lectura
   const isReadOnly = currentEvent?.validado === true;
 
   return (
     <DashboardLayout headerTitle="Expediente Técnico">
       <div className="users-container">
-        
+
         {/* Barra de herramientas superior */}
         <div className="users-header-actions">
           <div className="tr-search-container">
@@ -159,15 +162,13 @@ const TechnicalRecord = () => {
                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} required={false} label={false}
               />
             </div>
-            
+
             <div className="tr-filter-pill" title="Oculta los eventos que ya fueron validados y completados.">
               <input type="checkbox" checked={hideValidated} onChange={(e) => setHideValidated(e.target.checked)} />
               <span onClick={() => setHideValidated(!hideValidated)}>Ocultar Validados</span>
             </div>
           </div>
         </div>
-
-        {/* Tabla Dinámica */}
         <div className="table-wrapper">
           <table className="users-table">
             <thead>
@@ -219,8 +220,6 @@ const TechnicalRecord = () => {
                         {r.validado ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
                         {r.validado ? 'Validado y Cerrado' : 'Abierto (Pediente)'}
                       </div>
-                      
-                      {/* Pildoras de fases */}
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
                         <div className="status-badge" style={{ backgroundColor: r.diagnostico ? '#dbeafe' : '#f3f4f6', color: r.diagnostico ? '#1e40af' : '#9ca3af' }} title={r.diagnostico ? 'Diagnóstico Anexado' : 'Sin Diagnóstico'}>
                           <Database size={12} /> Diag
@@ -245,13 +244,10 @@ const TechnicalRecord = () => {
           </table>
         </div>
 
-        {/* ============================================================== */}
-        {/* MODAL MULTI-TABS DE EXPEDIENTE */}
-        {/* ============================================================== */}
         {isModalOpen && currentEvent && (
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '750px' }}>
-              
+
               <div className="tr-modal-header">
                 <div className="tr-modal-title-wrapper">
                   <h3 className="tr-modal-title">Expediente Folio #{currentEvent.id_evento}</h3>
@@ -259,23 +255,21 @@ const TechnicalRecord = () => {
                 </div>
                 <button type="button" className="btn-close-modal" onClick={closeModal} style={{ flexShrink: 0, marginTop: '-0.3rem' }}><X size={24} /></button>
               </div>
-
-              {/* TABS SUPERIORES */}
               <div className="tr-tabs-container">
-                <button 
-                  type="button" onClick={() => setActiveTab('EVENTO')} 
+                <button
+                  type="button" onClick={() => setActiveTab('EVENTO')}
                   className={`tr-tab-btn ${activeTab === 'EVENTO' ? 'active' : ''}`}
                 >
                   <AlertCircle size={16} /> Falla
                 </button>
-                <button 
-                  type="button" onClick={() => setActiveTab('DIAGNOSTICO')} 
+                <button
+                  type="button" onClick={() => setActiveTab('DIAGNOSTICO')}
                   className={`tr-tab-btn ${activeTab === 'DIAGNOSTICO' ? 'active' : ''}`}
                 >
                   <Activity size={16} /> Diagnóstico
                 </button>
-                <button 
-                  type="button" onClick={() => setActiveTab('MANTENIMIENTO')} 
+                <button
+                  type="button" onClick={() => setActiveTab('MANTENIMIENTO')}
                   className={`tr-tab-btn ${activeTab === 'MANTENIMIENTO' ? 'active' : ''}`}
                 >
                   <Wrench size={16} /> Mantenimiento
@@ -285,30 +279,30 @@ const TechnicalRecord = () => {
               <form onSubmit={handleSaveModal} className="modal-form">
                 <div className="modal-body">
 
-                  {/* VISTA 1: EVENTO / FALLA INICIAL */}
+                  {/*vista de evento*/}
                   {activeTab === 'EVENTO' && (
                     <div className="fade-in-tab">
-                      <p className="tr-tab-desc">Reporte general del incidente y estado en el que se entregó el hardware al departamento de sistemas.</p>
+                      <p className="tr-tab-desc">Reporte general del incidente y estado en el que se entregó el hardware al personal.</p>
                       <div className="modal-grid" style={{ gridTemplateColumns: '1fr' }}>
                         <div className="input-group">
                           <label>Falla Reportada por el Usuario</label>
-                          <textarea 
-                            className="auth-input" 
-                            rows={3} 
-                            value={currentEvent.falla_reportada} 
-                            disabled={isReadOnly || !isAdmin} 
-                            onChange={(e) => setCurrentEvent({...currentEvent, falla_reportada: e.target.value})} 
+                          <textarea
+                            className="auth-input"
+                            rows={3}
+                            value={currentEvent.falla_reportada}
+                            disabled={isReadOnly || !isAdmin}
+                            onChange={(e) => setCurrentEvent({ ...currentEvent, falla_reportada: e.target.value })}
                           />
                         </div>
                         <div className="input-group">
                           <label>Condición y Estado Físico de Recepción</label>
-                          <textarea 
-                            className="auth-input" 
-                            rows={2} 
-                            value={currentEvent.estado_fisico} 
-                            disabled={isReadOnly || !isAdmin} 
+                          <textarea
+                            className="auth-input"
+                            rows={2}
+                            value={currentEvent.estado_fisico}
+                            disabled={isReadOnly || !isAdmin}
                             placeholder="Abonado por el técnico de recepción inicial..."
-                            onChange={(e) => setCurrentEvent({...currentEvent, estado_fisico: e.target.value})} 
+                            onChange={(e) => setCurrentEvent({ ...currentEvent, estado_fisico: e.target.value })}
                           />
                         </div>
                         {!isAdmin && !isReadOnly && (
@@ -320,31 +314,31 @@ const TechnicalRecord = () => {
                     </div>
                   )}
 
-                  {/* VISTA 2: DIAGNOSTICO */}
+                  {/*vista de diagnostico*/}
                   {activeTab === 'DIAGNOSTICO' && (
                     <div className="fade-in-tab">
                       {currentEvent.diagnostico ? (
                         <>
                           <div className="modal-grid" style={{ gridTemplateColumns: '1fr' }}>
                             <div className="input-group">
-                              <label>Verdugo / Resultado Preliminar ExperBot</label>
-                              <textarea 
-                                className="auth-input" 
-                                rows={3} 
-                                value={currentEvent.diagnostico.resultado_preeliminar} 
-                                disabled={isReadOnly} 
-                                onChange={(e) => setCurrentEvent({...currentEvent, diagnostico: {...currentEvent.diagnostico, resultado_preeliminar: e.target.value}})} 
+                              <label>Resultado Preliminar ExperBot</label>
+                              <textarea
+                                className="auth-input"
+                                rows={3}
+                                value={currentEvent.diagnostico.resultado_preeliminar}
+                                disabled={isReadOnly}
+                                onChange={(e) => setCurrentEvent({ ...currentEvent, diagnostico: { ...currentEvent.diagnostico, resultado_preeliminar: e.target.value } })}
                               />
                             </div>
                             <div className="input-group">
                               <label>Validación en Sitio (Juicio del Técnico Humano)</label>
-                              <textarea 
-                                className="auth-input" 
-                                rows={3} 
+                              <textarea
+                                className="auth-input"
+                                rows={3}
                                 placeholder="Describe luego de tu inspección si concordó con Prolog o si localizaste otras deficiencias..."
-                                value={currentEvent.diagnostico.validacion_tecnico} 
-                                disabled={isReadOnly} 
-                                onChange={(e) => setCurrentEvent({...currentEvent, diagnostico: {...currentEvent.diagnostico, validacion_tecnico: e.target.value}})} 
+                                value={currentEvent.diagnostico.validacion_tecnico}
+                                disabled={isReadOnly}
+                                onChange={(e) => setCurrentEvent({ ...currentEvent, diagnostico: { ...currentEvent.diagnostico, validacion_tecnico: e.target.value } })}
                               />
                             </div>
                           </div>
@@ -355,7 +349,7 @@ const TechnicalRecord = () => {
                           <h4 className="tr-no-data-title">Sin Diagnóstico Registrado</h4>
                           <p className="tr-tab-desc">Este evento se originó sin la asistencia del Sistema Experto.</p>
                           {isTecnico && !isReadOnly && (
-                            <button type="button" className="btn-chat-action action-yes" onClick={() => setCurrentEvent({...currentEvent, diagnostico: { es_nuevo: true, resultado_preeliminar: 'Creado manual', validacion_tecnico: '', log_chatbot: null }})}>
+                            <button type="button" className="btn-chat-action action-yes" onClick={() => setCurrentEvent({ ...currentEvent, diagnostico: { es_nuevo: true, resultado_preeliminar: 'Creado manual', validacion_tecnico: '', log_chatbot: null } })}>
                               + Aperturar Diagnóstico Manualmente
                             </button>
                           )}
@@ -364,7 +358,7 @@ const TechnicalRecord = () => {
                     </div>
                   )}
 
-                  {/* VISTA 3: MANTENIMIENTO */}
+                  {/*vista de mantenimiento*/}
                   {activeTab === 'MANTENIMIENTO' && (
                     <div className="fade-in-tab">
                       {currentEvent.mantenimiento ? (
@@ -374,53 +368,53 @@ const TechnicalRecord = () => {
                               <label>Tipo de Intervención</label>
                               <div className="input-wrapper">
                                 <Wrench className="input-icon" size={20} />
-                                <select 
-                                  className="auth-select" 
-                                  value={currentEvent.mantenimiento.tipo} 
+                                <select
+                                  className="auth-select"
+                                  value={currentEvent.mantenimiento.tipo}
                                   disabled={isReadOnly}
-                                  onChange={(e) => setCurrentEvent({...currentEvent, mantenimiento: {...currentEvent.mantenimiento, tipo: e.target.value}})}
+                                  onChange={(e) => setCurrentEvent({ ...currentEvent, mantenimiento: { ...currentEvent.mantenimiento, tipo: e.target.value } })}
                                 >
-                                  <option value="Preventivo">Limpieza / Mantenimiento Preventivo</option>
-                                  <option value="Correctivo">Reparación Severa / Sustitución de Piezas (Correctivo)</option>
+                                  <option value="Preventivo">Mantenimiento Preventivo</option>
+                                  <option value="Correctivo">Mantenimiento Correctivo</option>
                                 </select>
                               </div>
                             </div>
                             <div className="input-group">
-                              <label>Fecha de Disposición / Entrega</label>
+                              <label>Fecha de Entrega</label>
                               <div className="input-wrapper">
                                 <Calendar className="input-icon" size={20} />
-                                <input 
-                                  type="date" 
-                                  className="auth-input" 
-                                  style={{ paddingLeft: '3rem' }} 
+                                <input
+                                  type="date"
+                                  className="auth-input"
+                                  style={{ paddingLeft: '3rem' }}
                                   disabled={isReadOnly}
-                                  value={currentEvent.mantenimiento.fecha_entrega ? currentEvent.mantenimiento.fecha_entrega.split('T')[0] : ''} 
-                                  onChange={(e) => setCurrentEvent({...currentEvent, mantenimiento: {...currentEvent.mantenimiento, fecha_entrega: e.target.value}})} 
+                                  value={currentEvent.mantenimiento.fecha_entrega ? currentEvent.mantenimiento.fecha_entrega.split('T')[0] : ''}
+                                  onChange={(e) => setCurrentEvent({ ...currentEvent, mantenimiento: { ...currentEvent.mantenimiento, fecha_entrega: e.target.value } })}
                                 />
                               </div>
                             </div>
                           </div>
                           <div className="modal-grid" style={{ gridTemplateColumns: '1fr', marginTop: '1rem' }}>
                             <div className="input-group">
-                              <label>Desarrollo y Descripción de los Trabajos Efectuados</label>
-                              <textarea 
-                                className="auth-input" 
-                                rows={3} 
+                              <label>Desarrollo y Descripción de los Trabajos Realizados</label>
+                              <textarea
+                                className="auth-input"
+                                rows={3}
                                 disabled={isReadOnly}
                                 placeholder="Se destapó el equipo, se cambió pasta térmica..."
-                                value={currentEvent.mantenimiento.descripcion_trabajo} 
-                                onChange={(e) => setCurrentEvent({...currentEvent, mantenimiento: {...currentEvent.mantenimiento, descripcion_trabajo: e.target.value}})} 
+                                value={currentEvent.mantenimiento.descripcion_trabajo}
+                                onChange={(e) => setCurrentEvent({ ...currentEvent, mantenimiento: { ...currentEvent.mantenimiento, descripcion_trabajo: e.target.value } })}
                               />
                             </div>
                             <div className="input-group">
                               <label>Inventario de Repuestos o Piezas Reemplazadas (si aplica)</label>
-                              <textarea 
-                                className="auth-input" 
-                                rows={2} 
+                              <textarea
+                                className="auth-input"
+                                rows={2}
                                 disabled={isReadOnly}
                                 placeholder="1x Memoria RAM DDR4 8GB..."
-                                value={currentEvent.mantenimiento.piezas_reemplazadas} 
-                                onChange={(e) => setCurrentEvent({...currentEvent, mantenimiento: {...currentEvent.mantenimiento, piezas_reemplazadas: e.target.value}})} 
+                                value={currentEvent.mantenimiento.piezas_reemplazadas}
+                                onChange={(e) => setCurrentEvent({ ...currentEvent, mantenimiento: { ...currentEvent.mantenimiento, piezas_reemplazadas: e.target.value } })}
                               />
                             </div>
                           </div>
@@ -431,7 +425,7 @@ const TechnicalRecord = () => {
                           <h4 className="tr-no-data-title">Sin Actividades de Mantenimiento</h4>
                           <p className="tr-tab-desc">No se han documentado intervenciones definitivas para este Evento aún.</p>
                           {isTecnico && !isReadOnly && (
-                            <button type="button" className="btn-chat-action action-yes" onClick={() => setCurrentEvent({...currentEvent, mantenimiento: { es_nuevo: true, tipo: 'Correctivo', descripcion_trabajo: '', piezas_reemplazadas: '', fecha_entrega: '' }})}>
+                            <button type="button" className="btn-chat-action action-yes" onClick={() => setCurrentEvent({ ...currentEvent, mantenimiento: { es_nuevo: true, tipo: 'Correctivo', descripcion_trabajo: '', piezas_reemplazadas: '', fecha_entrega: '' } })}>
                               + Asentar Nuevo Mantenimiento
                             </button>
                           )}
@@ -442,10 +436,10 @@ const TechnicalRecord = () => {
 
                 </div>
 
-                {/* BOTONERA INFERIOR UNIFIED */}
+                {/*botonera inferior*/}
                 <div className="tr-modal-footer">
-                  
-                  {/* Boton especial de validacion para Tecnicos */}
+
+                  {/*boton para validar*/}
                   <div className="tr-footer-left">
                     {isTecnico && !isReadOnly && (
                       <button type="button" className="btn-chat-action tr-btn-validate" onClick={handleValidarEvento}>
@@ -458,7 +452,7 @@ const TechnicalRecord = () => {
                     <button type="button" className="btn-cancel tr-cancel-btn" onClick={closeModal}>
                       Cancelar
                     </button>
-                    
+
                     {!isReadOnly && (
                       <div className="tr-save-btn-wrapper">
                         <AuthButton type="submit" icon={isSaving ? Loader2 : Save} disabled={isSaving}>

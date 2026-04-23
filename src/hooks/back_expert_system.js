@@ -15,11 +15,11 @@ export const useExpertSystem = () => {
 
   // Solo operativos. Solicitantes solo ven los suyos. Técnicos ven todos los operativos.
   const availableAssets = assets.filter(a => {
-    if (a.estado_operativo !== 'Operativo') return false; 
+    if (a.estado_operativo !== 'Operativo') return false;
     if (isSolicitante) {
       return Number(a.id_usuario) === Number(userId);
     }
-    return true; 
+    return true;
   });
 
   //manifestaciones de falla iniciales
@@ -114,7 +114,7 @@ export const useExpertSystem = () => {
             .map(s => `🔹 ${s.trim()}${s.endsWith('.') ? '' : '.'}`)
             .join('\n\n');
 
-          const finalMsg = isSolicitante 
+          const finalMsg = isSolicitante
             ? `Tu diagnóstico se ha realizado exitosamente.\n\n─────────────────────\nPara nutrir la bitácora y notificar a soporte, por favor describe con tus propias palabras qué le notas al equipo en la barra inferior (caja de texto):`
             : `DIAGNÓSTICO ENCONTRADO:\n\n${textoLimpio}\n\n─────────────────────\nPara nutrir la bitácora, por favor describe con tus propias palabras algún detalle extra de la falla en la barra inferior (caja de texto):`;
 
@@ -174,11 +174,11 @@ export const useExpertSystem = () => {
     //suprimimos el selector
     setMessages(prev => prev.map(m => ({ ...m, showOptions: null })));
 
-    setSessionData(prev => ({ 
-      ...prev, 
+    setSessionData(prev => ({
+      ...prev,
       id_equipo: asset.id_equipo,
-      equipo_codigo: asset.codigo_inventario, 
-      tipo: tipoNormalizado 
+      equipo_codigo: asset.codigo_inventario,
+      tipo: tipoNormalizado
     }));
     setChatState('ASKING_SINTOMA');
 
@@ -196,8 +196,8 @@ export const useExpertSystem = () => {
   //cuando selecciona la manifestacion de falla principal
   const handleSymptomSelect = (claveSintoma) => {
     const isNoFalla = claveSintoma === 'NO_FALLA';
-    const sintomaName = isNoFalla 
-      ? 'No veo la falla de mi equipo' 
+    const sintomaName = isNoFalla
+      ? 'No veo la falla de mi equipo'
       : (sintomasValidos.find(s => s.clave === claveSintoma)?.descripcion || claveSintoma);
 
     addUserMessage(`Manifestación de falla: ${sintomaName}`);
@@ -207,7 +207,7 @@ export const useExpertSystem = () => {
     // Si solucionó "No veo la falla", omitimos Prolog
     if (isNoFalla) {
       setChatState('ASKING_FINAL_DETAILS');
-      
+
       const nuevoPayload = {
         id_equipo: sessionData.id_equipo,
         equipo_codigo: sessionData.equipo_codigo,
@@ -222,7 +222,7 @@ export const useExpertSystem = () => {
       setIsTyping(true);
       setTimeout(() => {
         setIsTyping(false);
-        const autoMsg = isSolicitante 
+        const autoMsg = isSolicitante
           ? "Hemos registrado tu solicitud de diagnóstico. Para finalizar y notificar a los técnicos, por favor describe con tus propias palabras qué le falla a tu equipo en la barra inferior (caja de texto):"
           : "Entendido. Como la falla no parece estar en la biblioteca estándar, por favor describe detalladamente qué le sucede al equipo en la barra inferior (caja de texto):";
         addBotMessage(autoMsg);
@@ -273,7 +273,7 @@ export const useExpertSystem = () => {
   const enviarReporte = async (estadoFisico, descripcionFinal) => {
     setChatState('DONE');
     setIsTyping(true);
-    
+
     try {
       Swal.fire({
         title: 'Generando Reporte...',
@@ -308,13 +308,14 @@ export const useExpertSystem = () => {
 
       // 2. Crear Diagnostico
       const chatLogLimpio = messages.map(m => ({ sender: m.sender, text: m.text, time: m.time }));
-      // Incluimos lo ultimo que dijo el usuario
-      chatLogLimpio.push({ 
-        sender: 'user', 
-        text: estadoFisico ? estadoFisico : descripcionFinal, 
-        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) 
+      //incluimos lo ultimo que dijo el usuario
+      chatLogLimpio.push({
+        sender: 'user',
+        text: estadoFisico ? estadoFisico : descripcionFinal,
+        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
       });
 
+      //hacemos la peticion a la api para crear el diagnostico
       const resDiag = await fetch('/api/diagnosticos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -327,7 +328,7 @@ export const useExpertSystem = () => {
         })
       });
 
-      const dataDiag = await resDiag.json();
+      const dataDiag = await resDiag.json(); //convertimos la respuesta a json
 
       if (!resDiag.ok || dataDiag.status !== 'success') {
         throw new Error(dataDiag.message || 'Error al guardar log de diagnóstico');
@@ -356,7 +357,7 @@ export const useExpertSystem = () => {
     }
   };
 
-  //cuando se envia texto texto (Fase Detalle Final o Estado Fisico)
+  //fase Detalle Final o estado fFisico
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
     const msg = inputMessage.trim();
@@ -372,7 +373,7 @@ export const useExpertSystem = () => {
         //solicitante no captura estado físico, manda string vacío.
         enviarReporte("", nuevoDetalle);
       } else {
-        //técnico sÍ, lo mandamos a un paso intermedio
+        //tecnico si, lo mandamos a un paso intermedio
         setChatState('ASKING_ESTADO_FISICO');
         setIsTyping(true);
         setTimeout(() => {
@@ -389,9 +390,9 @@ export const useExpertSystem = () => {
   //reset del ciclo
   const resetDiagnosticSession = () => {
     setSintomasValidos([]); //limpiamos la lista de opciones
-    setSessionData({ 
-      id_equipo: null, equipo_codigo: null, tipo: null, sintoma: null, 
-      sintoma_nombre: null, historial: [], resultado_prolog: "", descripcion_usuario: "" 
+    setSessionData({
+      id_equipo: null, equipo_codigo: null, tipo: null, sintoma: null,
+      sintoma_nombre: null, historial: [], resultado_prolog: "", descripcion_usuario: ""
     });
     setChatState('ASKING_TIPO');
     setCurrentPrologQuestion(null);
