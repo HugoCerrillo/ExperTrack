@@ -227,6 +227,16 @@
   color: #FFF;
 }
 
+.btn-pdf {
+  color: #2563eb; /* Azul para resaltar la extracción de documento */
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+.btn-pdf:hover {
+  background-color: #2563eb;
+  color: #FFF;
+}
+
 /* =========================================
    SISTEMA DE TABLAS RESPONSIVAS A "CARTAS" 
 ========================================== */

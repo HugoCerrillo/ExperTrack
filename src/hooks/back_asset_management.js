@@ -211,6 +211,55 @@ export function useAssetManagement() {
         }
     };
 
+    //solicitud para generar y descargar expediente PDF
+    const descargarExpedientePdf = async (id, codigo_inventario) => {
+        try {
+            Swal.fire({
+                title: 'Generando Reporte PDF...',
+                text: 'Consultando el expediente técnico completo...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const response = await fetch(`${API_URL}/equipos/${id}/expediente_pdf`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                
+                // Forzar descarga del blob
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `Expediente_${codigo_inventario || id}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+                window.URL.revokeObjectURL(url);
+
+                Swal.close();
+            } else {
+                const data = await response.json().catch(() => ({}));
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al generar PDF',
+                    text: data.message || 'Error en el servidor',
+                    confirmButtonColor: '#504b38'
+                });
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Red',
+                text: 'No se pudo contactar al servidor para descargar el PDF.',
+                confirmButtonColor: '#504b38'
+            });
+        }
+    };
+
     //retornar los valores
     return {
         assets,
@@ -220,6 +269,7 @@ export function useAssetManagement() {
         fetchEquipoDetalle,
         crearEquipo,
         actualizarEquipo,
-        eliminarEquipo
+        eliminarEquipo,
+        descargarExpedientePdf
     };
 }

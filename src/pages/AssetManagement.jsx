@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Edit, Trash2, Plus, Search, MapPin,
   User as UserIcon, Barcode, Calendar, Laptop, Monitor, Tablet,
-  Server, Cpu, HardDrive, ShieldCheck, X, Save, AlertCircle, CheckCircle2, XCircle, Tag, ClipboardList, Loader2, RefreshCw
+  Server, Cpu, HardDrive, ShieldCheck, X, Save, AlertCircle, CheckCircle2, XCircle, Tag, ClipboardList, Loader2, RefreshCw, FileText
 } from 'lucide-react'; //importamos los iconos de lucide-react
 import Swal from 'sweetalert2'; //importamos sweetalert2 para las alertas
 import { DashboardLayout } from '../components/layout/DashboardLayout';
@@ -16,7 +16,7 @@ import '../assets/styles/assets-management.css';
 //pagina para la gestion de activos
 const AssetManagement = () => {
 
-  const { assets, loading: loadingAssets, fetchEquipos, fetchEquipoDetalle, crearEquipo, actualizarEquipo, eliminarEquipo } = useAssetManagement();
+  const { assets, loading: loadingAssets, fetchEquipos, fetchEquipoDetalle, crearEquipo, actualizarEquipo, eliminarEquipo, descargarExpedientePdf } = useAssetManagement();
   
   const loggedUser = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = loggedUser.id_usuario || loggedUser.id;
@@ -272,12 +272,17 @@ const AssetManagement = () => {
                   {/*celda con los iconos de editar y eliminar*/}
                   <td data-label="Mantenimiento">
                     <div className="action-buttons">
+                      <button className="btn-icon btn-pdf" title="Generar Expediente PDF" onClick={() => descargarExpedientePdf(asset.id_equipo, asset.codigo_inventario)}>
+                        <FileText size={18} />
+                      </button>
                       <button className="btn-icon btn-edit" title="Ver / Editar Ficha" onClick={() => openModal('EDIT', asset)}>
                         <Edit size={18} />
                       </button>
-                      <button className="btn-icon btn-delete" title="Retirar Activo" onClick={() => handleDelete(asset.id_equipo)}>
-                        <Trash2 size={18} />
-                      </button>
+                      {!isSolicitante && (
+                        <button className="btn-icon btn-delete" title="Retirar Activo" onClick={() => handleDelete(asset.id_equipo)}>
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
 
