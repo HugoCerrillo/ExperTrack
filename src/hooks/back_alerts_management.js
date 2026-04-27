@@ -15,10 +15,10 @@ export const useAlertasManagement = () => {
             if (estatus) {
                 url += `?estatus=${estatus}`;
             }
-            
+
             const response = await fetch(url, { credentials: 'include' });
             const data = await response.json();
-            
+
             if (response.ok && data.status === 'success') {
                 setAlertas(data.alertas || []);
                 setError(null);
@@ -45,7 +45,7 @@ export const useAlertasManagement = () => {
                 credentials: 'include'
             });
             const data = await response.json();
-            
+
             if (response.ok && data.status === 'success') {
                 Swal.fire('¡Éxito!', 'Alerta preventiva programada correctamente.', 'success');
                 return true;
@@ -72,7 +72,7 @@ export const useAlertasManagement = () => {
                 credentials: 'include'
             });
             const data = await response.json();
-            
+
             if (response.ok && data.status === 'success') {
                 Swal.fire('¡Actualizado!', 'La alerta se modificó correctamente.', 'success');
                 return true;
@@ -109,7 +109,7 @@ export const useAlertasManagement = () => {
                     credentials: 'include'
                 });
                 const data = await response.json();
-                
+
                 if (response.ok && data.status === 'success') {
                     Swal.fire('¡Eliminada!', 'La alerta ha sido borrada.', 'success');
                     return true;
@@ -143,7 +143,7 @@ export const useAlertasManagement = () => {
                 method: 'POST',
                 credentials: 'include'
             });
-            
+
             const data = await response.json();
             Swal.close();
 
@@ -178,3 +178,5 @@ export const useAlertasManagement = () => {
         triggerVerificacionManual
     };
 };
+
+//
