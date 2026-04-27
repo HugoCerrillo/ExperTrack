@@ -239,15 +239,17 @@ const FactManagement = () => {
                             />
                             <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                               <label>Descripción Legible para el Usuario</label>
-                              <textarea 
-                                className="auth-input" rows={2} required 
-                                placeholder="Ej. La pantalla está estrellada o no enciende."
-                                value={formData.descripcion} onChange={(e) => setFormData({...formData, descripcion: e.target.value})} 
-                              />
+                              <div className="input-wrapper">
+                                <textarea 
+                                  className="textarea-auth" required 
+                                  placeholder="Ej. La pantalla está estrellada o no enciende."
+                                  value={formData.descripcion} onChange={(e) => setFormData({...formData, descripcion: e.target.value})} 
+                                />
+                              </div>
                             </div>
                           </div>
-                          <h4 className="section-divider" style={{ marginTop: '1.5rem' }}><Activity size={20} /> 2. Falla Asociada (Obligatoria)</h4>
-                          <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1rem' }}>Todo síntoma debe tener al menos una vía de diagnóstico para que Prolog pueda operar.</p>
+                          <h4 className="section-divider"><Activity size={20} /> 2. Falla Asociada (Obligatoria)</h4>
+                          <span className="section-hint">Todo síntoma debe tener al menos una vía de diagnóstico para que Prolog pueda operar.</span>
                         </>
                       )}
 
@@ -295,9 +297,9 @@ const FactManagement = () => {
                         <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                           <label>Pregunta Pista (Motor de Inferencia)</label>
                           <div className="input-wrapper">
-                            <HelpCircle className="input-icon" size={20} style={{ top: '15px', transform: 'none' }} />
+                            <HelpCircle className="icon-textarea" size={20} />
                             <textarea 
-                              className="auth-input" rows={2} style={{ paddingLeft: '3rem' }} required 
+                              className="textarea-auth textarea-with-icon" required 
                               placeholder="Ej. ¿Emitió algún sonido metálico antes de apagarse?"
                               value={formData.pregunta_pista} onChange={(e) => setFormData({...formData, pregunta_pista: e.target.value})} 
                             />
@@ -307,9 +309,9 @@ const FactManagement = () => {
                         <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                           <label>Diagnóstico Técnico (Veredicto)</label>
                           <div className="input-wrapper">
-                            <Monitor className="input-icon" size={20} style={{ top: '15px', transform: 'none' }} />
+                            <Monitor className="icon-textarea" size={20} />
                             <textarea 
-                              className="auth-input" rows={2} style={{ paddingLeft: '3rem' }} required 
+                              className="textarea-auth textarea-with-icon" required 
                               placeholder="Ej. Falla del disco duro por impacto o fatiga mecánica."
                               value={formData.diagnostico} onChange={(e) => setFormData({...formData, diagnostico: e.target.value})} 
                             />
@@ -319,9 +321,9 @@ const FactManagement = () => {
                         <div className="input-group" style={{ gridColumn: '1 / -1' }}>
                           <label>Recomendación / Solución Estándar</label>
                           <div className="input-wrapper">
-                            <CheckCircle2 className="input-icon" size={20} style={{ top: '15px', transform: 'none' }} />
+                            <CheckCircle2 className="icon-textarea" size={20} />
                             <textarea 
-                              className="auth-input" rows={2} style={{ paddingLeft: '3rem' }} required 
+                              className="textarea-auth textarea-with-icon" required 
                               placeholder="Ej. Reemplazar HDD por una unidad SSD y reinstalar el sistema operativo."
                               value={formData.recomendacion} onChange={(e) => setFormData({...formData, recomendacion: e.target.value})} 
                             />
