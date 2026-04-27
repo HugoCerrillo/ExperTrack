@@ -260,6 +260,67 @@ export function useAssetManagement() {
         }
     };
 
+    //solicitud para generar y descargar reporte general de inventario PDF
+    const descargarReporteInventarioPdf = async () => {
+        try {
+            Swal.fire({
+                title: 'Generando Inventario...',
+                text: 'Consultando la base de datos de activos...',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            const response = await fetch(`${API_URL}/reporte_inventario_pdf`, {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                
+                // Forzar descarga del blob
+                const link = document.createElement('a');
+                link.href = url;
+                
+                // Obtener nombre del archivo del header si es posible, si no uno por defecto
+                let filename = 'Inventario_ExperTrack.pdf';
+                const disposition = response.headers.get('Content-Disposition');
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    const matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) { 
+                      filename = matches[1].replace(/['"]/g, '');
+                    }
+                }
+                
+                link.setAttribute('download', filename);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+                window.URL.revokeObjectURL(url);
+
+                Swal.close();
+            } else {
+                const data = await response.json().catch(() => ({}));
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error al generar PDF',
+                    text: data.message || 'Error en el servidor',
+                    confirmButtonColor: '#504b38'
+                });
+            }
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de Red',
+                text: 'No se pudo contactar al servidor para descargar el inventario.',
+                confirmButtonColor: '#504b38'
+            });
+        }
+    };
+
     //retornar los valores
     return {
         assets,
@@ -270,6 +331,7 @@ export function useAssetManagement() {
         crearEquipo,
         actualizarEquipo,
         eliminarEquipo,
-        descargarExpedientePdf
+        descargarExpedientePdf,
+        descargarReporteInventarioPdf
     };
 }

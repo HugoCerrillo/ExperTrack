@@ -16,7 +16,7 @@ import '../assets/styles/assets-management.css';
 //pagina para la gestion de activos
 const AssetManagement = () => {
 
-  const { assets, loading: loadingAssets, fetchEquipos, fetchEquipoDetalle, crearEquipo, actualizarEquipo, eliminarEquipo, descargarExpedientePdf } = useAssetManagement();
+  const { assets, loading: loadingAssets, fetchEquipos, fetchEquipoDetalle, crearEquipo, actualizarEquipo, eliminarEquipo, descargarExpedientePdf, descargarReporteInventarioPdf } = useAssetManagement();
   
   const loggedUser = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = loggedUser.id_usuario || loggedUser.id;
@@ -165,7 +165,7 @@ const AssetManagement = () => {
 
         {/*barra de herramientas*/}
         <div className="users-header-actions">
-          <div className="am-search-wrapper">
+          <div className="am-search-wrapper" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
             <div className="am-search-input-box">
               <AuthInput
                 icon={Search} type="text" placeholder="Buscar activo..."
@@ -187,10 +187,19 @@ const AssetManagement = () => {
               </div>
             )}
           </div>
-          <button className="btn-add-user" onClick={() => openModal('ADD')}>
-            <Plus size={18} />
-            <span>Registrar Nuevo Equipo</span>
-          </button>
+          
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            {!isSolicitante && (
+              <button className="btn-chat-action action-yes" onClick={descargarReporteInventarioPdf} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', backgroundColor: '#504b38', color: '#fff' }}>
+                <FileText size={18} /> Inventario PDF
+              </button>
+            )}
+            
+            <button className="btn-add-user" onClick={() => openModal('ADD')}>
+              <Plus size={18} />
+              <span>Registrar Nuevo Equipo</span>
+            </button>
+          </div>
         </div>
 
         {/*tablita de activos (equipos)*/}
