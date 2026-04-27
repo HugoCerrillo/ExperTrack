@@ -36,18 +36,25 @@ export function useHechosManagement() {
         }
     }, []);
 
+    // Fetch Categorias
+    const fetchCategorias = useCallback(async () => {
+        try {
+            const response = await fetch(`${API_URL}/categorias_hechos`, { credentials: 'include' });
+            const data = await response.json();
+            if (response.ok && data.status === 'success') {
+                setCategorias(data.categorias || []);
+            }
+        } catch (err) {
+            console.error("Error fetching categorias:", err);
+        }
+    }, []);
+
     // Load initial data
     useEffect(() => {
         fetchSintomas();
         fetchFallas();
-        // Mock categories since GET /categorias_hechos is missing
-        setCategorias([
-            { id: 1, nombre: 'Hardware' },
-            { id: 2, nombre: 'Software / SO' },
-            { id: 3, nombre: 'Redes y Conectividad' },
-            { id: 4, nombre: 'Periféricos' }
-        ]);
-    }, [fetchSintomas, fetchFallas]);
+        fetchCategorias();
+    }, [fetchSintomas, fetchFallas, fetchCategorias]);
 
     // Create Categoria
     const createCategoria = async (nombre) => {
@@ -62,8 +69,7 @@ export function useHechosManagement() {
             const data = await response.json();
             if (response.ok && data.status === 'success') {
                 Swal.fire('¡Éxito!', 'Categoría registrada.', 'success');
-                // Temporary add to mock
-                setCategorias(prev => [...prev, data.categoria || { id: Date.now(), nombre }]);
+                await fetchCategorias();
                 return true;
             } else {
                 Swal.fire('Error', data.message || 'Error al guardar categoría.', 'error');
