@@ -108,15 +108,12 @@ const FactManagement = () => {
             <button className="btn-add-user" style={{ backgroundColor: '#2563eb' }} onClick={() => openModal('CAT')}>
               <Plus size={20} /> Categoría
             </button>
-            {activeTab === 'SINTOMAS' ? (
-              <button className="btn-add-user" style={{ backgroundColor: '#504b38' }} onClick={() => openModal('SINTOMA')}>
-                <Plus size={20} /> Nuevo Síntoma Inicial
-              </button>
-            ) : (
-              <button className="btn-add-user" style={{ backgroundColor: '#504b38' }} onClick={() => openModal('FALLA')}>
-                <Plus size={20} /> Nueva Inferencia (Falla)
-              </button>
-            )}
+            <button className="btn-add-user" style={{ backgroundColor: '#504b38' }} onClick={() => openModal('SINTOMA')}>
+              <Plus size={20} /> Nuevo Síntoma Inicial
+            </button>
+            <button className="btn-add-user" style={{ backgroundColor: '#059669' }} onClick={() => openModal('FALLA')}>
+              <Plus size={20} /> Nueva Inferencia (Falla)
+            </button>
           </div>
         </div>
 
@@ -128,14 +125,12 @@ const FactManagement = () => {
                 <tr>
                   <th>Clave Única Lenguaje</th>
                   <th>Descripción del Síntoma (Mostrado a usuario)</th>
-                  <th style={{ width: '120px' }}>Acciones</th>
                 </tr>
               ) : (
                 <tr>
                   <th>Contexto (Equipo / Categoría)</th>
                   <th>Síntoma Raíz</th>
                   <th>Veredicto (Diagnóstico y Solución)</th>
-                  <th style={{ width: '120px' }}>Acciones</th>
                 </tr>
               )}
             </thead>
@@ -151,16 +146,6 @@ const FactManagement = () => {
                     <td data-label="Descripción">
                       <div className="contact-cell">
                         <span style={{ color: '#4b5563' }}>{sintoma.descripcion}</span>
-                      </div>
-                    </td>
-                    <td data-label="Acciones">
-                      <div className="action-buttons">
-                        <button className="btn-icon btn-edit" title="Editar (No disponible)" disabled style={{ opacity: 0.5 }}>
-                          <Edit size={18} />
-                        </button>
-                        <button className="btn-icon btn-delete" title="Borrar (No disponible)" disabled style={{ opacity: 0.5 }}>
-                          <Trash2 size={18} />
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -188,16 +173,6 @@ const FactManagement = () => {
                         <span style={{ color: '#059669', marginTop: '4px' }}>R: {falla.recomendacion}</span>
                       </div>
                     </td>
-                    <td data-label="Acciones">
-                      <div className="action-buttons">
-                        <button className="btn-icon btn-edit" title="Editar (No disponible)" disabled style={{ opacity: 0.5 }}>
-                          <Edit size={18} />
-                        </button>
-                        <button className="btn-icon btn-delete" title="Borrar (No disponible)" disabled style={{ opacity: 0.5 }}>
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
                   </tr>
                 ))
               )}
@@ -205,7 +180,7 @@ const FactManagement = () => {
               {/* Fallback visual vacio */}
               {(activeTab === 'SINTOMAS' && filteredSintomas.length === 0) || (activeTab === 'FALLAS' && filteredFallas.length === 0) ? (
                 <tr>
-                  <td colSpan={activeTab === 'SINTOMAS' ? "3" : "4"} style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
+                  <td colSpan={activeTab === 'SINTOMAS' ? "2" : "3"} style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
                     <Database size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
                     <p>No se encontraron registros en la base de conocimientos.</p>
                   </td>
