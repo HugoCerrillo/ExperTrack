@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import Swal from 'sweetalert2';
-import { API_URL } from '../config/env';
+
+const API_URL = '/api';
 
 export const useAlertasManagement = () => {
     const [alertas, setAlertas] = useState([]);
