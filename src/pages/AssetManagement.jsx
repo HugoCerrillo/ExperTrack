@@ -22,6 +22,7 @@ const AssetManagement = () => {
   const userId = loggedUser.id_usuario || loggedUser.id;
   const userRole = loggedUser.rol || 'Usuario Solicitante';
   const isSolicitante = userRole === 'Usuario Solicitante';
+  const isAdmin = userRole === 'Administrador';
 
   const { users } = useUserManagement(); // Para el dropdown de dueños (Administradores y Técnicos)
 
@@ -278,7 +279,7 @@ const AssetManagement = () => {
                       <button className="btn-icon btn-edit" title="Ver / Editar Ficha" onClick={() => openModal('EDIT', asset)}>
                         <Edit size={18} />
                       </button>
-                      {!isSolicitante && (
+                      {isAdmin && (
                         <button className="btn-icon btn-delete" title="Retirar Activo" onClick={() => handleDelete(asset.id_equipo)}>
                           <Trash2 size={18} />
                         </button>
