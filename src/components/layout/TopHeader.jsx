@@ -64,10 +64,19 @@ export const TopHeader = ({ toggleSidebar, title }) => {
   useEffect(() => {
     fetchAlertas('Enviada');
     
-    //opcional: refrescar cada 5 minutos
     const interval = setInterval(() => fetchAlertas('Enviada'), 300000);
     return () => clearInterval(interval);
   }, [fetchAlertas]);
+
+  // Filtrar alertas para mostrar solo las que pertenecen al usuario logueado
+  const personalAlerts = alertas.filter(alerta => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      return Number(alerta.id_usuario) === Number(user.id || user.id_usuario);
+    }
+    return false;
+  });
 
   //cerrar paneles flotantes al hacer clic afuera
   useEffect(() => {
@@ -108,7 +117,7 @@ export const TopHeader = ({ toggleSidebar, title }) => {
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell size={20} />
-            {alertas.length > 0 && <span className="badge">{alertas.length}</span>}
+            {personalAlerts.length > 0 && <span className="badge">{personalAlerts.length}</span>}
           </button>
 
           {/*menu desplegable de notificaciones*/}
@@ -116,12 +125,12 @@ export const TopHeader = ({ toggleSidebar, title }) => {
             <div className="notification-dropdown">
               <div className="dropdown-header">Notificaciones Recientes</div>
               <div className="dropdown-list">
-                {alertas.length === 0 ? (
+                {personalAlerts.length === 0 ? (
                   <div className="dropdown-item" style={{ textAlign: 'center', opacity: 0.6 }}>
                     No hay notificaciones nuevas
                   </div>
                 ) : (
-                  alertas.slice(0, 5).map(alerta => (
+                  personalAlerts.slice(0, 5).map(alerta => (
                     <div key={alerta.id_alerta} className="dropdown-item">
                       <p className="notif-text" style={{ fontWeight: '600' }}>{alerta.titulo}</p>
                       <p className="notif-text" style={{ fontSize: '0.8rem', marginTop: '2px' }}>
