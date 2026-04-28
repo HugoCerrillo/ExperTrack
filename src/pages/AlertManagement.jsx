@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Bell, BellRing, CalendarClock, Send, Plus, 
-  Trash2, Edit, Monitor, User as UserIcon, RefreshCw, X, Tag, AlignLeft 
+  Trash2, Edit, Monitor, User as UserIcon, RefreshCw, X, Tag, AlignLeft, Search 
 } from 'lucide-react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { AuthInput } from '../components/ui/AuthInput';
@@ -25,6 +25,7 @@ const AlertManagement = () => {
   const [activeTab, setActiveTab] = useState('Pendiente'); // 'Pendiente' o 'Enviada'
   const [modalMode, setModalMode] = useState(null); // 'ADD' o 'EDIT'
   const [currentId, setCurrentId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const emptyForm = {
     titulo: '',
@@ -116,6 +117,17 @@ const AlertManagement = () => {
     formData.id_usuario ? Number(a.id_usuario) === Number(formData.id_usuario) : true
   );
 
+  // Lógica de filtrado por búsqueda
+  const filteredAlertas = alertas.filter(alerta => {
+    const search = searchTerm.toLowerCase();
+    return (
+      alerta.titulo.toLowerCase().includes(search) ||
+      alerta.descripcion.toLowerCase().includes(search) ||
+      alerta.codigo_equipo.toLowerCase().includes(search) ||
+      alerta.nombre_responsable.toLowerCase().includes(search)
+    );
+  });
+
   return (
     <DashboardLayout headerTitle="Gestión de Alertas Preventivas">
       <div className="users-container">
@@ -150,9 +162,33 @@ const AlertManagement = () => {
           </button>
         </div>
 
-        {/* Toolbar Superior */}
-        <div className="users-header-actions" style={{ marginTop: '1.5rem', justifyContent: 'flex-end' }}>
-          <button className="btn-add-user" style={{ backgroundColor: '#504b38' }} onClick={() => openModal('ADD')}>
+        {/* Toolbar Superior: Búsqueda y Registro */}
+        <div className="users-header-actions" style={{ marginTop: '1.5rem', justifyContent: 'space-between', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="search-box" style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
+            <Search 
+              size={18} 
+              style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} 
+            />
+            <input 
+              type="text" 
+              placeholder="Buscar por título, equipo o responsable..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.6rem 1rem 0.6rem 2.5rem',
+                borderRadius: '8px',
+                border: '1px solid rgba(80, 75, 56, 0.2)',
+                fontSize: '0.9rem',
+                outline: 'none',
+                transition: 'all 0.2s'
+              }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--color-olive-dark)'}
+              onBlur={(e) => e.target.style.borderColor = 'rgba(80, 75, 56, 0.2)'}
+            />
+          </div>
+
+          <button className="btn-add-user" style={{ backgroundColor: '#504b38', whiteSpace: 'nowrap' }} onClick={() => openModal('ADD')}>
             <Plus size={20} /> Programar Nueva Alerta
           </button>
         </div>
@@ -172,15 +208,15 @@ const AlertManagement = () => {
             <tbody>
               {loading && alertas.length === 0 ? (
                 <tr><td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} style={{ textAlign: 'center', padding: '2rem' }}>Cargando alertas...</td></tr>
-              ) : alertas.length === 0 ? (
+              ) : filteredAlertas.length === 0 ? (
                 <tr>
                   <td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
-                    {activeTab === 'Pendiente' ? <BellRing size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} /> : <Send size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />}
-                    <p>No se encontraron alertas en la bandeja.</p>
+                    <Search size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
+                    <p>{searchTerm ? `No se encontraron resultados para "${searchTerm}"` : 'No se encontraron alertas en la bandeja.'}</p>
                   </td>
                 </tr>
               ) : (
-                alertas.map((alerta) => (
+                filteredAlertas.map((alerta) => (
                   <tr key={alerta.id_alerta}>
                     <td data-label="Asunto">
                       <div className="contact-cell" style={{ whiteSpace: 'normal', maxWidth: '300px' }}>

@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { Menu, Bell, User, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { useAlertasManagement } from '../../hooks/back_alerts_management';
 
 //renderizado de header interactivo
 export const TopHeader = ({ toggleSidebar, title }) => {
+  const { alertas, fetchAlertas } = useAlertasManagement();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -58,12 +60,14 @@ export const TopHeader = ({ toggleSidebar, title }) => {
     }
   }, []);
 
-  // Datos Ficticios de Prueba para la UI
-  const notifications = [
-    { id: 1, text: 'Mantenimiento preventivo PC-Contabilidad completado', time: 'Hace 5 min' },
-    { id: 2, text: 'Alerta térmica crítica en Servidor 01 detectada', time: 'Hace 2 hrs' },
-    { id: 3, text: 'Inventario actualizado: +5 Discos SSD 1TB ingresados', time: 'Ayer' },
-  ];
+  //cargar alertas enviadas para el centro de notificaciones
+  useEffect(() => {
+    fetchAlertas('Enviada');
+    
+    //opcional: refrescar cada 5 minutos
+    const interval = setInterval(() => fetchAlertas('Enviada'), 300000);
+    return () => clearInterval(interval);
+  }, [fetchAlertas]);
 
   //cerrar paneles flotantes al hacer clic afuera
   useEffect(() => {
@@ -104,7 +108,7 @@ export const TopHeader = ({ toggleSidebar, title }) => {
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <Bell size={20} />
-            <span className="badge">3</span>
+            {alertas.length > 0 && <span className="badge">{alertas.length}</span>}
           </button>
 
           {/*menu desplegable de notificaciones*/}
@@ -112,14 +116,22 @@ export const TopHeader = ({ toggleSidebar, title }) => {
             <div className="notification-dropdown">
               <div className="dropdown-header">Notificaciones Recientes</div>
               <div className="dropdown-list">
-                {notifications.map(n => (
-                  <div key={n.id} className="dropdown-item">
-                    <p className="notif-text">{n.text}</p>
-                    <span className="notif-time">{n.time}</span>
+                {alertas.length === 0 ? (
+                  <div className="dropdown-item" style={{ textAlign: 'center', opacity: 0.6 }}>
+                    No hay notificaciones nuevas
                   </div>
-                ))}
+                ) : (
+                  alertas.slice(0, 5).map(alerta => (
+                    <div key={alerta.id_alerta} className="dropdown-item">
+                      <p className="notif-text" style={{ fontWeight: '600' }}>{alerta.titulo}</p>
+                      <p className="notif-text" style={{ fontSize: '0.8rem', marginTop: '2px' }}>
+                        Equipo: {alerta.codigo_equipo}
+                      </p>
+                      <span className="notif-time">{alerta.fecha_programada?.substring(0, 10)}</span>
+                    </div>
+                  ))
+                )}
               </div>
-              <div className="dropdown-footer">Ver todo el historial</div>
             </div>
           )}
         </div>
