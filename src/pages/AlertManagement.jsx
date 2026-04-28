@@ -166,15 +166,15 @@ const AlertManagement = () => {
                 <th>Equipo Asignado</th>
                 <th>Responsable</th>
                 <th>Fecha de Envío</th>
-                <th style={{ width: '120px' }}>Acciones</th>
+                {(activeTab === 'Pendiente' || isAdmin) && <th style={{ width: '120px' }}>Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {loading && alertas.length === 0 ? (
-                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>Cargando alertas...</td></tr>
+                <tr><td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} style={{ textAlign: 'center', padding: '2rem' }}>Cargando alertas...</td></tr>
               ) : alertas.length === 0 ? (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
+                  <td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
                     {activeTab === 'Pendiente' ? <BellRing size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} /> : <Send size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />}
                     <p>No se encontraron alertas en la bandeja.</p>
                   </td>
@@ -208,20 +208,22 @@ const AlertManagement = () => {
                         </span>
                       </div>
                     </td>
-                    <td data-label="Acciones">
-                      <div className="action-buttons">
-                        {activeTab === 'Pendiente' && (
-                          <button className="btn-icon btn-edit" title="Editar" onClick={() => openModal('EDIT', alerta)}>
-                            <Edit size={18} />
-                          </button>
-                        )}
-                        {isAdmin && (
-                          <button className="btn-icon btn-delete" title="Borrar" onClick={() => handleDelete(alerta.id_alerta)}>
-                            <Trash2 size={18} />
-                          </button>
-                        )}
-                      </div>
-                    </td>
+                    {(activeTab === 'Pendiente' || isAdmin) && (
+                      <td data-label="Acciones">
+                        <div className="action-buttons">
+                          {activeTab === 'Pendiente' && (
+                            <button className="btn-icon btn-edit" title="Editar" onClick={() => openModal('EDIT', alerta)}>
+                              <Edit size={18} />
+                            </button>
+                          )}
+                          {isAdmin && (
+                            <button className="btn-icon btn-delete" title="Borrar" onClick={() => handleDelete(alerta.id_alerta)}>
+                              <Trash2 size={18} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

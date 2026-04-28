@@ -38,9 +38,6 @@ export const useAlertasManagement = () => {
     // Crear nueva alerta
     const createAlerta = async (alertaData) => {
         setLoading(true);
-        console.log("=== DEBUG: Payload enviado a /alertas ===");
-        console.log(JSON.stringify(alertaData, null, 2));
-
         try {
             const response = await fetch(`${API_URL}/alertas`, {
                 method: 'POST',
@@ -50,9 +47,6 @@ export const useAlertasManagement = () => {
             });
             const data = await response.json();
             
-            console.log("=== DEBUG: Respuesta del servidor ===");
-            console.log(data);
-
             if (response.ok && data.status === 'success') {
                 Swal.fire('¡Éxito!', 'Alerta preventiva programada correctamente.', 'success');
                 return true;
@@ -61,7 +55,6 @@ export const useAlertasManagement = () => {
                 return false;
             }
         } catch (err) {
-            console.error("=== DEBUG: Error de red ===", err);
             Swal.fire('Error', 'Error de conexión con el servidor', 'error');
             return false;
         } finally {
