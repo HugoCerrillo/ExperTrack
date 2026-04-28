@@ -259,7 +259,7 @@ const AlertManagement = () => {
                         <UserIcon className="input-icon" size={20} />
                         <select className="auth-select" required value={formData.id_usuario} onChange={(e) => setFormData({...formData, id_usuario: e.target.value})}>
                           <option value="">Selecciona al técnico...</option>
-                          {responsables.map(r => <option key={r.id_usuario} value={r.id_usuario}>{r.nombre} {r.apellido_paterno}</option>)}
+                          {responsables.map(r => <option key={r.id} value={r.id}>{r.nombre} {r.apellidoPaterno}</option>)}
                         </select>
                       </div>
                     </div>
