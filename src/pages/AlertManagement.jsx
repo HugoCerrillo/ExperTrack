@@ -68,6 +68,12 @@ const AlertManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.id_equipo || !formData.id_usuario) {
+      Swal.fire('Atención', 'Debes seleccionar un usuario y un equipo válido.', 'warning');
+      return;
+    }
+
     let success = false;
     
     // Convertir IDs a números
@@ -105,8 +111,10 @@ const AlertManagement = () => {
     }
   };
 
-  // Filtrar técnicos y admins para el combo de responsables
-  const responsables = users.filter(u => u.rol === 'Técnico' || u.rol === 'Administrador');
+  // Filtrar equipos basados en el usuario seleccionado
+  const filteredEquipos = assets.filter(a => 
+    formData.id_usuario ? Number(a.id_usuario) === Number(formData.id_usuario) : true
+  );
 
   return (
     <DashboardLayout headerTitle="Gestión de Alertas Preventivas">
@@ -243,23 +251,38 @@ const AlertManagement = () => {
                     </div>
 
                     <div className="input-group select-group">
-                      <label>Equipo Objetivo</label>
+                      <label>1. Usuario Destinatario (Dueño)</label>
                       <div className="input-wrapper">
-                        <Monitor className="input-icon" size={20} />
-                        <select className="auth-select" required value={formData.id_equipo} onChange={(e) => setFormData({...formData, id_equipo: e.target.value})}>
-                          <option value="">Selecciona un equipo...</option>
-                          {assets.map(a => <option key={a.id_equipo} value={a.id_equipo}>{a.codigo_inventario} - {a.marca} {a.modelo}</option>)}
+                        <UserIcon className="input-icon" size={20} />
+                        <select 
+                          className="auth-select" 
+                          required 
+                          value={formData.id_usuario} 
+                          onChange={(e) => {
+                            setFormData({...formData, id_usuario: e.target.value, id_equipo: ''});
+                          }}
+                        >
+                          <option value="">Selecciona al dueño del equipo...</option>
+                          {users.map(u => <option key={u.id} value={u.id}>{u.nombre} {u.apellidoPaterno || u.apellido_paterno}</option>)}
                         </select>
                       </div>
                     </div>
 
                     <div className="input-group select-group">
-                      <label>Técnico Responsable</label>
+                      <label>2. Equipo de {formData.id_usuario ? users.find(u => Number(u.id) === Number(formData.id_usuario))?.nombre : 'Usuario'}</label>
                       <div className="input-wrapper">
-                        <UserIcon className="input-icon" size={20} />
-                        <select className="auth-select" required value={formData.id_usuario} onChange={(e) => setFormData({...formData, id_usuario: e.target.value})}>
-                          <option value="">Selecciona al técnico...</option>
-                          {responsables.map(r => <option key={r.id} value={r.id}>{r.nombre} {r.apellidoPaterno}</option>)}
+                        <Monitor className="input-icon" size={20} />
+                        <select 
+                          className="auth-select" 
+                          required 
+                          disabled={!formData.id_usuario}
+                          value={formData.id_equipo} 
+                          onChange={(e) => setFormData({...formData, id_equipo: e.target.value})}
+                        >
+                          <option value="">
+                            {!formData.id_usuario ? 'Selecciona primero un usuario...' : (filteredEquipos.length === 0 ? 'Este usuario no tiene equipos' : 'Selecciona un equipo...')}
+                          </option>
+                          {filteredEquipos.map(a => <option key={a.id_equipo} value={a.id_equipo}>{a.codigo_inventario} - {a.marca} {a.modelo}</option>)}
                         </select>
                       </div>
                     </div>
