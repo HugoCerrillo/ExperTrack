@@ -22,7 +22,7 @@ const AdminDashboard = ({ data }) => {
   const getPercent = (val) => Math.round((val / totalEquipos) * 100);
 
   return (
-    <div className="dashboard-wrapper">
+    <div className="dash-stats-wrapper">
       {/* Tarjetas de Resumen */}
       <div className="dash-summary-grid">
         <div className="dash-summary-card">
@@ -125,7 +125,7 @@ const TechDashboard = ({ data }) => {
   const { diagnosticos_pendientes, sugerencias_recientes } = data;
 
   return (
-    <div className="dashboard-wrapper">
+    <div className="dash-stats-wrapper">
       <div className="dash-charts-grid">
         
         <div className="dash-panel">
@@ -178,7 +178,7 @@ const UserDashboard = ({ data }) => {
   const { mis_reportes, notificaciones_preventivas } = data;
 
   return (
-    <div className="dashboard-wrapper">
+    <div className="dash-stats-wrapper">
       <div className="dash-charts-grid">
         
         <div className="dash-panel">
@@ -244,7 +244,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <DashboardLayout headerTitle="Panel de Control">
-        <div className="dashboard-wrapper">
+        <div className="dash-stats-wrapper">
           <div className="dash-summary-grid">
             <div className="dash-skeleton" style={{ height: '100px' }}></div>
             <div className="dash-skeleton" style={{ height: '100px' }}></div>
