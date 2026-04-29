@@ -284,3 +284,35 @@
     padding: 1rem; /* Margen menos intrusivo inferior */
   }
 }
+/* ==================================================
+   UTILIDADES DE LIMPIEZA (ESTILOS INLINE)
+   ================================================== */
+.btn-reset-chat {
+  margin-left: auto;
+}
+
+.msg-content-flex {
+  display: flex;
+  flex-direction: column;
+}
+
+.msg-bubble-pre {
+  white-space: pre-wrap;
+}
+
+.chat-options-column {
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.chat-select-custom {
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px solid var(--color-khaki);
+  background-color: #fff;
+  color: var(--color-olive-dark);
+}
+
+.btn-chat-confirm {
+  align-self: flex-start;
+}

@@ -7,6 +7,7 @@ export const useDashboardStats = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    //llamad apara cargar stats del dashboard
     const fetchStats = useCallback(async () => {
         setLoading(true);
         try {
@@ -15,7 +16,7 @@ export const useDashboardStats = () => {
                 credentials: 'include'
             });
             const data = await response.json();
-            
+
             if (response.ok && data.status === 'success') {
                 setStats({
                     rol: data.rol,

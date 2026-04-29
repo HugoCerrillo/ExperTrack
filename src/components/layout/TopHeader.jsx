@@ -15,6 +15,7 @@ export const TopHeader = ({ toggleSidebar, title }) => {
   const userMenuRef = useRef(null);
   const navigate = useNavigate();
 
+  //cerrar sesion
   const handleLogout = async () => {
     const result = await Swal.fire({
       title: '¿Cerrar Sesión?',
@@ -63,12 +64,12 @@ export const TopHeader = ({ toggleSidebar, title }) => {
   //cargar alertas enviadas para el centro de notificaciones
   useEffect(() => {
     fetchAlertas('Enviada');
-    
+
     const interval = setInterval(() => fetchAlertas('Enviada'), 300000);
     return () => clearInterval(interval);
   }, [fetchAlertas]);
 
-  // Filtrar alertas para mostrar solo las que pertenecen al usuario logueado
+  //filtrar alertas para mostrar solo las que pertenecen al usuario
   const personalAlerts = alertas.filter(alerta => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -111,7 +112,7 @@ export const TopHeader = ({ toggleSidebar, title }) => {
       {/*botones de accion derecho con dropdown*/}
       <div className="header-right">
 
-        <div className="notification-wrapper" ref={dropdownRef} style={{ position: 'relative' }}>
+        <div className="notification-wrapper" ref={dropdownRef}>
           <button
             className="icon-btn"
             onClick={() => setShowNotifications(!showNotifications)}
@@ -126,14 +127,14 @@ export const TopHeader = ({ toggleSidebar, title }) => {
               <div className="dropdown-header">Notificaciones Recientes</div>
               <div className="dropdown-list">
                 {personalAlerts.length === 0 ? (
-                  <div className="dropdown-item" style={{ textAlign: 'center', opacity: 0.6 }}>
+                  <div className="dropdown-item notif-empty">
                     No hay notificaciones nuevas
                   </div>
                 ) : (
                   personalAlerts.slice(0, 5).map(alerta => (
                     <div key={alerta.id_alerta} className="dropdown-item">
-                      <p className="notif-text" style={{ fontWeight: '600' }}>{alerta.titulo}</p>
-                      <p className="notif-text" style={{ fontSize: '0.8rem', marginTop: '2px' }}>
+                      <p className="notif-text notif-title-bold">{alerta.titulo}</p>
+                      <p className="notif-text notif-desc-small">
                         Equipo: {alerta.codigo_equipo}
                       </p>
                       <span className="notif-time">{alerta.fecha_programada?.substring(0, 10)}</span>
@@ -145,7 +146,7 @@ export const TopHeader = ({ toggleSidebar, title }) => {
           )}
         </div>
 
-        <div className="user-menu-wrapper" ref={userMenuRef} style={{ position: 'relative' }}>
+        <div className="user-menu-wrapper" ref={userMenuRef}>
           <button
             className="avatar-btn"
             onClick={() => setShowUserMenu(!showUserMenu)}
@@ -170,9 +171,8 @@ export const TopHeader = ({ toggleSidebar, title }) => {
                 <div className="dropdown-divider"></div>
 
                 <button
-                  className="dropdown-item user-item logout-item"
+                  className="dropdown-item user-item logout-item btn-logout-dropdown"
                   onClick={handleLogout}
-                  style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer' }}
                 >
                   <LogOut size={16} />
                   <span>Cerrar Sesión</span>

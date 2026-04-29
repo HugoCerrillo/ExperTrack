@@ -17,7 +17,7 @@ import '../assets/styles/assets-management.css';
 const AssetManagement = () => {
 
   const { assets, loading: loadingAssets, fetchEquipos, fetchEquipoDetalle, crearEquipo, actualizarEquipo, eliminarEquipo, descargarExpedientePdf, descargarReporteInventarioPdf } = useAssetManagement();
-  
+
   const loggedUser = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = loggedUser.id_usuario || loggedUser.id;
   const userRole = loggedUser.rol || 'Usuario Solicitante';
@@ -60,7 +60,7 @@ const AssetManagement = () => {
   //funcion para abrir el modal de editar mediante la variable modalMode
   const openModal = async (mode, asset = null) => {
     if (mode === 'EDIT' && asset) {
-      // Cargamos el detalle completo para obtener periféricos y specs vigentes
+      //cargamos el detalle completo para obtener perifericos y specs vigentes
       const detail = await fetchEquipoDetalle(asset.id_equipo || asset.id);
       if (detail) {
         setCurrentAsset({
@@ -69,7 +69,7 @@ const AssetManagement = () => {
           perifericos: detail.perifericos || []
         });
       } else {
-        // Fallback si falla el detalle
+        // si falla el detalle cargamos la informacion que tenemos del equipo
         setCurrentAsset({ ...asset, perifericos: [], especificaciones: emptyAsset.especificaciones });
       }
     } else {
@@ -88,9 +88,8 @@ const AssetManagement = () => {
   const handleSaveModal = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    
-    // Forzamos el casteo de id_usuario a entero, ya que el select nativo lo convierte a string
-    // y Python/Flask a veces bloquea o ignora las actualizaciones de IDs si viajan como string.
+
+    //hacemos un cast de id_usuario a entero
     const assetToSave = {
       ...currentAsset,
       id_usuario: currentAsset.id_usuario ? Number(currentAsset.id_usuario) : null
@@ -149,10 +148,8 @@ const AssetManagement = () => {
     const matchesSearch = `${a.codigo_inventario} ${a.marca} ${a.modelo} ${a.dueño}`
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-      
-    // Si showOnlyMine está activado, comprobamos que el id del activo sea igual al id logueado
-    // Nota: backend debe enviar a.id_usuario para validar esto de forma segura.
-    // Usamos doble validación por si el backend mandara IDs como int o string
+
+    //comprobamos que el id del activo sea igual al id logueado, si es true entonces se muestra el activo
     const matchesOwner = showOnlyMine ? (Number(a.id_usuario) === Number(userId)) : true;
 
     return matchesSearch && matchesOwner;
@@ -165,21 +162,21 @@ const AssetManagement = () => {
 
         {/*barra de herramientas*/}
         <div className="users-header-actions">
-          <div className="am-search-wrapper" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="am-search-wrapper">
             <div className="am-search-input-box">
               <AuthInput
                 icon={Search} type="text" placeholder="Buscar activo..."
                 value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} required={false} label={false}
               />
             </div>
-            
-            {/* Filtro para ver únicamente mis equipos */}
+
+            {/*filtro para ver únicamente mis equipos*/}
             {!isSolicitante && (
               <div className="am-filter-pill" title="Activa esta casilla para ocultar el inventario general y mostrar exclusivamente los equipos en los que tú eres el responsable asignado.">
-                <input 
-                  type="checkbox" 
-                  checked={showOnlyMine} 
-                  onChange={(e) => setShowOnlyMine(e.target.checked)} 
+                <input
+                  type="checkbox"
+                  checked={showOnlyMine}
+                  onChange={(e) => setShowOnlyMine(e.target.checked)}
                 />
                 <span onClick={() => setShowOnlyMine(!showOnlyMine)}>
                   Ver solo mis equipos
@@ -187,14 +184,14 @@ const AssetManagement = () => {
               </div>
             )}
           </div>
-          
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+
+          <div className="am-toolbar-btns">
             {!isSolicitante && (
-              <button className="btn-chat-action action-yes" onClick={descargarReporteInventarioPdf} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', backgroundColor: '#504b38', color: '#fff' }}>
+              <button className="btn-chat-action action-yes btn-inventory-pdf" onClick={descargarReporteInventarioPdf}>
                 <FileText size={18} /> Inventario PDF
               </button>
             )}
-            
+
             <button className="btn-add-user" onClick={() => openModal('ADD')}>
               <Plus size={18} />
               <span>Registrar Nuevo Equipo</span>
@@ -219,9 +216,9 @@ const AssetManagement = () => {
               {/*pantalla de carga en caso de que este cargando los datos*/}
               {loadingAssets && (
                 <tr>
-                  <td colSpan="6" className="am-empty-row">
-                    <Loader2 size={40} className="spin-icon" style={{ margin: '0 auto', color: '#504b38' }} />
-                    <p style={{ marginTop: '1rem' }}>Consultando Inventario...</p>
+                  <td colSpan="6" className="am-loading-cell">
+                    <Loader2 size={40} className="spin-icon am-loading-icon" />
+                    <p className="am-loading-text">Consultando Inventario...</p>
                   </td>
                 </tr>
               )}
@@ -232,7 +229,7 @@ const AssetManagement = () => {
 
                   {/*celda identificadora*/}
                   <td data-label="Equipo">
-                    <div className="user-details" style={{ fontWeight: '500' }}>
+                    <div className="user-details am-asset-name-cell">
                       <span className="asset-main-title">{asset.codigo_inventario}</span>
                       <span className="asset-subtitle">{asset.marca} {asset.modelo}</span>
                       <span className="specs-text am-sn-text">S/N: {asset.numero_serie}</span>
@@ -250,7 +247,7 @@ const AssetManagement = () => {
                   {/*celda para asignación y ubicación*/}
                   <td data-label="Asignación Responsable">
                     <div className="contact-cell">
-                      <span className="am-owner-text"><UserIcon size={14} style={{ display: 'none' }} /> {asset.dueño}</span>
+                      <span className="am-owner-name">{asset.dueño}</span>
                       <span className="contact-phone">{asset.area}</span>
                       <span className="specs-text">{asset.ubicacion}</span>
                     </div>
@@ -272,7 +269,7 @@ const AssetManagement = () => {
                         {asset.estado_operativo === 'Operativo' ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
                         {asset.estado_operativo}
                       </div>
-                      <div className={`status-badge ${asset.en_garantia ? 'status-active' : 'status-inactive'}`} style={{ backgroundColor: asset.en_garantia ? '#fef08a' : '#f3f4f6', color: asset.en_garantia ? '#854d0e' : '#6b7280' }}>
+                      <div className={`status-badge ${asset.en_garantia ? 'status-active status-badge-warranty' : 'status-inactive status-badge-no-warranty'}`}>
                         {asset.en_garantia ? <ShieldCheck size={12} /> : <AlertCircle size={12} />}
                         {asset.en_garantia ? 'Garantía Vigente' : 'Sin Garantía'}
                       </div>

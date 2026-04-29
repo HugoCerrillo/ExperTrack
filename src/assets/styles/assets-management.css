@@ -209,3 +209,56 @@
     justify-content: center;
   }
 }
+
+/* ==================================================
+   UTILIDADES DE LIMPIEZA (ESTILOS INLINE)
+   ================================================== */
+.am-toolbar-btns {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-inventory-pdf {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background-color: var(--color-olive-dark);
+  color: #fff;
+}
+
+.am-loading-cell {
+  text-align: center;
+  padding: 3rem;
+}
+
+.am-loading-icon {
+  margin: 0 auto;
+  color: var(--color-olive-dark);
+}
+
+.am-loading-text {
+  margin-top: 1rem;
+}
+
+.am-asset-name-cell {
+  font-weight: 500;
+}
+
+.am-sn-text {
+  font-weight: 400; /* reset bold if inherited */
+}
+
+.am-owner-name {
+  font-weight: 600;
+}
+
+.status-badge-warranty {
+  background-color: #fef08a; /* amarillo claro */
+  color: #854d0e; /* cafe/oro */
+}
+
+.status-badge-no-warranty {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}

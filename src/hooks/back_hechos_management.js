@@ -10,7 +10,7 @@ export function useHechosManagement() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Fetch Sintomas
+    //llamada para cargar sintomas (manifestaciones de falla)
     const fetchSintomas = useCallback(async () => {
         try {
             const response = await fetch(`${API_URL}/sintomas`, { credentials: 'include' });
@@ -23,7 +23,7 @@ export function useHechosManagement() {
         }
     }, []);
 
-    // Fetch Fallas
+    //llamada para cargar las fallas
     const fetchFallas = useCallback(async () => {
         try {
             const response = await fetch(`${API_URL}/fallas_hechos`, { credentials: 'include' });
@@ -36,7 +36,7 @@ export function useHechosManagement() {
         }
     }, []);
 
-    // Fetch Categorias
+    //llamada para cargar las categirias de fallas
     const fetchCategorias = useCallback(async () => {
         try {
             const response = await fetch(`${API_URL}/categorias_hechos`, { credentials: 'include' });
@@ -49,14 +49,14 @@ export function useHechosManagement() {
         }
     }, []);
 
-    // Load initial data
+    //cargamos datos iniciales
     useEffect(() => {
         fetchSintomas();
         fetchFallas();
         fetchCategorias();
     }, [fetchSintomas, fetchFallas, fetchCategorias]);
 
-    // Create Categoria
+    //llamada para crear una nueva categoria
     const createCategoria = async (nombre) => {
         try {
             Swal.fire({ title: 'Guardando Categoría...', allowEscapeKey: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -81,7 +81,7 @@ export function useHechosManagement() {
         }
     };
 
-    // Create Sintoma Inicial (requiere Falla)
+    //llamda para crear un nuevo sintoma (manifestación de falla) 
     const createSintomaConFalla = async (formData) => {
         try {
             Swal.fire({ title: 'Guardando Síntoma y Regla...', allowEscapeKey: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -107,7 +107,7 @@ export function useHechosManagement() {
         }
     };
 
-    // Create Falla
+    //llamada para crear una nueva falla
     const createFalla = async (formData) => {
         try {
             Swal.fire({ title: 'Registrando Inferencia...', allowEscapeKey: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -132,7 +132,7 @@ export function useHechosManagement() {
         }
     };
 
-    // Download hechos.pl
+    //llamdada para descargar hechos.pl
     const descargarPrologBase = async () => {
         try {
             Swal.fire({ title: 'Descargando...', allowEscapeKey: false, allowOutsideClick: false, didOpen: () => Swal.showLoading() });

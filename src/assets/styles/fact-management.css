@@ -1,0 +1,136 @@
+/* src/assets/styles/fact-management.css */
+
+.fm-tab-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(80, 75, 56, 0.1);
+  padding-bottom: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fm-tab-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.fm-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  background-color: transparent;
+  color: var(--color-olive-dark);
+  transition: all 0.2s;
+}
+
+.fm-tab-btn.active {
+  background-color: var(--color-olive-dark);
+  color: #FFF;
+}
+
+.btn-download-prolog {
+  padding: 0.5rem 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  max-width: max-content;
+}
+
+.fm-header-actions-mt {
+  margin-top: 1.5rem;
+}
+
+.fm-search-bar {
+  flex: 1 1 300px;
+}
+
+.fm-btn-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-add-cat { background-color: #2563eb !important; }
+.btn-add-sintoma { background-color: #504b38 !important; }
+.btn-add-falla { background-color: #059669 !important; }
+
+.fm-clave-text {
+  font-weight: 600;
+  color: var(--color-olive-dark);
+}
+
+.fm-desc-text {
+  color: #4b5563;
+}
+
+.fm-badge-inline {
+  display: inline-block;
+  width: max-content;
+  margin-bottom: 4px;
+}
+
+.fm-cat-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.fm-sintoma-title {
+  font-weight: 600;
+}
+
+.fm-question-text {
+  font-size: 0.8rem;
+  color: #8b5cf6;
+  margin-top: 4px;
+  display: block;
+}
+
+.fm-verdict-cell {
+  white-space: normal;
+  max-width: 400px;
+}
+
+.fm-diag-text {
+  font-weight: 600;
+  color: #111827;
+  display: block;
+}
+
+.fm-recom-text {
+  color: #059669;
+  margin-top: 4px;
+  display: block;
+}
+
+.fm-empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.fm-empty-icon {
+  margin: 0 auto 1rem;
+  opacity: 0.3;
+}
+
+.modal-content-sm {
+  max-width: 400px;
+}
+
+.modal-content-lg {
+  max-width: 750px;
+}
+
+.fm-input-padding {
+  padding-left: 3rem !important;
+}
+
+.fm-mb-1 {
+  margin-bottom: 1rem;
+}

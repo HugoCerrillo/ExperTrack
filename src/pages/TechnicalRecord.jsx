@@ -34,14 +34,14 @@ const TechnicalRecord = () => {
 
   //filtrado de los expedientes
   const filteredRecords = records.filter(r => {
-    //Filtro estricto por Rol
+    //filtro estricto por Rol
     if (isTecnico && Number(r.id_usuario) !== Number(userId)) return false;
 
-    //Filtro de Búsqueda
+    //filtro de Búsqueda
     const searchString = `${r.id_evento} ${r.falla_reportada} ${r.equipo_detalle?.codigo_inventario} ${r.equipo_detalle?.marca}`.toLowerCase();
     if (!searchString.includes(searchTerm.toLowerCase())) return false;
 
-    //Filtro de Validación
+    //filtro de Validación
     if (hideValidated && r.validado) return false;
 
     return true;
@@ -153,7 +153,7 @@ const TechnicalRecord = () => {
     <DashboardLayout headerTitle="Expediente Técnico">
       <div className="users-container">
 
-        {/* Barra de herramientas superior */}
+        {/*barra superior interactiva*/}
         <div className="users-header-actions">
           <div className="tr-search-container">
             <div className="tr-search-input-wrapper">
@@ -184,8 +184,8 @@ const TechnicalRecord = () => {
               {loading && (
                 <tr>
                   <td colSpan="5" className="tr-empty-state">
-                    <Loader2 size={40} className="spin-icon" style={{ margin: '0 auto', color: '#504b38' }} />
-                    <p style={{ marginTop: '1rem' }}>Sincronizando Expedientes...</p>
+                    <Loader2 size={40} className="spin-icon tr-loading-icon" />
+                    <p className="tr-loading-text">Sincronizando Expedientes...</p>
                   </td>
                 </tr>
               )}
@@ -201,12 +201,12 @@ const TechnicalRecord = () => {
               {!loading && filteredRecords.map(r => (
                 <tr key={r.id_evento}>
                   <td data-label="Folio">
-                    <div style={{ fontWeight: '600', fontSize: '1.1rem', color: '#504b38' }}>#{r.id_evento}</div>
+                    <div className="tr-folio-text">#{r.id_evento}</div>
                     <div className="specs-text">{new Date(r.fecha_creacion).toLocaleDateString()}</div>
                   </td>
                   <td data-label="Equipo">
                     {r.equipo_detalle ? (
-                      <div className="user-details" style={{ fontWeight: '500' }}>
+                      <div className="user-details am-asset-name-cell">
                         <span className="asset-main-title">{r.equipo_detalle.codigo_inventario}</span>
                         <span className="asset-subtitle">{r.equipo_detalle.marca} - {r.equipo_detalle.tipo_equipo}</span>
                       </div>
@@ -215,16 +215,16 @@ const TechnicalRecord = () => {
                     )}
                   </td>
                   <td data-label="Estatus">
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'flex-start' }}>
-                      <div className={`status-badge ${r.validado ? 'status-active' : 'status-inactive'}`} style={{ backgroundColor: r.validado ? '#bbf7d0' : '#fef08a', color: r.validado ? '#166534' : '#854d0e' }}>
+                    <div className="tr-status-col">
+                      <div className={`status-badge ${r.validado ? 'tr-badge-validated' : 'tr-badge-pending'}`}>
                         {r.validado ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
                         {r.validado ? 'Validado y Cerrado' : 'Abierto (Pediente)'}
                       </div>
-                      <div style={{ display: 'flex', gap: '0.4rem' }}>
-                        <div className="status-badge" style={{ backgroundColor: r.diagnostico ? '#dbeafe' : '#f3f4f6', color: r.diagnostico ? '#1e40af' : '#9ca3af' }} title={r.diagnostico ? 'Diagnóstico Anexado' : 'Sin Diagnóstico'}>
+                      <div className="tr-status-badges-row">
+                        <div className={`status-badge ${r.diagnostico ? 'tr-badge-diag-active' : 'tr-badge-diag-inactive'}`} title={r.diagnostico ? 'Diagnóstico Anexado' : 'Sin Diagnóstico'}>
                           <Database size={12} /> Diag
                         </div>
-                        <div className="status-badge" style={{ backgroundColor: r.mantenimiento ? '#fae8ff' : '#f3f4f6', color: r.mantenimiento ? '#86198f' : '#9ca3af' }} title={r.mantenimiento ? 'Mantenimiento Ejecutado' : 'Sin Mantenimiento'}>
+                        <div className={`status-badge ${r.mantenimiento ? 'tr-badge-mant-active' : 'tr-badge-mant-inactive'}`} title={r.mantenimiento ? 'Mantenimiento Ejecutado' : 'Sin Mantenimiento'}>
                           <Wrench size={12} /> Mant
                         </div>
                       </div>
@@ -246,14 +246,14 @@ const TechnicalRecord = () => {
 
         {isModalOpen && currentEvent && (
           <div className="modal-overlay" onClick={closeModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '750px' }}>
+            <div className="modal-content modal-content-md" onClick={(e) => e.stopPropagation()}>
 
               <div className="tr-modal-header">
                 <div className="tr-modal-title-wrapper">
                   <h3 className="tr-modal-title">Expediente Folio #{currentEvent.id_evento}</h3>
                   {isReadOnly && <span className="status-badge tr-seal-badge"><ShieldCheck size={12} /> Documento Sellado (Solo Lectura)</span>}
                 </div>
-                <button type="button" className="btn-close-modal" onClick={closeModal} style={{ flexShrink: 0, marginTop: '-0.3rem' }}><X size={24} /></button>
+                <button type="button" className="btn-close-modal tr-btn-close-modal-adj" onClick={closeModal}><X size={24} /></button>
               </div>
               <div className="tr-tabs-container">
                 <button
@@ -283,11 +283,11 @@ const TechnicalRecord = () => {
                   {activeTab === 'EVENTO' && (
                     <div className="fade-in-tab">
                       <p className="tr-tab-desc">Reporte general del incidente y estado en el que se entregó el hardware al personal.</p>
-                      <div className="modal-grid" style={{ gridTemplateColumns: '1fr' }}>
+                      <div className="modal-grid input-group-full">
                         <div className="input-group">
-                          <label>Falla Reportada por el Usuario</label>
+                          <label className="tr-input-label">Falla Reportada por el Usuario</label>
                           <textarea
-                            className="auth-input"
+                            className="textarea-auth"
                             rows={3}
                             value={currentEvent.falla_reportada}
                             disabled={isReadOnly || !isAdmin}
@@ -295,9 +295,9 @@ const TechnicalRecord = () => {
                           />
                         </div>
                         <div className="input-group">
-                          <label>Condición y Estado Físico de Recepción</label>
+                          <label className="tr-input-label">Condición y Estado Físico de Recepción</label>
                           <textarea
-                            className="auth-input"
+                            className="textarea-auth"
                             rows={2}
                             value={currentEvent.estado_fisico}
                             disabled={isReadOnly || !isAdmin}
@@ -319,11 +319,11 @@ const TechnicalRecord = () => {
                     <div className="fade-in-tab">
                       {currentEvent.diagnostico ? (
                         <>
-                          <div className="modal-grid" style={{ gridTemplateColumns: '1fr' }}>
+                          <div className="modal-grid input-group-full">
                             <div className="input-group">
-                              <label>Resultado Preliminar ExperBot</label>
+                              <label className="tr-input-label">Resultado Preliminar ExperBot</label>
                               <textarea
-                                className="auth-input"
+                                className="textarea-auth"
                                 rows={3}
                                 value={currentEvent.diagnostico.resultado_preeliminar}
                                 disabled={isReadOnly}
@@ -331,9 +331,9 @@ const TechnicalRecord = () => {
                               />
                             </div>
                             <div className="input-group">
-                              <label>Validación en Sitio (Juicio del Técnico Humano)</label>
+                              <label className="tr-input-label">Validación en Sitio (Juicio del Técnico Humano)</label>
                               <textarea
-                                className="auth-input"
+                                className="textarea-auth"
                                 rows={3}
                                 placeholder="Describe luego de tu inspección si concordó con Prolog o si localizaste otras deficiencias..."
                                 value={currentEvent.diagnostico.validacion_tecnico}
@@ -380,13 +380,12 @@ const TechnicalRecord = () => {
                               </div>
                             </div>
                             <div className="input-group">
-                              <label>Fecha de Entrega</label>
+                              <label className="tr-input-label">Fecha de Entrega</label>
                               <div className="input-wrapper">
                                 <Calendar className="input-icon" size={20} />
                                 <input
                                   type="date"
-                                  className="auth-input"
-                                  style={{ paddingLeft: '3rem' }}
+                                  className="auth-select tr-date-input"
                                   disabled={isReadOnly}
                                   value={currentEvent.mantenimiento.fecha_entrega ? currentEvent.mantenimiento.fecha_entrega.split('T')[0] : ''}
                                   onChange={(e) => setCurrentEvent({ ...currentEvent, mantenimiento: { ...currentEvent.mantenimiento, fecha_entrega: e.target.value } })}
@@ -394,11 +393,11 @@ const TechnicalRecord = () => {
                               </div>
                             </div>
                           </div>
-                          <div className="modal-grid" style={{ gridTemplateColumns: '1fr', marginTop: '1rem' }}>
+                          <div className="modal-grid input-group-full">
                             <div className="input-group">
-                              <label>Desarrollo y Descripción de los Trabajos Realizados</label>
+                              <label className="tr-input-label">Desarrollo y Descripción de los Trabajos Realizados</label>
                               <textarea
-                                className="auth-input"
+                                className="textarea-auth"
                                 rows={3}
                                 disabled={isReadOnly}
                                 placeholder="Se destapó el equipo, se cambió pasta térmica..."
@@ -407,9 +406,9 @@ const TechnicalRecord = () => {
                               />
                             </div>
                             <div className="input-group">
-                              <label>Inventario de Repuestos o Piezas Reemplazadas (si aplica)</label>
+                              <label className="tr-input-label">Inventario de Repuestos o Piezas Reemplazadas (si aplica)</label>
                               <textarea
-                                className="auth-input"
+                                className="textarea-auth"
                                 rows={2}
                                 disabled={isReadOnly}
                                 placeholder="1x Memoria RAM DDR4 8GB..."

@@ -24,7 +24,7 @@ const ExpertSystem = () => {
 
   const chatBodyRef = useRef(null);
 
-  //manipulacion para que el chat siempre se mantenga al final y no de un saltito raro
+  //manipulacion para el scroll del chat
   const scrollToBottom = () => {
     if (chatBodyRef.current) {
       chatBodyRef.current.scrollTo({
@@ -48,7 +48,7 @@ const ExpertSystem = () => {
     <DashboardLayout headerTitle="Sistema Experto (Diagnósticos)">
       <div className="chat-container">
 
-        {/*Cabecera del chat */}
+        {/*cabecera del chat*/}
         <div className="chat-header">
           <div className="chat-header-icon">
             <BrainCircuit size={24} />
@@ -57,12 +57,12 @@ const ExpertSystem = () => {
             <h3>ExperBot - Asistente de Diagnóstico</h3>
             <p>Diagnóstico inteligente de equipos</p>
           </div>
-          <button onClick={resetDiagnosticSession} className="btn-chat-action" style={{ marginLeft: 'auto' }} title="Limpiar y Reiniciar">
+          <button onClick={resetDiagnosticSession} className="btn-chat-action btn-reset-chat" title="Limpiar y Reiniciar">
             <RefreshCw size={16} /> Reiniciar
           </button>
         </div>
 
-        {/* Zona Scrollable de Conversación */}
+        {/*zona para hacer scroll en el hatbot*/}
         <div className="chat-body" ref={chatBodyRef}>
           {messages.map((msg) => (
             <div key={msg.id} className={`chat-message ${msg.sender}`}>
@@ -70,18 +70,17 @@ const ExpertSystem = () => {
                 {msg.sender === 'bot' ? <BrainCircuit size={18} /> : <User size={18} />}
               </div>
 
-              <div className="message-content" style={{ display: 'flex', flexDirection: 'column' }}>
-                <div className="message-bubble" style={{ whiteSpace: 'pre-wrap' }}>
+              <div className="message-content msg-content-flex">
+                <div className="message-bubble msg-bubble-pre">
                   {msg.text}
                 </div>
 
                 {/*insercion dinamica de botones*/}
                 {msg.showOptions === 'EQUIPO' && (
-                  <div className="chat-action-buttons" style={{ flexDirection: 'column', gap: '0.6rem' }}>
+                  <div className="chat-action-buttons chat-options-column">
                     <select
-                      className="auth-select"
+                      className="auth-select chat-select-custom"
                       id="asset-dropdown"
-                      style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--color-khaki)', backgroundColor: '#fff', color: 'var(--color-olive-dark)' }}
                       defaultValue=""
                     >
                       {loadingAssets ? (
@@ -98,8 +97,7 @@ const ExpertSystem = () => {
                       )}
                     </select>
                     <button
-                      className="btn-chat-action action-yes"
-                      style={{ alignSelf: 'flex-start' }}
+                      className="btn-chat-action action-yes btn-chat-confirm"
                       onClick={() => {
                         const selector = document.getElementById('asset-dropdown');
                         if (selector.value) handleAssetSelect(selector.value);
@@ -112,11 +110,10 @@ const ExpertSystem = () => {
 
                 {/*manifestacion de falla (sintoma) seleccionable*/}
                 {msg.showOptions === 'SINTOMA' && (
-                  <div className="chat-action-buttons" style={{ flexDirection: 'column', gap: '0.6rem' }}>
+                  <div className="chat-action-buttons chat-options-column">
                     <select
-                      className="auth-select"
+                      className="auth-select chat-select-custom"
                       id="symptom-dropdown"
-                      style={{ padding: '0.6rem', borderRadius: '8px', border: '1px solid var(--color-khaki)', backgroundColor: '#fff', color: 'var(--color-olive-dark)' }}
                       defaultValue=""
                     >
                       <option value="" disabled>-- Selecciona una manifestación de falla --</option>
@@ -129,8 +126,7 @@ const ExpertSystem = () => {
                       <option value="NO_FALLA">• No veo la falla de mi equipo en esta lista</option>
                     </select>
                     <button
-                      className="btn-chat-action action-yes"
-                      style={{ alignSelf: 'flex-start' }}
+                      className="btn-chat-action action-yes btn-chat-confirm"
                       onClick={() => {
                         const selector = document.getElementById('symptom-dropdown');
                         if (selector.value) handleSymptomSelect(selector.value);

@@ -4,10 +4,11 @@ import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { AuthInput } from '../components/ui/AuthInput';
 import { useHechosManagement } from '../hooks/back_hechos_management';
 import '../assets/styles/users.css';
+import '../assets/styles/fact-management.css';
 
 const FactManagement = () => {
   const {
-    sintomas, fallas, categorias, loading, 
+    sintomas, fallas, categorias, loading,
     createCategoria, createSintomaConFalla, createFalla, descargarPrologBase
   } = useHechosManagement();
 
@@ -15,7 +16,6 @@ const FactManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [modalMode, setModalMode] = useState(null); // 'CAT', 'SINTOMA', 'FALLA'
 
-  // Form states
   const [catName, setCatName] = useState('');
   const [formData, setFormData] = useState({
     clave: '', descripcion: '', tipo_equipo: 'PC', categoria_id: '',
@@ -36,7 +36,7 @@ const FactManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let success = false;
-    
+
     if (modalMode === 'CAT') {
       success = await createCategoria(catName);
     } else if (modalMode === 'SINTOMA') {
@@ -48,13 +48,13 @@ const FactManagement = () => {
     if (success) closeModal();
   };
 
-  const filteredSintomas = sintomas.filter(s => 
-    s.clave.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredSintomas = sintomas.filter(s =>
+    s.clave.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.descripcion.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredFallas = fallas.filter(f => 
-    (f.diagnostico && f.diagnostico.toLowerCase().includes(searchTerm.toLowerCase())) || 
+  const filteredFallas = fallas.filter(f =>
+    (f.diagnostico && f.diagnostico.toLowerCase().includes(searchTerm.toLowerCase())) ||
     (f.sintoma_descripcion && f.sintoma_descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
@@ -62,39 +62,31 @@ const FactManagement = () => {
     <DashboardLayout headerTitle="Gestión de Hechos (Base de Conocimiento)">
       <div className="users-container">
 
-        {/* Tab Selector de Categoría Lógica */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid rgba(80, 75, 56, 0.1)', paddingBottom: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+        {/*menu de navegacion entre sintomas y fallas*/}
+        <div className="fm-tab-header">
+          <div className="fm-tab-group">
             <button
               onClick={() => setActiveTab('SINTOMAS')}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600',
-                backgroundColor: activeTab === 'SINTOMAS' ? 'var(--color-olive-dark)' : 'transparent',
-                color: activeTab === 'SINTOMAS' ? '#FFF' : 'var(--color-olive-dark)'
-              }}
+              className={`fm-tab-btn ${activeTab === 'SINTOMAS' ? 'active' : ''}`}
             >
               <Tag size={18} /> Diccionario de Síntomas
             </button>
             <button
               onClick={() => setActiveTab('FALLAS')}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600',
-                backgroundColor: activeTab === 'FALLAS' ? 'var(--color-olive-dark)' : 'transparent',
-                color: activeTab === 'FALLAS' ? '#FFF' : 'var(--color-olive-dark)'
-              }}
+              className={`fm-tab-btn ${activeTab === 'FALLAS' ? 'active' : ''}`}
             >
               <BrainCircuit size={18} /> Árbol de Inferencias
             </button>
           </div>
-          
-          <button onClick={descargarPrologBase} className="btn-chat-action action-yes" style={{ padding: '0.5rem 1rem', display: 'flex', gap: '0.5rem', alignItems: 'center', maxWidth: 'max-content' }}>
+
+          <button onClick={descargarPrologBase} className="btn-chat-action action-yes btn-download-prolog">
             <FileDown size={18} /> Descargar hechos.pl
           </button>
         </div>
 
-        {/* Cabecera Interactiva */}
-        <div className="users-header-actions" style={{ marginTop: '1.5rem' }}>
-          <div className="search-bar" style={{ flex: '1 1 300px' }}>
+        {/*cabecera interactiva con buscador y botones para agregar*/}
+        <div className="users-header-actions fm-header-actions-mt">
+          <div className="search-bar fm-search-bar">
             <AuthInput
               icon={Search}
               placeholder={activeTab === 'SINTOMAS' ? "Buscar por clave o descripción..." : "Buscar inferencia por diagnóstico..."}
@@ -104,20 +96,20 @@ const FactManagement = () => {
               label={false}
             />
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button className="btn-add-user" style={{ backgroundColor: '#2563eb' }} onClick={() => openModal('CAT')}>
+          <div className="fm-btn-group">
+            <button className="btn-add-user btn-add-cat" onClick={() => openModal('CAT')}>
               <Plus size={20} /> Categoría
             </button>
-            <button className="btn-add-user" style={{ backgroundColor: '#504b38' }} onClick={() => openModal('SINTOMA')}>
+            <button className="btn-add-user btn-add-sintoma" onClick={() => openModal('SINTOMA')}>
               <Plus size={20} /> Nuevo Síntoma Inicial
             </button>
-            <button className="btn-add-user" style={{ backgroundColor: '#059669' }} onClick={() => openModal('FALLA')}>
+            <button className="btn-add-user btn-add-falla" onClick={() => openModal('FALLA')}>
               <Plus size={20} /> Nueva Inferencia (Falla)
             </button>
           </div>
         </div>
 
-        {/* Tabla Robusta Condicional */}
+        {/*tabla dinamica para mostrar sintomas o fallas*/}
         <div className="table-wrapper">
           <table className="users-table">
             <thead>
@@ -140,12 +132,12 @@ const FactManagement = () => {
                   <tr key={sintoma.id}>
                     <td data-label="Clave">
                       <div className="contact-cell">
-                        <span style={{ fontWeight: '600', color: 'var(--color-olive-dark)' }}>{sintoma.clave}</span>
+                        <span className="fm-clave-text">{sintoma.clave}</span>
                       </div>
                     </td>
                     <td data-label="Descripción">
                       <div className="contact-cell">
-                        <span style={{ color: '#4b5563' }}>{sintoma.descripcion}</span>
+                        <span className="fm-desc-text">{sintoma.descripcion}</span>
                       </div>
                     </td>
                   </tr>
@@ -155,33 +147,33 @@ const FactManagement = () => {
                   <tr key={falla.id}>
                     <td data-label="Contexto">
                       <div className="contact-cell">
-                        <span className={`role-badge ${falla.tipo_equipo === 'Laptop' ? 'role-técnico' : 'role-administrador'}`} style={{ display: 'inline-block', width: 'max-content', marginBottom: '4px' }}>
+                        <span className={`role-badge fm-badge-inline ${falla.tipo_equipo === 'Laptop' ? 'role-técnico' : 'role-administrador'}`}>
                           {falla.tipo_equipo}
                         </span>
-                        <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>Cat: {falla.categoria_nombre}</span>
+                        <span className="fm-cat-label">Cat: {falla.categoria_nombre}</span>
                       </div>
                     </td>
                     <td data-label="Síntoma Raíz">
                       <div className="contact-cell">
-                        <span style={{ fontWeight: '600' }}><Tag size={14} style={{ display: 'none' }} /> {falla.sintoma_descripcion}</span>
-                        <span style={{ fontSize: '0.8rem', color: '#8b5cf6', marginTop: '4px' }}>Q: {falla.pregunta_pista}</span>
+                        <span className="fm-sintoma-title">{falla.sintoma_descripcion}</span>
+                        <span className="fm-question-text">Q: {falla.pregunta_pista}</span>
                       </div>
                     </td>
                     <td data-label="Veredicto Final">
-                      <div className="contact-cell" style={{ whiteSpace: 'normal', maxWidth: '400px' }}>
-                        <span style={{ fontWeight: '600', color: '#111827' }}>D: {falla.diagnostico}</span>
-                        <span style={{ color: '#059669', marginTop: '4px' }}>R: {falla.recomendacion}</span>
+                      <div className="contact-cell fm-verdict-cell">
+                        <span className="fm-diag-text">D: {falla.diagnostico}</span>
+                        <span className="fm-recom-text">R: {falla.recomendacion}</span>
                       </div>
                     </td>
                   </tr>
                 ))
               )}
-              
-              {/* Fallback visual vacio */}
+
+              {/*msj si no hay registros*/}
               {(activeTab === 'SINTOMAS' && filteredSintomas.length === 0) || (activeTab === 'FALLAS' && filteredFallas.length === 0) ? (
                 <tr>
-                  <td colSpan={activeTab === 'SINTOMAS' ? "2" : "3"} style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
-                    <Database size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
+                  <td colSpan={activeTab === 'SINTOMAS' ? "2" : "3"} className="fm-empty-state">
+                    <Database size={40} className="fm-empty-icon" />
                     <p>No se encontraron registros en la base de conocimientos.</p>
                   </td>
                 </tr>
@@ -190,10 +182,10 @@ const FactManagement = () => {
           </table>
         </div>
 
-        {/* MODALES MULTIPROPOSITO */}
+        {/*modales multiproposito */}
         {modalMode && (
           <div className="modal-overlay" onClick={closeModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: modalMode === 'CAT' ? '400px' : '750px' }}>
+            <div className={`modal-content ${modalMode === 'CAT' ? 'modal-content-sm' : 'modal-content-lg'}`} onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>
                   {modalMode === 'CAT' && 'Nueva Categoría de Diagnóstico'}
@@ -206,44 +198,43 @@ const FactManagement = () => {
               <form onSubmit={handleSubmit} className="modal-form">
                 <div className="modal-body">
 
-                  {/* FORM: CATEGORIA */}
+                  {/*form para categoria*/}
                   {modalMode === 'CAT' && (
                     <div className="input-group">
                       <label>Nombre de la Categoría</label>
                       <div className="input-wrapper">
                         <Tag className="input-icon" size={20} />
-                        <input 
-                          type="text" 
-                          className="auth-input" 
-                          style={{ paddingLeft: '3rem' }} 
-                          placeholder="Ej. Problemas de Pantalla" 
-                          required 
-                          value={catName} 
-                          onChange={(e) => setCatName(e.target.value)} 
+                        <input
+                          type="text"
+                          className="auth-input fm-input-padding"
+                          placeholder="Ej. Problemas de Pantalla"
+                          required
+                          value={catName}
+                          onChange={(e) => setCatName(e.target.value)}
                         />
                       </div>
                     </div>
                   )}
 
-                  {/* FORMS: SINTOMA Y FALLA COMPARTEN MUCHOS CAMPOS */}
+                  {/*forms para sintoma y falla*/}
                   {(modalMode === 'SINTOMA' || modalMode === 'FALLA') && (
                     <>
                       {modalMode === 'SINTOMA' && (
                         <>
                           <h4 className="section-divider"><Tag size={20} /> 1. Datos del Síntoma Inicial (Raíz)</h4>
                           <div className="modal-grid">
-                            <AuthInput 
-                              label="Clave Única (Prolog)" icon={BrainCircuit} 
-                              placeholder="ej. pantalla_rota (sin espacios)" required 
-                              value={formData.clave} onChange={(e) => setFormData({...formData, clave: e.target.value})} 
+                            <AuthInput
+                              label="Clave Única (Prolog)" icon={BrainCircuit}
+                              placeholder="ej. pantalla_rota (sin espacios)" required
+                              value={formData.clave} onChange={(e) => setFormData({ ...formData, clave: e.target.value })}
                             />
-                            <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                            <div className="input-group input-group-full">
                               <label>Descripción Legible para el Usuario</label>
                               <div className="input-wrapper">
-                                <textarea 
-                                  className="textarea-auth" required 
+                                <textarea
+                                  className="textarea-auth" required
                                   placeholder="Ej. La pantalla está estrellada o no enciende."
-                                  value={formData.descripcion} onChange={(e) => setFormData({...formData, descripcion: e.target.value})} 
+                                  value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                                 />
                               </div>
                             </div>
@@ -255,13 +246,13 @@ const FactManagement = () => {
 
                       {modalMode === 'FALLA' && (
                         <>
-                          <div className="input-group select-group" style={{ marginBottom: '1rem' }}>
+                          <div className="input-group select-group fm-mb-1">
                             <label>Síntoma Raíz Asociado</label>
                             <div className="input-wrapper">
                               <Tag className="input-icon" size={20} />
-                              <select 
-                                className="auth-select" required 
-                                value={formData.sintoma_id} onChange={(e) => setFormData({...formData, sintoma_id: e.target.value})}
+                              <select
+                                className="auth-select" required
+                                value={formData.sintoma_id} onChange={(e) => setFormData({ ...formData, sintoma_id: e.target.value })}
                               >
                                 <option value="">Selecciona un síntoma existente...</option>
                                 {sintomas.map(s => <option key={s.id} value={s.id}>{s.descripcion}</option>)}
@@ -276,7 +267,7 @@ const FactManagement = () => {
                           <label>Tipo de Equipo Objetivo</label>
                           <div className="input-wrapper">
                             <Laptop className="input-icon" size={20} />
-                            <select className="auth-select" value={formData.tipo_equipo} onChange={(e) => setFormData({...formData, tipo_equipo: e.target.value})}>
+                            <select className="auth-select" value={formData.tipo_equipo} onChange={(e) => setFormData({ ...formData, tipo_equipo: e.target.value })}>
                               <option value="PC">Computadora de Escritorio (PC)</option>
                               <option value="Laptop">Portátil (Laptop)</option>
                             </select>
@@ -287,45 +278,45 @@ const FactManagement = () => {
                           <label>Categoría Diagnóstica</label>
                           <div className="input-wrapper">
                             <Database className="input-icon" size={20} />
-                            <select className="auth-select" required value={formData.categoria_id} onChange={(e) => setFormData({...formData, categoria_id: e.target.value})}>
+                            <select className="auth-select" required value={formData.categoria_id} onChange={(e) => setFormData({ ...formData, categoria_id: e.target.value })}>
                               <option value="">Selecciona una categoría...</option>
                               {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
                             </select>
                           </div>
                         </div>
 
-                        <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                        <div className="input-group input-group-full">
                           <label>Pregunta Pista (Motor de Inferencia)</label>
                           <div className="input-wrapper">
                             <HelpCircle className="icon-textarea" size={20} />
-                            <textarea 
-                              className="textarea-auth textarea-with-icon" required 
+                            <textarea
+                              className="textarea-auth textarea-with-icon" required
                               placeholder="Ej. ¿Emitió algún sonido metálico antes de apagarse?"
-                              value={formData.pregunta_pista} onChange={(e) => setFormData({...formData, pregunta_pista: e.target.value})} 
+                              value={formData.pregunta_pista} onChange={(e) => setFormData({ ...formData, pregunta_pista: e.target.value })}
                             />
                           </div>
                         </div>
 
-                        <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                        <div className="input-group input-group-full">
                           <label>Diagnóstico Técnico (Veredicto)</label>
                           <div className="input-wrapper">
                             <Monitor className="icon-textarea" size={20} />
-                            <textarea 
-                              className="textarea-auth textarea-with-icon" required 
+                            <textarea
+                              className="textarea-auth textarea-with-icon" required
                               placeholder="Ej. Falla del disco duro por impacto o fatiga mecánica."
-                              value={formData.diagnostico} onChange={(e) => setFormData({...formData, diagnostico: e.target.value})} 
+                              value={formData.diagnostico} onChange={(e) => setFormData({ ...formData, diagnostico: e.target.value })}
                             />
                           </div>
                         </div>
 
-                        <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                        <div className="input-group input-group-full">
                           <label>Recomendación / Solución Estándar</label>
                           <div className="input-wrapper">
                             <CheckCircle2 className="icon-textarea" size={20} />
-                            <textarea 
-                              className="textarea-auth textarea-with-icon" required 
+                            <textarea
+                              className="textarea-auth textarea-with-icon" required
                               placeholder="Ej. Reemplazar HDD por una unidad SSD y reinstalar el sistema operativo."
-                              value={formData.recomendacion} onChange={(e) => setFormData({...formData, recomendacion: e.target.value})} 
+                              value={formData.recomendacion} onChange={(e) => setFormData({ ...formData, recomendacion: e.target.value })}
                             />
                           </div>
                         </div>

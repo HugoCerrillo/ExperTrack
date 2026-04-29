@@ -8,7 +8,7 @@ export const useAlertasManagement = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Obtener alertas, opcionalmente filtradas por estatus ('Pendiente' o 'Enviada')
+    //llamada para obtener alertas pendientes o enviadas
     const fetchAlertas = useCallback(async (estatus = null) => {
         setLoading(true);
         try {
@@ -35,7 +35,7 @@ export const useAlertasManagement = () => {
         }
     }, []);
 
-    // Crear nueva alerta
+    //llamada para crear una nueva alerta
     const createAlerta = async (alertaData) => {
         setLoading(true);
         try {
@@ -46,7 +46,7 @@ export const useAlertasManagement = () => {
                 credentials: 'include'
             });
             const data = await response.json();
-            
+
             if (response.ok && data.status === 'success') {
                 Swal.fire('¡Éxito!', 'Alerta preventiva programada correctamente.', 'success');
                 return true;
@@ -62,7 +62,7 @@ export const useAlertasManagement = () => {
         }
     };
 
-    // Editar una alerta existente
+    //llamada para actualizar una alerta existente
     const updateAlerta = async (id, alertaData) => {
         setLoading(true);
         try {
@@ -89,7 +89,7 @@ export const useAlertasManagement = () => {
         }
     };
 
-    // Eliminar una alerta (Exclusivo Administrador)
+    //llamda dparea eliminar alerta  (para el adminsitrador)
     const deleteAlerta = async (id) => {
         const result = await Swal.fire({
             title: '¿Eliminar alerta?',
@@ -128,7 +128,7 @@ export const useAlertasManagement = () => {
         return false;
     };
 
-    // Disparador manual para enviar alertas pendientes
+    //llamda para enviar manualmete alertas pendientes
     const triggerVerificacionManual = async () => {
         setLoading(true);
         try {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Bell, BellRing, CalendarClock, Send, Plus, 
-  Trash2, Edit, Monitor, User as UserIcon, RefreshCw, X, Tag, AlignLeft, Search 
+import {
+  Bell, BellRing, CalendarClock, Send, Plus,
+  Trash2, Edit, Monitor, User as UserIcon, RefreshCw, X, Tag, AlignLeft, Search
 } from 'lucide-react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { AuthInput } from '../components/ui/AuthInput';
@@ -11,11 +11,11 @@ import { useUserManagement } from '../hooks/back_user_management';
 import '../assets/styles/users.css';
 
 const AlertManagement = () => {
-  const { 
-    alertas, loading, fetchAlertas, createAlerta, 
-    updateAlerta, deleteAlerta, triggerVerificacionManual 
+  const {
+    alertas, loading, fetchAlertas, createAlerta,
+    updateAlerta, deleteAlerta, triggerVerificacionManual
   } = useAlertasManagement();
-  
+
   const { assets, fetchEquipos } = useAssetManagement();
   const { users } = useUserManagement(); // Técnicos y Administradores
 
@@ -37,13 +37,13 @@ const AlertManagement = () => {
 
   const [formData, setFormData] = useState(emptyForm);
 
-  // Cargar datos iniciales
+  //cargar datos iniciales
   useEffect(() => {
     fetchAlertas(activeTab);
     fetchEquipos();
   }, [activeTab, fetchAlertas, fetchEquipos]);
 
-  // Manejo de modales
+  //manejo de modals
   const openModal = (mode, alerta = null) => {
     setModalMode(mode);
     if (mode === 'EDIT' && alerta) {
@@ -53,7 +53,7 @@ const AlertManagement = () => {
         descripcion: alerta.descripcion,
         id_equipo: alerta.id_equipo,
         id_usuario: alerta.id_usuario,
-        // Adaptar el string de fecha (YYYY-MM-DDTHH:mm:ss -> YYYY-MM-DD)
+        //adaptar el string de fecha
         fecha_programada: alerta.fecha_programada ? alerta.fecha_programada.substring(0, 10) : ''
       });
     } else {
@@ -69,15 +69,15 @@ const AlertManagement = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.id_equipo || !formData.id_usuario) {
       Swal.fire('Atención', 'Debes seleccionar un usuario y un equipo válido.', 'warning');
       return;
     }
 
     let success = false;
-    
-    // Convertir IDs a números
+
+    //convertir ids a numeros
     const dataToSend = {
       ...formData,
       id_equipo: Number(formData.id_equipo),
@@ -106,18 +106,18 @@ const AlertManagement = () => {
   const handleTriggerManual = async () => {
     const success = await triggerVerificacionManual();
     if (success && activeTab === 'Enviada') {
-      fetchAlertas(activeTab); // Refrescar si estamos en la pestaña Enviadas
+      fetchAlertas(activeTab); // refrescamos la tabla
     } else if (success && activeTab === 'Pendiente') {
-      fetchAlertas(activeTab); // Refrescar para ver que desaparecen de pendientes
+      fetchAlertas(activeTab); // refrescamos la tabla
     }
   };
 
-  // Filtrar equipos basados en el usuario seleccionado
-  const filteredEquipos = assets.filter(a => 
+  //filtrar equipos basados en el usuario seleccionado
+  const filteredEquipos = assets.filter(a =>
     formData.id_usuario ? Number(a.id_usuario) === Number(formData.id_usuario) : true
   );
 
-  // Lógica de filtrado por búsqueda
+  //logica de filtrado por busqueda
   const filteredAlertas = alertas.filter(alerta => {
     const search = searchTerm.toLowerCase();
     return (
@@ -131,69 +131,48 @@ const AlertManagement = () => {
   return (
     <DashboardLayout headerTitle="Gestión de Alertas Preventivas">
       <div className="users-container">
-        
-        {/* Pestañas (Tabs) y Botón Manual */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', borderBottom: '1px solid rgba(80, 75, 56, 0.1)', paddingBottom: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+
+        {/*pestañas y boton manual*/}
+        <div className="alert-tabs-container">
+          <div className="alert-tabs-group">
             <button
               onClick={() => setActiveTab('Pendiente')}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600',
-                backgroundColor: activeTab === 'Pendiente' ? 'var(--color-olive-dark)' : 'transparent',
-                color: activeTab === 'Pendiente' ? '#FFF' : 'var(--color-olive-dark)'
-              }}
+              className={`alert-tab-btn ${activeTab === 'Pendiente' ? 'active' : ''}`}
             >
               <CalendarClock size={18} /> Alertas Pendientes
             </button>
             <button
               onClick={() => setActiveTab('Enviada')}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: '600',
-                backgroundColor: activeTab === 'Enviada' ? 'var(--color-olive-dark)' : 'transparent',
-                color: activeTab === 'Enviada' ? '#FFF' : 'var(--color-olive-dark)'
-              }}
+              className={`alert-tab-btn ${activeTab === 'Enviada' ? 'active' : ''}`}
             >
               <Send size={18} /> Correos Enviados
             </button>
           </div>
-          
-          <button onClick={handleTriggerManual} className="btn-chat-action action-yes" style={{ padding: '0.5rem 1rem', display: 'flex', gap: '0.5rem', alignItems: 'center', backgroundColor: '#2563eb', color: '#fff' }}>
+
+          <button onClick={handleTriggerManual} className="btn-manual-verify">
             <RefreshCw size={18} /> Forzar Verificación Ahora
           </button>
         </div>
 
-        {/* Toolbar Superior: Búsqueda y Registro */}
-        <div className="users-header-actions" style={{ marginTop: '1.5rem', justifyContent: 'space-between', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div className="search-box" style={{ flex: 1, maxWidth: '400px', position: 'relative' }}>
-            <Search 
-              size={18} 
-              style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} 
-            />
-            <input 
-              type="text" 
-              placeholder="Buscar por título, equipo o responsable..." 
+        {/*boton de busqueda y añadir alerta*/}
+        <div className="alert-toolbar">
+          <div className="alert-search-box">
+            <Search size={18} className="alert-search-icon" />
+            <input
+              type="text"
+              placeholder="Buscar por título, equipo o responsable..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.6rem 1rem 0.6rem 2.5rem',
-                borderRadius: '8px',
-                border: '1px solid rgba(80, 75, 56, 0.2)',
-                fontSize: '0.9rem',
-                outline: 'none',
-                transition: 'all 0.2s'
-              }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--color-olive-dark)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(80, 75, 56, 0.2)'}
+              className="alert-search-input"
             />
           </div>
 
-          <button className="btn-add-user" style={{ backgroundColor: '#504b38', whiteSpace: 'nowrap' }} onClick={() => openModal('ADD')}>
+          <button className="btn-add-user" onClick={() => openModal('ADD')}>
             <Plus size={20} /> Programar Nueva Alerta
           </button>
         </div>
 
-        {/* Tabla Robusta Reutilizada */}
+        {/*tabla de alertas*/}
         <div className="table-wrapper">
           <table className="users-table">
             <thead>
@@ -202,16 +181,16 @@ const AlertManagement = () => {
                 <th>Equipo Asignado</th>
                 <th>Responsable</th>
                 <th>Fecha de Envío</th>
-                {(activeTab === 'Pendiente' || isAdmin) && <th style={{ width: '120px' }}>Acciones</th>}
+                {(activeTab === 'Pendiente' || isAdmin) && <th className="th-actions">Acciones</th>}
               </tr>
             </thead>
             <tbody>
               {loading && alertas.length === 0 ? (
-                <tr><td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} style={{ textAlign: 'center', padding: '2rem' }}>Cargando alertas...</td></tr>
+                <tr><td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} className="alert-loading-cell">Cargando alertas...</td></tr>
               ) : filteredAlertas.length === 0 ? (
                 <tr>
-                  <td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
-                    <Search size={40} style={{ margin: '0 auto 1rem', opacity: 0.3 }} />
+                  <td colSpan={(activeTab === 'Pendiente' || isAdmin) ? "5" : "4"} className="alert-no-results">
+                    <Search size={40} className="alert-empty-icon" />
                     <p>{searchTerm ? `No se encontraron resultados para "${searchTerm}"` : 'No se encontraron alertas en la bandeja.'}</p>
                   </td>
                 </tr>
@@ -219,27 +198,27 @@ const AlertManagement = () => {
                 filteredAlertas.map((alerta) => (
                   <tr key={alerta.id_alerta}>
                     <td data-label="Asunto">
-                      <div className="contact-cell" style={{ whiteSpace: 'normal', maxWidth: '300px' }}>
-                        <span style={{ fontWeight: '600', color: '#111827' }}>{alerta.titulo}</span>
-                        <span style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '4px' }}>{alerta.descripcion}</span>
+                      <div className="contact-cell alert-title-cell">
+                        <span className="alert-title-text">{alerta.titulo}</span>
+                        <span className="alert-desc-text">{alerta.descripcion}</span>
                       </div>
                     </td>
                     <td data-label="Equipo">
                       <div className="contact-cell">
-                        <span style={{ fontWeight: '600', color: 'var(--color-olive-dark)' }}>{alerta.codigo_equipo}</span>
+                        <span className="alert-equipo-code">{alerta.codigo_equipo}</span>
                       </div>
                     </td>
                     <td data-label="Responsable">
                       <div className="contact-cell">
-                        <span className={`role-badge ${isAdmin ? 'role-administrador' : 'role-técnico'}`} style={{ display: 'inline-block', width: 'max-content', marginBottom: '4px' }}>
+                        <span className={`role-badge alert-resp-badge ${isAdmin ? 'role-administrador' : 'role-técnico'}`}>
                           Técnico
                         </span>
-                        <span style={{ fontSize: '0.85rem' }}>{alerta.nombre_responsable}</span>
+                        <span className="alert-resp-name">{alerta.nombre_responsable}</span>
                       </div>
                     </td>
                     <td data-label="Fecha de Envío">
                       <div className="contact-cell">
-                        <span style={{ color: activeTab === 'Enviada' ? '#059669' : '#d97706', fontWeight: '600' }}>
+                        <span className={`alert-date-text ${activeTab === 'Enviada' ? 'alert-date-sent' : 'alert-date-pending'}`}>
                           {alerta.fecha_programada ? alerta.fecha_programada.substring(0, 10) : 'S/F'}
                         </span>
                       </div>
@@ -267,10 +246,10 @@ const AlertManagement = () => {
           </table>
         </div>
 
-        {/* MODAL MULTIPROPÓSITO (ADD/EDIT) */}
+        {/*modal para añadir/editar*/}
         {modalMode && (
           <div className="modal-overlay" onClick={closeModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px' }}>
+            <div className="modal-content modal-content-md" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
                 <h3>{modalMode === 'ADD' ? 'Programar Nueva Alerta' : 'Editar Alerta Programada'}</h3>
                 <button type="button" className="btn-close-modal" onClick={closeModal}><X size={24} /></button>
@@ -279,12 +258,12 @@ const AlertManagement = () => {
               <form onSubmit={handleSubmit} className="modal-form">
                 <div className="modal-body">
                   <div className="modal-grid">
-                    
-                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
-                      <AuthInput 
-                        label="Título del Asunto" icon={Tag} 
-                        placeholder="Ej. Mantenimiento Preventivo Bimestral" required 
-                        value={formData.titulo} onChange={(e) => setFormData({...formData, titulo: e.target.value})} 
+
+                    <div className="input-group input-group-full">
+                      <AuthInput
+                        label="Título del Asunto" icon={Tag}
+                        placeholder="Ej. Mantenimiento Preventivo Bimestral" required
+                        value={formData.titulo} onChange={(e) => setFormData({ ...formData, titulo: e.target.value })}
                       />
                     </div>
 
@@ -292,12 +271,12 @@ const AlertManagement = () => {
                       <label>1. Usuario Destinatario (Dueño)</label>
                       <div className="input-wrapper">
                         <UserIcon className="input-icon" size={20} />
-                        <select 
-                          className="auth-select" 
-                          required 
-                          value={formData.id_usuario} 
+                        <select
+                          className="auth-select"
+                          required
+                          value={formData.id_usuario}
                           onChange={(e) => {
-                            setFormData({...formData, id_usuario: e.target.value, id_equipo: ''});
+                            setFormData({ ...formData, id_usuario: e.target.value, id_equipo: '' });
                           }}
                         >
                           <option value="">Selecciona al dueño del equipo...</option>
@@ -310,12 +289,12 @@ const AlertManagement = () => {
                       <label>2. Equipo de {formData.id_usuario ? users.find(u => Number(u.id) === Number(formData.id_usuario))?.nombre : 'Usuario'}</label>
                       <div className="input-wrapper">
                         <Monitor className="input-icon" size={20} />
-                        <select 
-                          className="auth-select" 
-                          required 
+                        <select
+                          className="auth-select"
+                          required
                           disabled={!formData.id_usuario}
-                          value={formData.id_equipo} 
-                          onChange={(e) => setFormData({...formData, id_equipo: e.target.value})}
+                          value={formData.id_equipo}
+                          onChange={(e) => setFormData({ ...formData, id_equipo: e.target.value })}
                         >
                           <option value="">
                             {!formData.id_usuario ? 'Selecciona primero un usuario...' : (filteredEquipos.length === 0 ? 'Este usuario no tiene equipos' : 'Selecciona un equipo...')}
@@ -329,26 +308,25 @@ const AlertManagement = () => {
                       <label>Fecha de la Actividad</label>
                       <div className="input-wrapper">
                         <CalendarClock className="input-icon" size={20} />
-                        <input 
-                          type="date" 
+                        <input
+                          type="date"
                           className="auth-select" // Reutilizamos el estilo del select para el padding
-                          style={{ fontFamily: 'inherit' }}
-                          required 
-                          value={formData.fecha_programada} 
-                          onChange={(e) => setFormData({...formData, fecha_programada: e.target.value})}
+                          required
+                          value={formData.fecha_programada}
+                          onChange={(e) => setFormData({ ...formData, fecha_programada: e.target.value })}
                         />
                       </div>
-                      <span className="section-hint" style={{ marginTop: '0.25rem' }}>* El correo se enviará 2 días antes de esta fecha.</span>
+                      <span className="section-hint section-hint-margin">* El correo se enviará 2 días antes de esta fecha.</span>
                     </div>
 
-                    <div className="input-group" style={{ gridColumn: '1 / -1' }}>
+                    <div className="input-group input-group-full">
                       <label>Cuerpo / Descripción de la Alerta</label>
                       <div className="input-wrapper">
                         <AlignLeft className="icon-textarea" size={20} />
-                        <textarea 
-                          className="textarea-auth textarea-with-icon" required 
+                        <textarea
+                          className="textarea-auth textarea-with-icon" required
                           placeholder="Instrucciones que llegarán en el cuerpo del correo..."
-                          value={formData.descripcion} onChange={(e) => setFormData({...formData, descripcion: e.target.value})} 
+                          value={formData.descripcion} onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                         />
                       </div>
                     </div>

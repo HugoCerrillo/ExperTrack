@@ -36,9 +36,10 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
     ]
   };
 
-  // Seleccionamos la configuración de acuerdo al rol, si no llega uno válido mostramos nivel bajo (Usuario Solicitante)
+  //seleccionamos de acuerdo al rol, si no es válido mostramos nivel bajo (Usuario Solicitante)
   const renderMenu = menuConfig[userRole] || menuConfig['Usuario Solicitante'];
 
+  //cerrar sesion
   const handleLogout = async () => {
     const result = await Swal.fire({
       title: '¿Cerrar Sesión?',
@@ -71,7 +72,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
 
         <div className="sidebar-menu-title">Menu Principal</div>
 
-        {/*enlaces de navegacion interna construidos dinamicamente*/}
+        {/*enlaces de navegacion interna construidos dinamicamente segun el rol*/}
         <nav className="sidebar-nav">
           {renderMenu.map((item, idx) => {
             const Icon = item.icon;
@@ -92,7 +93,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
 
         {/*cierre de sesion anclado abajo*/}
         <div className="sidebar-bottom">
-          <button className="sidebar-item" onClick={handleLogout} style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}>
+          <button className="sidebar-item btn-logout-sidebar" onClick={handleLogout}>
             <LogOut size={20} className="icon" />
             <span>Cerrar Sesión</span>
           </button>

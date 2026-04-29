@@ -84,13 +84,13 @@ const Register = () => {
           placeholder="********"
         />
 
-        <div style={{ marginTop: '0.75rem' }}>
+        <div className="mt-075">
           <AuthButton type="submit">
             Registrarse <ArrowRight size={20} />
           </AuthButton>
         </div>
 
-        <div className="register-link" style={{ marginTop: '0.25rem' }}>
+        <div className="register-link mt-025">
           <span>¿Ya tienes una cuenta? </span>
           <Link to="/">Iniciar Sesión</Link>
         </div>

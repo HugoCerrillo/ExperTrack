@@ -22,7 +22,7 @@ export const DashboardLayout = ({ children, headerTitle = "Administrador" }) => 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Extraer el rol del usuario guardado en localStorage
+  //extraer el rol del usuario guardado en localStorage
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -48,7 +48,7 @@ export const DashboardLayout = ({ children, headerTitle = "Administrador" }) => 
       <main className="dashboard-main">
         <TopHeader toggleSidebar={toggleSidebar} title={headerTitle} />
         <div className="dashboard-content">
-          {/* Aquí se inyectan las diferentes tablas/gráficas según la URL */}
+          {/*aqui se insertan las diferentes pantallas*/}
           {children}
         </div>
       </main>

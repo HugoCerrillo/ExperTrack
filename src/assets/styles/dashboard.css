@@ -8,6 +8,19 @@
   --color-olive-dark: #504B38;
 }
 
+/* Utilidades de Margen y Layout */
+.mt-025 { margin-top: 0.25rem !important; }
+.mt-05 { margin-top: 0.5rem !important; }
+.mt-075 { margin-top: 0.75rem !important; }
+.mt-1 { margin-top: 1rem !important; }
+.mt-2 { margin-top: 2rem !important; }
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* Base reset to ensure no gray bars */
 body, html {
   margin: 0;
@@ -124,6 +137,14 @@ body, html {
 .sidebar-bottom {
   padding: 1rem 0;
   border-top: 1px solid rgba(80, 75, 56, 0.1);
+}
+
+.btn-logout-sidebar {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
 }
 
 /* ----------------------------------
@@ -400,7 +421,7 @@ body, html {
     font-size: 1rem;
   }
   .dashboard-content {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   .notification-dropdown {
     width: 280px;
@@ -409,6 +430,19 @@ body, html {
   .user-dropdown {
     width: 200px; /* Ligeramente mas delgado en celulares */
     right: 0px; 
+  }
+  
+  .dash-summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .dash-charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .donut-container {
+    flex-direction: column;
+    gap: 1.5rem;
   }
 }
 
@@ -640,4 +674,63 @@ body, html {
 @keyframes loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* ==================================================
+   CLASES DE UTILIDAD PARA DASHBOARD (LIMPIEZA)
+   ================================================== */
+
+.dash-empty-text {
+  color: #6b7280;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.dash-item-pending { border-left-color: #f59e0b; }
+.dash-item-success { border-left-color: #10b981; }
+.dash-item-info { border-left-color: #3b82f6; }
+
+.status-text-sent { color: #10b981; }
+.status-text-pending { color: #f59e0b; }
+
+.dash-skeleton-summary { height: 100px; }
+.dash-skeleton-chart { height: 300px; }
+
+.dash-error-container {
+  padding: 2rem;
+  text-align: center;
+  color: #ef4444;
+}
+
+.dash-error-icon {
+  margin: 0 auto 1rem auto;
+}
+
+/* ==================================================
+   ESTILOS PARA TOPHEADER
+   ================================================== */
+.notification-wrapper, .user-menu-wrapper {
+  position: relative;
+}
+
+.notif-empty {
+  text-align: center;
+  opacity: 0.6;
+}
+
+.notif-title-bold {
+  font-weight: 600;
+}
+
+.notif-desc-small {
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.btn-logout-dropdown {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
 }

@@ -34,13 +34,13 @@ const ForgotPassword = () => {
           placeholder="example@example.com"
         />
 
-        <div style={{ marginTop: '0.5rem' }}>
+        <div className="mt-05">
           <AuthButton icon={Send}>
             Enviar enlace de recuperación
           </AuthButton>
         </div>
 
-        <div className="register-link" style={{ marginTop: '1rem' }}>
+        <div className="register-link mt-1">
           <Link to="/">&lt;- Volver al inicio de sesión</Link>
         </div>
       </form>

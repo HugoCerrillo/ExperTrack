@@ -284,6 +284,10 @@
   min-height: 0; /* Permite que el contenedor se encoja en flexbox */
 }
 
+.modal-content-md {
+  max-width: 600px;
+}
+
 /* Permitir que el form anidado herede el Flexbox para scrollear su contenido */
 .modal-form {
   display: flex;
@@ -340,6 +344,10 @@
   grid-template-columns: 1fr 1fr;
   row-gap: 1.5rem;
   column-gap: 1.5rem;
+}
+
+.input-group-full {
+  grid-column: 1 / -1;
 }
 
 /* Selectores visuales idénticos al AuthInput pero en Menu */
@@ -406,6 +414,46 @@
   .modal-footer > div, .btn-cancel {
     width: 100% !important;
     text-align: center;
+  }
+  
+  .users-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-bar {
+    width: 100%;
+  }
+  
+  .users-actions-group {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 600px) {
+  .alert-tabs-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .alert-tabs-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .alert-tab-btn {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .btn-manual-verify {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .alert-toolbar {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
@@ -526,6 +574,138 @@
   color: #9ca3af;
 }
 
+/* =========================================
+   GESTIÓN DE ALERTAS (RF-14)
+========================================== */
+.alert-tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid rgba(80, 75, 56, 0.1);
+  padding-bottom: 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.alert-tabs-group {
+  display: flex;
+  gap: 1rem;
+}
+
+.alert-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  background-color: transparent;
+  color: var(--color-olive-dark);
+}
+
+.alert-tab-btn.active {
+  background-color: var(--color-olive-dark);
+  color: #FFF;
+}
+
+.btn-manual-verify {
+  padding: 0.5rem 1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  background-color: #2563eb;
+  color: #fff;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.btn-manual-verify:hover {
+  opacity: 0.9;
+}
+
+.alert-toolbar {
+  margin-top: 1.5rem;
+  justify-content: space-between;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.alert-search-box {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+}
+
+.alert-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+.alert-search-input {
+  width: 100%;
+  padding: 0.6rem 1rem 0.6rem 2.5rem;
+  border-radius: 8px;
+  border: 1px solid rgba(80, 75, 56, 0.2);
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.alert-search-input:focus {
+  border-color: var(--color-olive-dark);
+}
+
+.alert-title-cell {
+  white-space: normal;
+  max-width: 300px;
+}
+
+.alert-title-text {
+  display: block;
+  font-weight: 600;
+  color: #111827;
+}
+
+.alert-desc-text {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.alert-date-text {
+  font-weight: 600;
+}
+
+.alert-date-sent {
+  color: #059669;
+}
+
+.alert-date-pending {
+  color: #d97706;
+}
+
+.alert-no-results {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.alert-loading-cell {
+  text-align: center;
+  padding: 2rem;
+}
+
 /* Separadores de sección en modales largos */
 .section-divider {
   display: flex;
@@ -546,3 +726,20 @@
   margin-top: -0.5rem;
   display: block;
 }
+
+.section-hint-margin {
+  margin-top: 0.25rem;
+}
+
+/* Utilidades de Margen */
+.mt-025 { margin-top: 0.25rem !important; }
+.mt-05 { margin-top: 0.5rem !important; }
+.mt-075 { margin-top: 0.75rem !important; }
+.mt-1 { margin-top: 1rem !important; }
+.mt-2 { margin-top: 2rem !important; }
+
+.th-actions { width: 120px; }
+.alert-empty-icon { margin: 0 auto 1rem; opacity: 0.3; }
+.alert-equipo-code { font-weight: 600; color: var(--color-olive-dark); }
+.alert-resp-badge { display: inline-block; width: max-content; margin-bottom: 4px; }
+.alert-resp-name { font-size: 0.85rem; }
