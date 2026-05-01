@@ -153,7 +153,7 @@ const TechDashboard = ({ data }) => {
                 <div key={alerta.id_alerta} className="dash-list-item dash-item-success">
                   <span className="item-title">{alerta.titulo}</span>
                   <div className="item-meta">
-                    <span>Estatus: <strong className={alerta.estatus === 'Enviada' ? 'status-text-sent' : 'status-text-pending'}>{alerta.estatus}</strong></span>
+                    <span>Estado: <strong className={alerta.estatus === 'Enviada' ? 'status-text-sent' : 'status-text-pending'}>{alerta.estatus}</strong></span>
                     <span>{alerta.fecha_programada.substring(0, 10)}</span>
                   </div>
                 </div>

@@ -23,7 +23,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
       { path: '/dashboard', icon: Home, label: 'Inicio', exact: true },
       { path: '/dashboard/perfil', icon: User, label: 'Mi Perfil' },
       { path: '/dashboard/activos', icon: MonitorSmartphone, label: 'Activos' },
-      { path: '/dashboard/sistema-experto', icon: BrainCircuit, label: 'Diagnostico con sistema experto' },
+      { path: '/dashboard/sistema-experto', icon: BrainCircuit, label: 'Diagnóstico con Sistema Experto' },
       { path: '/dashboard/expediente', icon: FileText, label: 'Expediente Técnico' },
       { path: '/dashboard/alertas', icon: Bell, label: 'Gestión de Alertas' },
       { path: '/dashboard/hechos', icon: Database, label: 'Gestión de Hechos (S.E)' },
@@ -70,7 +70,7 @@ export const Sidebar = ({ isOpen, closeSidebar, userRole = 'Técnico' }) => {
           <span className="sidebar-brand">ExperTrack</span>
         </div>
 
-        <div className="sidebar-menu-title">Menu Principal</div>
+        <div className="sidebar-menu-title">Menú Principal</div>
 
         {/*enlaces de navegacion interna construidos dinamicamente segun el rol*/}
         <nav className="sidebar-nav">

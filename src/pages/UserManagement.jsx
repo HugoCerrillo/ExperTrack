@@ -141,7 +141,7 @@ const UserManagement = () => {
                 <th>Usuario (Nombre e Info Básica)</th>
                 <th>Privilegios (Rol)</th>
                 <th>Medios de Contacto</th>
-                <th>Estatus del Perfil</th>
+                <th>Estado del Perfil</th>
                 <th>Acciones Rápidas</th>
               </tr>
             </thead>
@@ -166,7 +166,7 @@ const UserManagement = () => {
                   </td>
 
                   {/*columna rol*/}
-                  <td data-label="Rol del Sistema">
+                  <td data-label="Rol de Usuario">
                     <span className={`role-badge role-${user.rol.split(' ')[0].toLowerCase()}`}>
                       {getRoleIcon(user.rol)}
                       {user.rol}
@@ -250,7 +250,7 @@ const UserManagement = () => {
                       maxLength="50" required={false} />
 
                     <div className="input-group select-group">
-                      <label>Rol del Sistema</label>
+                      <label>Rol de Usuario</label>
                       <div className="input-wrapper">
                         <Shield className="input-icon" size={20} />
                         <select className="auth-select" value={editingUser.rol}
@@ -280,7 +280,7 @@ const UserManagement = () => {
                       placeholder="Déjala en blanco para NO cambiarla" />
 
                     <div className="input-group select-group">
-                      <label>Estatus</label>
+                      <label>Estado</label>
                       <div className="input-wrapper">
                         <UserCheck className="input-icon" size={20} />
                         <select className="auth-select"
@@ -342,7 +342,7 @@ const UserManagement = () => {
                       maxLength="50" required={false} />
 
                     <div className="input-group select-group">
-                      <label>Rol del Sistema</label>
+                      <label>Rol de Usuario</label>
                       <div className="input-wrapper">
                         <Shield className="input-icon" size={20} />
                         <select className="auth-select" value={newUser.rol}
@@ -371,7 +371,7 @@ const UserManagement = () => {
                       placeholder="Asigna una contraseña inicial..." />
 
                     <div className="input-group select-group">
-                      <label>Estatus</label>
+                      <label>Estado</label>
                       <div className="input-wrapper">
                         <UserCheck className="input-icon" size={20} />
                         <select className="auth-select"

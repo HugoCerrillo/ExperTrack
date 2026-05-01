@@ -208,7 +208,7 @@ const AssetManagement = () => {
                 <th>Tipo</th>
                 <th>Asignación y Ubicación</th>
                 <th>Especificaciones (Actuales)</th>
-                <th>Estatus Operativo</th>
+                <th>Estado Operativo</th>
                 <th>Acciones</th>
               </tr>
             </thead>
@@ -313,7 +313,7 @@ const AssetManagement = () => {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
 
               <div className="modal-header">
-                <h3>{modalMode === 'ADD' ? 'Registrar Nuevo Equipo de Cómputo' : `Ficha Técnica Técnica: ${currentAsset.codigo_inventario}`}</h3>
+                <h3>{modalMode === 'ADD' ? 'Registrar Nuevo Equipo de Cómputo' : `Ficha Técnica: ${currentAsset.codigo_inventario}`}</h3>
                 <button type="button" className="btn-close-modal" onClick={closeModal}>
                   <X size={24} />
                 </button>
@@ -372,7 +372,7 @@ const AssetManagement = () => {
                     <AuthInput label="Ubicación Física Exacta" icon={MapPin} value={currentAsset.ubicacion} onChange={(e) => setCurrentAsset({ ...currentAsset, ubicacion: e.target.value })} placeholder="Piso 2, Cubículo 4" />
 
                     <div className="input-group select-group">
-                      <label>Estatus del Hardware</label>
+                      <label>Estado del Hardware</label>
                       <div className="input-wrapper">
                         <ShieldCheck className="input-icon" size={20} />
                         <select className="auth-select" value={currentAsset.estado_operativo} onChange={(e) => setCurrentAsset({ ...currentAsset, estado_operativo: e.target.value })}>

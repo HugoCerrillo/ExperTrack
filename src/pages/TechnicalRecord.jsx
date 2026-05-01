@@ -84,7 +84,7 @@ const TechnicalRecord = () => {
     const success = await updateEvento(currentEvent.id_evento, { validado: true });
 
     if (success) {
-      Swal.fire({ icon: 'success', title: 'Evento Cerrado', text: 'El equipo ha recuperado su estatus Operativo.' });
+      Swal.fire({ icon: 'success', title: 'Evento Cerrado', text: 'El equipo ha recuperado su estado Operativo.' });
       closeModal();
       fetchExpediente();
     }
@@ -175,7 +175,7 @@ const TechnicalRecord = () => {
               <tr>
                 <th>Folio Evento</th>
                 <th>Datos del Equipo</th>
-                <th>Estatus / Fases</th>
+                <th>Estado / Fases</th>
                 <th>Asignación</th>
                 <th>Acciones</th>
               </tr>
@@ -214,11 +214,11 @@ const TechnicalRecord = () => {
                       <span className="specs-text">Equipo #{r.id_equipo} (No desc)</span>
                     )}
                   </td>
-                  <td data-label="Estatus">
+                  <td data-label="Estado">
                     <div className="tr-status-col">
                       <div className={`status-badge ${r.validado ? 'tr-badge-validated' : 'tr-badge-pending'}`}>
                         {r.validado ? <CheckCircle2 size={12} /> : <AlertCircle size={12} />}
-                        {r.validado ? 'Validado y Cerrado' : 'Abierto (Pediente)'}
+                        {r.validado ? 'Validado y Cerrado' : 'Abierto (Pendiente)'}
                       </div>
                       <div className="tr-status-badges-row">
                         <div className={`status-badge ${r.diagnostico ? 'tr-badge-diag-active' : 'tr-badge-diag-inactive'}`} title={r.diagnostico ? 'Diagnóstico Anexado' : 'Sin Diagnóstico'}>

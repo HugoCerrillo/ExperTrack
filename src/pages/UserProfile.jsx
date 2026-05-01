@@ -130,7 +130,7 @@ const UserProfile = () => {
               />
 
               <AuthInput
-                label="Teléfono Móvil"
+                label="Teléfono Celular"
                 icon={Phone}
                 type="tel"
                 name="telefono"
