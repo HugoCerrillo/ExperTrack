@@ -146,8 +146,8 @@ const TechnicalRecord = () => {
     }
   };
 
-  //si el evento esta validado, es solo lectura
-  const isReadOnly = currentEvent?.validado === true;
+  //si el evento esta validado, es solo lectura (a menos que sea Administrador)
+  const isReadOnly = currentEvent?.validado === true && !isAdmin;
 
   return (
     <DashboardLayout headerTitle="Expediente Técnico">
