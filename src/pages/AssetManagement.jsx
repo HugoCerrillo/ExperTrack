@@ -282,9 +282,11 @@ const AssetManagement = () => {
                       <button className="btn-icon btn-pdf" title="Generar Expediente PDF" onClick={() => descargarExpedientePdf(asset.id_equipo, asset.codigo_inventario)}>
                         <FileText size={18} />
                       </button>
-                      <button className="btn-icon btn-edit" title="Ver / Editar Ficha" onClick={() => openModal('EDIT', asset)}>
-                        <Edit size={18} />
-                      </button>
+                      {!isSolicitante && (
+                        <button className="btn-icon btn-edit" title="Ver / Editar Ficha" onClick={() => openModal('EDIT', asset)}>
+                          <Edit size={18} />
+                        </button>
+                      )}
                       {isAdmin && (
                         <button className="btn-icon btn-delete" title="Retirar Activo" onClick={() => handleDelete(asset.id_equipo)}>
                           <Trash2 size={18} />
