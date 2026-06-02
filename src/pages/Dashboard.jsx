@@ -95,7 +95,7 @@ const AdminDashboard = ({ data }) => {
 
         {/* Índice de Proactividad */}
         <div className="dash-panel">
-          <h3><BellRing size={20} /> Índice de Proactividad Técnica</h3>
+          <h3><BellRing size={20} /> Indicador de Proactividad Técnica</h3>
           <div className="donut-container">
             <div className="donut-stat">
               <div className="donut-circle circle-total">{indice_proactividad.total_alertas}</div>
