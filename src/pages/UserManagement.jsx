@@ -237,16 +237,19 @@ const UserManagement = () => {
                     <AuthInput label="Nombre(s)" icon={User} name="nombre"
                       value={editingUser.nombre}
                       onChange={(e) => setEditingUser({ ...editingUser, nombre: e.target.value })}
+                      placeholder="Ingresa el nombre(s)"
                       maxLength="50" />
 
                     <AuthInput label="Apellido Paterno" icon={User} name="apellidoPaterno"
                       value={editingUser.apellidoPaterno}
                       onChange={(e) => setEditingUser({ ...editingUser, apellidoPaterno: e.target.value })}
+                      placeholder="Primer apellido"
                       maxLength="50" />
 
                     <AuthInput label="Apellido Materno" icon={User} name="apellidoMaterno"
                       value={editingUser.apellidoMaterno}
                       onChange={(e) => setEditingUser({ ...editingUser, apellidoMaterno: e.target.value })}
+                      placeholder="Segundo apellido (Opcional)"
                       maxLength="50" required={false} />
 
                     <div className="input-group select-group">
@@ -267,11 +270,13 @@ const UserManagement = () => {
                       onChange={(e) => {
                         const rawValue = e.target.value.replace(/[^0-9]/g, '');
                         if (rawValue.length <= 10) setEditingUser({ ...editingUser, telefono: rawValue });
-                      }} />
+                      }}
+                      placeholder="10 dígitos" />
 
                     <AuthInput label="Correo Electrónico" type="email" icon={Mail} name="correo"
                       value={editingUser.correo}
-                      onChange={(e) => setEditingUser({ ...editingUser, correo: e.target.value })} />
+                      onChange={(e) => setEditingUser({ ...editingUser, correo: e.target.value })}
+                      placeholder="usuario@correo.com" />
 
                     <AuthInput label="Contraseña" type="password" icon={Lock} name="contrasena"
                       value={editingUser.contrasena}
@@ -329,16 +334,19 @@ const UserManagement = () => {
                     <AuthInput label="Nombre(s)" icon={User} name="nombre"
                       value={newUser.nombre}
                       onChange={(e) => setNewUser({ ...newUser, nombre: e.target.value })}
+                      placeholder="Ingresa el nombre(s)"
                       maxLength="50" />
 
                     <AuthInput label="Apellido Paterno" icon={User} name="apellidoPaterno"
                       value={newUser.apellidoPaterno}
                       onChange={(e) => setNewUser({ ...newUser, apellidoPaterno: e.target.value })}
+                      placeholder="Primer apellido"
                       maxLength="50" />
 
                     <AuthInput label="Apellido Materno" icon={User} name="apellidoMaterno"
                       value={newUser.apellidoMaterno}
                       onChange={(e) => setNewUser({ ...newUser, apellidoMaterno: e.target.value })}
+                      placeholder="Segundo apellido (Opcional)"
                       maxLength="50" required={false} />
 
                     <div className="input-group select-group">
@@ -359,11 +367,13 @@ const UserManagement = () => {
                       onChange={(e) => {
                         const rawValue = e.target.value.replace(/[^0-9]/g, '');
                         if (rawValue.length <= 10) setNewUser({ ...newUser, telefono: rawValue });
-                      }} />
+                      }}
+                      placeholder="10 dígitos" />
 
                     <AuthInput label="Correo Electrónico" type="email" icon={Mail} name="correo"
                       value={newUser.correo}
-                      onChange={(e) => setNewUser({ ...newUser, correo: e.target.value })} />
+                      onChange={(e) => setNewUser({ ...newUser, correo: e.target.value })}
+                      placeholder="usuario@correo.com" />
 
                     <AuthInput label="Contraseña de Acceso" type="password" icon={Lock} name="contrasena"
                       value={newUser.contrasena}
