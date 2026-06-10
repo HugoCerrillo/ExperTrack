@@ -34,6 +34,12 @@
   display: none; /* No necesitamos etiqueta en la barra de búsqueda superior */
 }
 
+.users-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .btn-add-user {
   display: flex;
   align-items: center;
