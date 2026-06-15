@@ -389,18 +389,7 @@ export const useExpertSystem = () => {
 
   //reset del ciclo
   const resetDiagnosticSession = () => {
-    setSintomasValidos([]); //limpiamos la lista de opciones
-    setSessionData({
-      id_equipo: null, equipo_codigo: null, tipo: null, sintoma: null,
-      sintoma_nombre: null, historial: [], resultado_prolog: "", descripcion_usuario: ""
-    });
-    setChatState('ASKING_TIPO');
-    setCurrentPrologQuestion(null);
-    setMessages([{
-      id: 1, sender: 'bot', text: '¡Sesión Limpia! Selecciona el equipo a diagnosticar:',
-      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      showOptions: 'EQUIPO'
-    }]);
+    window.location.reload();
   };
 
   return {
