@@ -43,9 +43,9 @@ export function useEventsManagement() {
 
       //2. realizamos la union de los datos de los eventos, diagnosticos, mantenimientos y equipos
       const joinedRecords = eventosList.map(evento => {
-        const myDiag = diagList.find(d => Number(d.id_evento) === Number(evento.id_evento)) || null;
-        const myMant = mantList.find(m => Number(m.id_evento) === Number(evento.id_evento)) || null;
-        const myEq = equiposList.find(e => Number(e.id_equipo) === Number(evento.id_equipo)) || null;
+        const myDiag = diagList.find(d => d.id_evento === evento.id_evento) || null;
+        const myMant = mantList.find(m => m.id_evento === evento.id_evento) || null;
+        const myEq = equiposList.find(e => e.id_equipo === evento.id_equipo) || null;
 
         return {
           ...evento,
