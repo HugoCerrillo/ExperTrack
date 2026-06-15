@@ -101,36 +101,50 @@ const TechnicalRecord = () => {
       //si es admin puede editar el evento
       //si es tecnico solo puede validar
       if (isAdmin) {
-        await updateEvento(currentEvent.id_evento, {
+        const evSuccess = await updateEvento(currentEvent.id_evento, {
           falla_reportada: currentEvent.falla_reportada,
           estado_fisico: currentEvent.estado_fisico
         });
+        if (!evSuccess) {
+          setIsSaving(false);
+          return;
+        }
       }
 
       //guardamos el diagnostico
       if (currentEvent.diagnostico) {
+        let diagSuccess = false;
         //si es nuevo se crea, si no se actualiza
         if (currentEvent.diagnostico.es_nuevo) {
-          await createDiagnostico({ ...currentEvent.diagnostico, id_evento: currentEvent.id_evento });
+          diagSuccess = await createDiagnostico({ ...currentEvent.diagnostico, id_evento: currentEvent.id_evento });
         } else {
-          await updateDiagnostico(currentEvent.id_evento, {
+          diagSuccess = await updateDiagnostico(currentEvent.id_evento, {
             resultado_preeliminar: currentEvent.diagnostico.resultado_preeliminar,
             validacion_tecnico: currentEvent.diagnostico.validacion_tecnico
           });
+        }
+        if (!diagSuccess) {
+          setIsSaving(false);
+          return;
         }
       }
 
       //guardamos el mantenimiento
       if (currentEvent.mantenimiento) {
+        let mantSuccess = false;
         if (currentEvent.mantenimiento.es_nuevo) {
-          await createMantenimiento({ ...currentEvent.mantenimiento, id_evento: currentEvent.id_evento });
+          mantSuccess = await createMantenimiento({ ...currentEvent.mantenimiento, id_evento: currentEvent.id_evento });
         } else {
-          await updateMantenimiento(currentEvent.id_evento, {
+          mantSuccess = await updateMantenimiento(currentEvent.id_evento, {
             tipo: currentEvent.mantenimiento.tipo,
             descripcion_trabajo: currentEvent.mantenimiento.descripcion_trabajo,
             piezas_reemplazadas: currentEvent.mantenimiento.piezas_reemplazadas,
             fecha_entrega: currentEvent.mantenimiento.fecha_entrega
           });
+        }
+        if (!mantSuccess) {
+          setIsSaving(false);
+          return;
         }
       }
 
@@ -423,7 +437,7 @@ const TechnicalRecord = () => {
                           <Wrench size={40} className="tr-no-data-icon" />
                           <h4 className="tr-no-data-title">Sin Actividades de Mantenimiento</h4>
                           <p className="tr-tab-desc">No se han documentado intervenciones definitivas para este Evento aún.</p>
-                          {isTecnico && !isReadOnly && (
+                          {(isTecnico || isAdmin) && !isReadOnly && (
                             <button type="button" className="btn-chat-action action-yes" onClick={() => setCurrentEvent({ ...currentEvent, mantenimiento: { es_nuevo: true, tipo: 'Correctivo', descripcion_trabajo: '', piezas_reemplazadas: '', fecha_entrega: '' } })}>
                               + Asentar Nuevo Mantenimiento
                             </button>
