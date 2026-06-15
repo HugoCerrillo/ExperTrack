@@ -15,6 +15,10 @@
   grid-column: 1 / -1; /* Atraviesa toda la grid */
 }
 
+.modal-body > .section-divider:first-child {
+  margin-top: 0;
+}
+
 /* Tarjetas Sub-internas para Periféricos Embebidos */
 .peripheral-card {
   background-color: #fafafa;
