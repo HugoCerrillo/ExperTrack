@@ -300,7 +300,6 @@ const TechnicalRecord = () => {
                             className="textarea-auth"
                             rows={2}
                             value={currentEvent.estado_fisico}
-                            disabled={isReadOnly || !isAdmin}
                             placeholder="Abonado por el técnico de recepción inicial..."
                             onChange={(e) => setCurrentEvent({ ...currentEvent, estado_fisico: e.target.value })}
                           />
