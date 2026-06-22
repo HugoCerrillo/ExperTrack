@@ -34,8 +34,6 @@ export function useEventsManagement() {
       if (dataEventos.status !== 'success') {
         throw new Error(dataEventos.message || 'Error cargando eventos');
       }
-      //mostrar en consola los mantenimientos obteneidos (verificar respuesta del backend      
-      console.log(dataMant);
 
       //obtener los datos de los eventos, diagnosticos, mantenimientos y equipos
       const eventosList = dataEventos.eventos || [];
