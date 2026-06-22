@@ -379,7 +379,7 @@ const AssetManagement = () => {
                         <ShieldCheck className="input-icon" size={20} />
                         <select className="auth-select" value={currentAsset.estado_operativo} onChange={(e) => setCurrentAsset({ ...currentAsset, estado_operativo: e.target.value })}>
                           <option value="Operativo">100% Operativo</option>
-                          <option value="En Reparacion">En Reparación Correctiva</option>
+                          <option value="En Mantenimiento">En Reparación Correctiva</option>
                           <option value="Baja">Dado de Baja</option>
                         </select>
                       </div>
